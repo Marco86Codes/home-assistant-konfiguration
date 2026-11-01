@@ -10,6 +10,32 @@ Dieses Repository dokumentiert den Aufbau meines Smart Homes mit Home Assistant.
 - **Plattform:** Generic x86-64
 - **Hardware:** Lenovo ThinkCentre M715q Gen 2
 
+## Dokumentation
+
+### Grundlagen
+
+- [Backups](grundlagen/backups.md) – Backup-Strategie und Aufbewahrung der Home-Assistant-Backups
+
+### Apps
+
+- [Samba share](apps/samba-share.md) – Bereitstellung des Backup-Verzeichnisses im lokalen Netzwerk
+
+### Externe Systeme
+
+- [Windows-Backup-Synchronisation](externe-systeme/windows/backup-synchronisation.md) – automatische Übertragung der Backups auf einen Windows-PC und Synchronisierung mit Proton Drive
+- [DHCP-Zuweisungen in der Freebox](externe-systeme/freebox/dhcp-zuweisungen.md) – feste DHCP-Zuweisungen für die beteiligten Netzwerkgeräte
+
+## Skripte und Konfigurationen
+
+### Windows
+
+- [PowerShell-Skript](skripte/windows/home-assistant-backup.ps1) – führt die Windows-Backup-Synchronisation aus
+- [Beispielkonfiguration](skripte/windows/config.example.ps1) – Vorlage für die lokale Konfiguration des PowerShell-Skripts
+
+### Home Assistant
+
+- [Automation zur Aktualisierung des Windows-Sicherungszeitstempels](skripte/home-assistant/automationen/aktualisierung-windows-sicherung-zeitstempel.yaml) – aktualisiert den Zeitpunkt der letzten erfolgreichen Windows-Sicherung
+
 ## Dokumentationsprinzip
 
 Die Dokumentation bildet die tatsächlich eingesetzte Home-Assistant-Konfiguration ab.
