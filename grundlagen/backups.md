@@ -67,12 +67,14 @@ Verwendete Einstellungen:
 | --- | --- |
 | Zeitplan | Täglich |
 | Uhrzeit | Systemoptimum |
+| Backup-Präferenz bei App-Updates | Backup vor dem Update |
 | Aufbewahrung | Benutzerdefiniert |
 | Maximal aufbewahren | 10 Backups |
 | Home-Assistant-Einstellungen | Enthalten |
 | Verlauf | Enthalten |
 | Medien | Enthalten |
 | Share-Ordner | Enthalten |
+
 
 Die Backups werden lokal auf dem Home-Assistant-System gespeichert.
 
