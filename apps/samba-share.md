@@ -12,10 +12,6 @@ Freigegeben wird nur `backup`.
 
 Andere Home-Assistant-Verzeichnisse werden nicht über Samba bereitgestellt.
 
-Der Windows-PC greift direkt über die lokale IPv4-Adresse von Home Assistant auf die Freigabe `\\<HOME-ASSISTANT-IP>\backup` zu.
-
-Eine dauerhaft eingebundene Netzwerkfreigabe beziehungsweise ein Netzlaufwerk wird dafür nicht benötigt.
-
 ## Installation
 
 Verwendet wird die offizielle Home-Assistant-App **Samba share**.
@@ -32,7 +28,9 @@ Automatische Updates sind deaktiviert, damit Aktualisierungen bewusst durchgefü
 
 ## Konfiguration
 
-Für Samba share wird ein eigenes Benutzerkonto verwendet.
+Benutzername und Passwort für den Zugriff auf die Freigabe werden direkt in der Konfiguration von **Samba share** festgelegt.
+
+Verwendete Konfiguration:
 
 | Einstellung | Konfiguration |
 | --- | --- |
@@ -60,24 +58,6 @@ Zugelassen sind ausschließlich die lokalen IPv4-Adressen der Netzwerkverbindung
 Da der PC sowohl über LAN als auch über WLAN mit dem lokalen Netzwerk verbunden werden kann, sind beide dafür vorgesehenen Adressen freigegeben.
 
 Für die beteiligten Geräte werden in der Freebox feste DHCP-Zuweisungen verwendet. Dadurch bleiben die für die Zugriffsbeschränkung verwendeten lokalen Adressen konstant.
-
-## Windows-Anmeldeinformationen
-
-Die Zugangsdaten für Samba share werden im **Windows-Anmeldeinformationsmanager** gespeichert.
-
-Als Netzwerkadresse wird die lokale IPv4-Adresse von Home Assistant verwendet.
-
-Der dazugehörige Samba-Benutzername sowie das zugehörige Samba-Passwort werden ebenfalls im Windows-Anmeldeinformationsmanager gespeichert.
-
-Dadurch kann Windows auf die Samba-Freigabe zugreifen, ohne dass Benutzername oder Passwort im PowerShell-Skript hinterlegt werden müssen.
-
-## Zugriff über die IP-Adresse
-
-Für die automatisierte Sicherung wird bewusst die lokale IPv4-Adresse von Home Assistant verwendet.
-
-Der Zugriff über den Hostnamen `\\homeassistant` funktionierte in der verwendeten Netzwerkkonfiguration nicht zuverlässig beziehungsweise nicht wie erwartet.
-
-Die konkrete Ursache wurde nicht weiter untersucht, da der Zugriff über die feste lokale IPv4-Adresse zuverlässig funktioniert und die Adresse über eine feste DHCP-Zuweisung in der Freebox konstant gehalten wird.
 
 ## Nützliche Links & Quellen
 
