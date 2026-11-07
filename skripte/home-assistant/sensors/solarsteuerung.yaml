@@ -171,6 +171,7 @@ template:
       # ZENDURE 2 – MAXIMALE AC-LEISTUNG
       # ------------------------------------------------------
       - name: "Zendure 2 maximale AC Leistung"
+        unique_id: zendure_2_maximale_ac_leistung
         unit_of_measurement: "W"
         device_class: power
         state_class: measurement
@@ -212,7 +213,7 @@ template:
       # ------------------------------------------------------
       # ZENDURE 2 – PV-LEISTUNG
       # ------------------------------------------------------
-      - name: "ZENDURE 2 PV Leistung"
+      - name: "Zendure 2 PV Leistung"
         unique_id: zendure_2_pv_leistung
         unit_of_measurement: "W"
         device_class: power
