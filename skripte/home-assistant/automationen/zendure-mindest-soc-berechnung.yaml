@@ -1,0 +1,82 @@
+alias: Zendure Mindest-SoC Berechnung
+description: >-
+  Berechnet zu diversen Zeiten den neuen Mindest-SoC beider Zendure anhand der
+  Bewölkungsprognose und aktualisiert den Zeitpunkt der letzten erfolgreichen
+  Berechnung.
+triggers:
+  - trigger: sun.sunrise
+    id: Sonnenaufgang
+    options:
+      offset:
+        days: 0
+        hours: 0
+        minutes: 0
+        seconds: 0
+  - trigger: time
+    at: '12:00:00'
+    id: Mittag
+  - trigger: sun.sunset
+    id: Sonnenuntergang-2h
+    options:
+      offset: '-02:00:00'
+conditions: []
+actions:
+  - action: weather.get_forecasts
+    target:
+      entity_id: weather.forecast_home
+    data:
+      type: hourly
+    response_variable: stündlicher_forecast
+  - variables:
+      ziel_zeit: |
+        {% if trigger.id == 'Sonnenuntergang-2h' %}
+          {{ (now() + timedelta(days=1)).replace(hour=12, minute=0, second=0).strftime('%Y-%m-%dT%H') }}
+        {% else %}
+          {{ now().replace(hour=12, minute=0, second=0).strftime('%Y-%m-%dT%H') }}
+        {% endif %}
+      wolkenanteil: >
+        {% set info = stündlicher_forecast['weather.forecast_home'].forecast %}
+        {% set treffer = info | selectattr('datetime', 'search', ziel_zeit) |
+        map(attribute='cloud_coverage') | list %} {{ treffer[0] if treffer |
+        length > 0 else -1 }}
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: '{{ wolkenanteil | float(0) < 0 }}'
+        sequence:
+          - stop: Keine Wettervorhersage für den gewünschten Zeitpunkt verfügbar
+      - conditions:
+          - condition: template
+            value_template: '{{ wolkenanteil | float(0) > 75 }}'
+        sequence:
+          - action: input_number.set_value
+            target:
+              entity_id:
+                - input_number.zendure_1_neuer_min_soc
+                - input_number.zendure_2_neuer_min_soc
+            data:
+              value: 15
+          - action: input_datetime.set_datetime
+            target:
+              entity_id: input_datetime.zendure_letzte_min_soc_berechnung
+            data:
+              timestamp: '{{ now().timestamp() }}'
+    default:
+      - action: input_number.set_value
+        target:
+          entity_id:
+            - input_number.zendure_1_neuer_min_soc
+            - input_number.zendure_2_neuer_min_soc
+        data:
+          value: 10
+      - action: input_datetime.set_datetime
+        target:
+          entity_id: input_datetime.zendure_letzte_min_soc_berechnung
+        data:
+          timestamp: '{{ now().timestamp() }}'
+  - action: automation.turn_on
+    metadata: {}
+    target:
+      entity_id: automation.zendure_ubernahme_neue_mindest_soc
+    data: {}
+mode: single

@@ -122,9 +122,9 @@ Home Assistant
 
 ## 🔗 Verwendung & Verknüpfungen
 
+- [Hardware & Geräte](../hardware.md) – Übersicht der eingesetzten Geräte und ihrer Einbindungsart
 - [Mosquitto broker](mosquitto-broker.md) – stellt den verwendeten MQTT-Broker bereit
 - [MQTT](mqtt.md) – Home-Assistant-Integration für die MQTT-Kommunikation
-- [Hardware & Geräte](../hardware.md) – Übersicht der eingesetzten Geräte und ihrer Einbindungsart
 
 ---
 

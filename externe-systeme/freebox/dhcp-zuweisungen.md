@@ -32,6 +32,7 @@ Konkrete lokale IP-Adressen werden nicht im Repository dokumentiert, da sie auss
 
 - [Samba share](../../apps/samba-share.md) – verwendet die festen lokalen Adressen des Windows-PCs für die Zugriffsbeschränkung
 - [Windows-Backup-Synchronisation](../windows/backup-synchronisation.md) – verwendet die feste lokale Adresse von Home Assistant für den Zugriff auf die Backup-Freigabe
+- [Zendure](../../apps/zendure.md) – die feste lokale Adresse von Home Assistant für den Zugriff über MQTT
 
 ---
 

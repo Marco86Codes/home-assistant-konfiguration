@@ -66,8 +66,8 @@ Für die beteiligten Geräte werden in der Freebox feste DHCP-Zuweisungen verwen
 ## 🔗 Verwendung & Verknüpfungen
 
 - [Backups](../grundlagen/backups.md) – übergeordnete Backup-Strategie
-- [Windows-Backup-Synchronisation](../externe-systeme/windows/backup-synchronisation.md) – automatisierter Abruf der bereitgestellten Backups
 - [DHCP-Zuweisungen in der Freebox](../externe-systeme/freebox/dhcp-zuweisungen.md) – feste lokale Adressen für die Zugriffsbeschränkung
+- [Windows-Backup-Synchronisation](../externe-systeme/windows/backup-synchronisation.md) – automatisierter Abruf der bereitgestellten Backups
 
 ---
 

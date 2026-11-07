@@ -1,3 +1,4 @@
+
 # Home Assistant Konfiguration
 
 Dokumentation und Konfiguration meiner persönlichen Home-Assistant-Installation.
@@ -16,12 +17,16 @@ Dieses Repository dokumentiert den Aufbau meines Smart Homes mit Home Assistant.
 ### Grundlagen
 
 - [Backups](grundlagen/backups.md) – Backup-Strategie und Aufbewahrung der Home-Assistant-Backups
+- [Solarsteuerung](grundlagen/solarsteuerung.md) – Dynamische AC-Leistungsregelung mit zwei Zendure SolarFlow 800 Plus, wetterabhängiger Mindest-SoC-Steuerung und automatischer Leistungsverteilung
 
 ### Apps & Integrationen
 
 - [Mosquitto broker](apps/mosquitto-broker.md) – MQTT-Broker für die Kommunikation zwischen MQTT-Komponenten
 - [MQTT](apps/mqtt.md) – Home-Assistant-Integration für die MQTT-Kommunikation
 - [Samba share](apps/samba-share.md) – Bereitstellung des Backup-Verzeichnisses im lokalen Netzwerk
+- [Shelly](apps/shelly.md) – Einbindung des Shelly 3EM zur Messung der Netzleistung
+- [Studio Code Server](apps/studio-code-server.md) – Bearbeitung der Home-Assistant-Konfiguration über einen integrierten Code-Editor
+- [Zendure](apps/zendure.md) – Einbindung der SolarFlow 800 Plus mit lokaler MQTT-Kommunikation
 - [Zigbee2MQTT](apps/zigbee2mqtt.md) – Einbindung von Zigbee-Geräten über MQTT
 
 ### Externe Systeme
@@ -33,7 +38,16 @@ Dieses Repository dokumentiert den Aufbau meines Smart Homes mit Home Assistant.
 
 ### Home Assistant
 
-- [Automation zur Aktualisierung des Windows-Sicherungszeitstempels](skripte/home-assistant/automationen/aktualisierung-windows-sicherung-zeitstempel.yaml) – aktualisiert den Zeitpunkt der letzten erfolgreichen Windows-Sicherung
+**Automationen**
+
+- [Aktualisierung des Windows-Sicherungszeitstempels](skripte/home-assistant/automationen/aktualisierung-windows-sicherung-zeitstempel.yaml) – aktualisiert den Zeitpunkt der letzten erfolgreichen Windows-Sicherung
+- [Zendure Leistungsanpassung](skripte/home-assistant/automationen/zendure-leistungsanpassung.yaml) – überträgt die berechneten AC-Sollwerte an beide Wechselrichter
+- [Zendure Mindest-SoC Berechnung](skripte/home-assistant/automationen/zendure-mindest-soc-berechnung.yaml) – berechnet die geplanten Mindest-SoC-Werte anhand der Wetterprognose
+- [Zendure Mindest-SoC Übernahme](skripte/home-assistant/automationen/zendure-mindest-soc-uebernahme.yaml) – überträgt die geplanten Mindest-SoC-Werte unter Berücksichtigung der Batterieladestände
+
+**Sensoren**
+
+- [Solarsteuerung](skripte/home-assistant/sensors/solarsteuerung.yaml) – Template-Sensoren für Netzleistung, Hausverbrauch, PV-Leistung, Batteriefreigabe und dynamische AC-Leistungsverteilung
 
 ### Windows
 

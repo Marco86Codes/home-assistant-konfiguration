@@ -313,11 +313,11 @@ Erfolgreich geprüft wurden:
 ## 🔗 Verwendung & Verknüpfungen
 
 - [Backups](../../grundlagen/backups.md) – übergeordnete Backup-Strategie
-- [Samba share](../../apps/samba-share.md) – Bereitstellung des Home-Assistant-Backup-Verzeichnisses
-- [DHCP-Zuweisungen in der Freebox](../freebox/dhcp-zuweisungen.md) – feste lokale Adressen der beteiligten Geräte
-- [PowerShell-Skript](../../skripte/windows/home-assistant-backup.ps1) – führt die Windows-Backup-Synchronisation aus
 - [Beispielkonfiguration](../../skripte/windows/config.example.ps1) – Vorlage für die lokale Konfiguration des PowerShell-Skripts
+- [DHCP-Zuweisungen in der Freebox](../freebox/dhcp-zuweisungen.md) – feste lokale Adressen der beteiligten Geräte
 - [Home-Assistant-Automation](../../skripte/home-assistant/automationen/aktualisierung-windows-sicherung-zeitstempel.yaml) – aktualisiert den Zeitstempel der letzten erfolgreichen Windows-Sicherung
+- [PowerShell-Skript](../../skripte/windows/home-assistant-backup.ps1) – führt die Windows-Backup-Synchronisation aus
+- [Samba share](../../apps/samba-share.md) – Bereitstellung des Home-Assistant-Backup-Verzeichnisses
 
 ---
 

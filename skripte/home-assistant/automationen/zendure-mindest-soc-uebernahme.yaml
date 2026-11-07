@@ -1,0 +1,60 @@
+alias: Zendure Mindest-SoC Übernahme
+description: 'Übernimmt den geplanten Mindest-SoC für beide Zendure unabhängig voneinander, sobald der jeweilige Batterie-SoC erreicht ist. Deaktiviert sich nach erfolgreicher Übernahme beider Werte.'
+triggers:
+  - trigger: battery.level_changed
+    target:
+      device_id: 7eb6e1a98778c7239278b046ff5f2fa3
+    options:
+      threshold:
+        type: any
+    id: Zendure_1_SoC
+  - trigger: battery.level_changed
+    target:
+      device_id: 757171563b0b59b04a520b8ec048b81b
+    options:
+      threshold:
+        type: any
+    id: Zendure_2_SoC
+actions:
+  - if:
+      - condition: template
+        value_template: >
+          {% set neu = states('input_number.zendure_1_neuer_min_soc') | int(0)
+          %} {% set aktuell = states('number.solarflow_800_plus_1_min_soc') |
+          int(0) %} {% set soc =
+          states('sensor.solarflow_800_plus_1_electric_level') | int(0) %} {{
+          neu != aktuell and soc >= neu }}
+    then:
+      - action: number.set_value
+        target:
+          entity_id: number.solarflow_800_plus_1_min_soc
+        data:
+          value: '{{ states(''input_number.zendure_1_neuer_min_soc'') | int(0) }}'
+  - if:
+      - condition: template
+        value_template: >
+          {% set neu = states('input_number.zendure_2_neuer_min_soc') | int(0)
+          %} {% set aktuell = states('number.solarflow_800_plus_2_min_soc') |
+          int(0) %} {% set soc =
+          states('sensor.solarflow_800_plus_2_electric_level') | int(0) %} {{
+          neu != aktuell and soc >= neu }}
+    then:
+      - action: number.set_value
+        target:
+          entity_id: number.solarflow_800_plus_2_min_soc
+        data:
+          value: '{{ states(''input_number.zendure_2_neuer_min_soc'') | int(0) }}'
+  - delay:
+      seconds: 5
+  - condition: template
+    value_template: |
+      {{ states('input_number.zendure_1_neuer_min_soc') | int(0) ==
+         states('number.solarflow_800_plus_1_min_soc') | int(0)
+         and
+         states('input_number.zendure_2_neuer_min_soc') | int(0) ==
+         states('number.solarflow_800_plus_2_min_soc') | int(0) }}
+  - action: automation.turn_off
+    target:
+      entity_id: automation.zendure_ubernahme_neue_mindest_soc
+    data:
+      stop_actions: false
