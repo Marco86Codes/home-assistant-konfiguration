@@ -1,0 +1,1325 @@
+views:
+  - title: Solar
+    path: solar
+    icon: mdi:solar-power
+    type: sections
+    sections:
+      - type: grid
+        columns: 1
+        square: false
+        cards:
+          - type: markdown
+            content: |
+              ### Zendure 1
+            text_only: true
+            card_mod:
+              style:
+                .: |
+                  ha-card {
+                    background: transparent !important;
+                    box-shadow: none !important;
+                    border: none !important;
+                  }
+                ha-markdown$: |
+                  h3 {
+                    text-align: center !important;
+                    font-size: 24px !important;
+                  }
+          - type: custom:config-template-card
+            entities:
+              - input_number.zendure_1_neuer_min_soc
+            card:
+              type: gauge
+              entity: sensor.solarflow_800_plus_1_electric_level
+              name: ''
+              min: 0
+              max: 100
+              needle: true
+              tap_action:
+                action: none
+              segments:
+                - from: 0
+                  color: '#E74C3C'
+                - from: ${Number(states['input_number.zendure_1_neuer_min_soc'].state)}
+                  color: '#E0E0E0'
+              card_mod:
+                style: |
+                  ha-card {
+                    background: transparent !important;
+                    box-shadow: none !important;
+                    border: none !important;
+                    margin-top: -8px !important;
+                    margin-bottom: -8px !important;
+                  }
+                  ha-tile-icon {
+                    display: none !important;
+                  }
+                  .card-content {
+                    padding: 0px !important;
+                  }
+          - square: false
+            type: grid
+            columns: 3
+            cards:
+              - type: tile
+                entity: sensor.solarflow_800_plus_1_solar_power1
+                name: PV 1
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.solarflow_800_plus_1_solar_power2
+                name: PV 2
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.zendure_1_pv_leistung
+                name: Gesamt
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+          - type: markdown
+            content: |
+              ### Steuerung
+            card_mod:
+              style:
+                .: |
+                  ha-card {
+                    background: transparent !important;
+                    box-shadow: none !important;
+                    border: none !important;
+                    border-top: 2px solid #E0E0E0 !important;
+                    border-radius: 0 !important;
+                    margin-top: -4px !important;
+                    margin-bottom: -8px !important;
+                    scrollbar-width: none !important;
+                  }
+                ha-markdown$: |
+                  h3 {
+                    text-align: center !important;
+                    font-size: 18px !important;
+                  }
+          - square: false
+            type: grid
+            columns: 3
+            cards:
+              - type: tile
+                entity: number.solarflow_800_plus_1_output_limit
+                name: Einspeisung
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.zendure_1_ac_soll_leistung
+                name: Einspeisung neu
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        {% set aktuell = states('number.solarflow_800_plus_1_output_limit') | float(none) %}
+                        {% set geplant = states('sensor.zendure_1_ac_soll_leistung') | float(none) %}
+                        {% if aktuell is not none and geplant is not none and aktuell != geplant %}
+                          background: #3498DB !important;
+                        {% else %}
+                          background: transparent !important;
+                        {% endif %}
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.zendure_1_leistungsanteil
+                name: Anteil
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+          - square: false
+            type: grid
+            columns: 3
+            cards:
+              - type: tile
+                entity: sensor.solarflow_800_plus_1_output_pack_power
+                name: Ladung
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.solarflow_800_plus_1_pack_input_power
+                name: Entladung
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.zendure_1_pv_begrenzung
+                name: PV Begrenzung
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        {% if is_state('sensor.zendure_1_pv_begrenzung', 'aktiv: 50 %') %}
+                          background: #F4D03F !important;
+                        {% else %}
+                          background: transparent !important;
+                        {% endif %}
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                        {% if is_state('sensor.zendure_1_pv_begrenzung', 'aktiv: 50 %') %}
+                          color: black !important;
+                        {% endif %}
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                        {% if is_state('sensor.zendure_1_pv_begrenzung', 'aktiv: 50 %') %}
+                          color: black !important;
+                        {% endif %}
+                      }
+          - type: markdown
+            content: |
+              ### Temperaturen
+            card_mod:
+              style:
+                .: |
+                  ha-card {
+                    background: transparent !important;
+                    box-shadow: none !important;
+                    border: none !important;
+                    border-top: 2px solid #E0E0E0 !important;
+                    border-radius: 0 !important;
+                    margin-top: -4px !important;
+                    margin-bottom: -8px !important;
+                    scrollbar-width: none !important;
+                  }
+                ha-markdown$: |
+                  h3 {
+                    text-align: center !important;
+                    font-size: 18px !important;
+                  }
+          - square: false
+            type: grid
+            columns: 3
+            cards:
+              - type: tile
+                entity: sensor.solarflow_800_plus_1_hyper_tmp
+                name: Wechselrichter
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        {% set t = states('sensor.solarflow_800_plus_1_hyper_tmp') | float(none) %}
+                        {% if t is not none and (t < 0 or t > 60) %}
+                          background: #E74C3C !important;
+                        {% else %}
+                          background: transparent !important;
+                        {% endif %}
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.ab2000_04046_max_temp
+                name: Batterie
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        {% set t = states('sensor.ab2000_04046_max_temp') | float(none) %}
+                        {% if t is not none and (t < 0 or t > 40) %}
+                          background: #E74C3C !important;
+                        {% else %}
+                          background: transparent !important;
+                        {% endif %}
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: binary_sensor.solarflow_800_plus_1_heat_state
+                name: Heizung
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        {% if is_state('binary_sensor.solarflow_800_plus_1_heat_state', 'on') %}
+                          background: #F4D03F !important;
+                        {% else %}
+                          background: transparent !important;
+                        {% endif %}
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                        {% if is_state('binary_sensor.solarflow_800_plus_1_heat_state', 'on') %}
+                          color: black !important;
+                        {% endif %}
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                        {% if is_state('binary_sensor.solarflow_800_plus_1_heat_state', 'on') %}
+                          color: black !important;
+                        {% endif %}
+                      }
+        card_mod:
+          style: |
+            :host {
+              border-left: 2px solid #B0B0B0;
+              border-right: 2px solid #B0B0B0;
+              padding-left: 8px;
+              padding-right: 8px;
+              margin-right: -14px;
+              box-sizing: border-box;
+            }
+      - type: grid
+        columns: 1
+        square: false
+        cards:
+          - type: markdown
+            content: |
+              ### Zendure 2
+            text_only: true
+            card_mod:
+              style:
+                .: |
+                  ha-card {
+                    background: transparent !important;
+                    box-shadow: none !important;
+                    border: none !important;
+                  }
+                ha-markdown$: |
+                  h3 {
+                    text-align: center !important;
+                    font-size: 24px !important;
+                  }
+          - type: custom:config-template-card
+            entities:
+              - input_number.zendure_2_neuer_min_soc
+            card:
+              type: gauge
+              entity: sensor.solarflow_800_plus_2_electric_level
+              name: ''
+              min: 0
+              max: 100
+              needle: true
+              tap_action:
+                action: none
+              segments:
+                - from: 0
+                  color: '#E74C3C'
+                - from: ${Number(states['input_number.zendure_2_neuer_min_soc'].state)}
+                  color: '#E0E0E0'
+              card_mod:
+                style: |
+                  ha-card {
+                    background: transparent !important;
+                    box-shadow: none !important;
+                    border: none !important;
+                    margin-top: -8px !important;
+                    margin-bottom: -8px !important;
+                  }
+                  ha-tile-icon {
+                    display: none !important;
+                  }
+                  .card-content {
+                    padding: 0px !important;
+                  }
+          - square: false
+            type: grid
+            columns: 3
+            cards:
+              - type: tile
+                entity: sensor.solarflow_800_plus_2_solar_power1
+                name: PV 1
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.solarflow_800_plus_2_solar_power2
+                name: PV 2
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.zendure_2_pv_leistung
+                name: Gesamt
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+          - type: markdown
+            content: |
+              ### Steuerung
+            card_mod:
+              style:
+                .: |
+                  ha-card {
+                    background: transparent !important;
+                    box-shadow: none !important;
+                    border: none !important;
+                    border-top: 2px solid #E0E0E0 !important;
+                    border-radius: 0 !important;
+                    margin-top: -4px !important;
+                    margin-bottom: -8px !important;
+                    scrollbar-width: none !important;
+                  }
+                ha-markdown$: |
+                  h3 {
+                    text-align: center !important;
+                    font-size: 18px !important;
+                  }
+          - square: false
+            type: grid
+            columns: 3
+            cards:
+              - type: tile
+                entity: number.solarflow_800_plus_2_output_limit
+                name: Einspeisung
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.zendure_2_ac_soll_leistung
+                name: Einspeisung neu
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        {% set aktuell = states('number.solarflow_800_plus_2_output_limit') | float(none) %}
+                        {% set geplant = states('sensor.zendure_2_ac_soll_leistung') | float(none) %}
+                        {% if aktuell is not none and geplant is not none and aktuell != geplant %}
+                          background: #3498DB !important;
+                        {% else %}
+                          background: transparent !important;
+                        {% endif %}
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.zendure_2_leistungsanteil
+                name: Anteil
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+          - square: false
+            type: grid
+            columns: 3
+            cards:
+              - type: tile
+                entity: sensor.solarflow_800_plus_2_output_pack_power
+                name: Ladung
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.solarflow_800_plus_2_pack_input_power
+                name: Entladung
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.zendure_2_pv_begrenzung
+                name: PV Begrenzung
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        {% if is_state('sensor.zendure_2_pv_begrenzung', 'aktiv: 50 %') %}
+                          background: #F4D03F !important;
+                        {% else %}
+                          background: transparent !important;
+                        {% endif %}
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                        {% if is_state('sensor.zendure_2_pv_begrenzung', 'aktiv: 50 %') %}
+                          color: black !important;
+                        {% endif %}
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                        {% if is_state('sensor.zendure_2_pv_begrenzung', 'aktiv: 50 %') %}
+                          color: black !important;
+                        {% endif %}
+                      }
+          - type: markdown
+            content: |
+              ### Temperaturen
+            card_mod:
+              style:
+                .: |
+                  ha-card {
+                    background: transparent !important;
+                    box-shadow: none !important;
+                    border: none !important;
+                    border-top: 2px solid #E0E0E0 !important;
+                    border-radius: 0 !important;
+                    margin-top: -4px !important;
+                    margin-bottom: -8px !important;
+                    scrollbar-width: none !important;
+                  }
+                ha-markdown$: |
+                  h3 {
+                    text-align: center !important;
+                    font-size: 18px !important;
+                  }
+          - square: false
+            type: grid
+            columns: 3
+            cards:
+              - type: tile
+                entity: sensor.solarflow_800_plus_2_hyper_tmp
+                name: Wechselrichter
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        {% set t = states('sensor.solarflow_800_plus_2_hyper_tmp') | float(none) %}
+                        {% if t is not none and (t < 0 or t > 60) %}
+                          background: #E74C3C !important;
+                        {% else %}
+                          background: transparent !important;
+                        {% endif %}
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.ab2000_02089_max_temp
+                name: Batterie
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        {% set t = states('sensor.ab2000_02089_max_temp') | float(none) %}
+                        {% if t is not none and (t < 0 or t > 40) %}
+                          background: #E74C3C !important;
+                        {% else %}
+                          background: transparent !important;
+                        {% endif %}
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: binary_sensor.solarflow_800_plus_2_heat_state
+                name: Heizung
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        {% if is_state('binary_sensor.solarflow_800_plus_2_heat_state', 'on') %}
+                          background: #F4D03F !important;
+                        {% else %}
+                          background: transparent !important;
+                        {% endif %}
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                        {% if is_state('binary_sensor.solarflow_800_plus_2_heat_state', 'on') %}
+                          color: black !important;
+                        {% endif %}
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                        {% if is_state('binary_sensor.solarflow_800_plus_2_heat_state', 'on') %}
+                          color: black !important;
+                        {% endif %}
+                      }
+        card_mod:
+          style: |
+            :host {
+              padding-left: 8px;
+              padding-right: 8px;
+              box-sizing: border-box;
+              margin-left: -14px;
+              margin-right: -14px;
+            }
+      - type: grid
+        cards:
+          - show_current: true
+            show_forecast: true
+            type: weather-forecast
+            entity: weather.forecast_home
+            forecast_type: daily
+            forecast_slots: 5
+            tap_action:
+              action: none
+            secondary_info_attribute: cloud_coverage
+            card_mod:
+              style: |
+                ha-card {
+                  background: transparent !important;
+                  box-shadow: none !important;
+                  border: none !important;
+                }
+          - type: heading
+            icon: ''
+            heading_style: subtitle
+          - show_current: false
+            show_forecast: true
+            type: weather-forecast
+            entity: weather.forecast_home
+            forecast_type: hourly
+            tap_action:
+              action: none
+            name: ''
+            card_mod:
+              style: |
+                ha-card {
+                  background: transparent !important;
+                  box-shadow: none !important;
+                  border: none !important;
+                }
+        card_mod:
+          style: |
+            :host {
+              border-left: 2px solid #B0B0B0;
+              border-right: 2px solid #B0B0B0;
+              padding-left: 8px;
+              padding-right: 8px;
+              margin-left: -14px;
+              margin-left: -14px;
+              box-sizing: border-box;
+            }
+      - type: grid
+        column_span: 2
+        cards:
+          - type: custom:home-flow-card
+            nodes:
+              - id: z1-pv1
+                kind: leaf
+                label: PV 1
+                entity: sensor.solarflow_800_plus_1_solar_power1
+                invert: false
+                flowDirection: supply
+                allowed_flow: supply
+                radius: 60
+                icon: null
+                color: '#F4D03F'
+              - id: z1-pv2
+                kind: leaf
+                label: PV 2
+                entity: sensor.solarflow_800_plus_1_solar_power2
+                invert: false
+                flowDirection: supply
+                allowed_flow: supply
+                radius: 60
+                icon: null
+                color: '#F4D03F'
+              - id: zendure1
+                kind: junction
+                label: ''
+                invert: false
+                balance_role: junction
+                flowMinVisibleValue: 0
+                flowMaxValue: 5000
+                radius: 70
+                icon: null
+                color: '#28B8B0'
+              - id: batterie1
+                kind: leaf
+                label: Zendure1
+                flow_mode: bidirectional
+                incoming_entity: sensor.solarflow_800_plus_1_output_pack_power
+                outgoing_entity: sensor.solarflow_800_plus_1_pack_input_power
+                invert: false
+                allowed_flow: both
+                radius: 60
+                icon: null
+                color: '#488DE0'
+              - id: grid1
+                kind: junction
+                label: ''
+                entity: sensor.solarflow_800_plus_1_output_home_power
+                invert: false
+                flowDirection: supply
+                balance_role: junction
+                flowMinVisibleValue: 0
+                flowMaxValue: 5000
+                radius: 60
+                icon: null
+                color: '#A78BFA'
+              - id: z2-pv1
+                kind: leaf
+                label: PV 1
+                entity: sensor.solarflow_800_plus_2_solar_power1
+                invert: false
+                flowDirection: supply
+                allowed_flow: supply
+                radius: 60
+                icon: null
+                color: '#F4D03F'
+              - id: z2-pv2
+                kind: leaf
+                label: PV 1
+                entity: sensor.solarflow_800_plus_2_solar_power2
+                invert: false
+                flowDirection: supply
+                allowed_flow: supply
+                radius: 60
+                icon: null
+                color: '#F4D03F'
+              - id: zendure2
+                kind: junction
+                label: ''
+                invert: false
+                balance_role: junction
+                flowMinVisibleValue: 0
+                flowMaxValue: 5000
+                radius: 70
+                icon: null
+                color: '#28B8B0'
+              - id: batterie2
+                kind: leaf
+                label: Zendure2
+                flow_mode: bidirectional
+                incoming_entity: sensor.solarflow_800_plus_2_output_pack_power
+                outgoing_entity: sensor.solarflow_800_plus_2_pack_input_power
+                invert: false
+                allowed_flow: both
+                radius: 60
+                icon: null
+                color: '#488DE0'
+              - id: grid2
+                kind: junction
+                label: ''
+                entity: sensor.solarflow_800_plus_2_output_home_power
+                invert: false
+                flowDirection: supply
+                balance_role: junction
+                flowMinVisibleValue: 0
+                flowMaxValue: 5000
+                radius: 60
+                icon: null
+                color: '#A78BFA'
+              - id: haus
+                kind: junction
+                label: Haus
+                entity: sensor.hausverbrauch_gesamt
+                invert: false
+                flowDirection: consume
+                balance_role: junction
+                flowMinVisibleValue: 0
+                flowMaxValue: 5000
+                radius: 80
+                icon: null
+                color: '#E88970'
+              - id: netz
+                kind: leaf
+                label: Netz
+                entity: sensor.shelly_netzleistung_gesamt
+                invert: false
+                flowDirection: supply
+                allowed_flow: both
+                radius: 70
+                icon: null
+                color: '#FF0000'
+            links:
+              - id: z1-pv1-zendure1
+                from: z1-pv1
+                to: zendure1
+                invert: false
+              - id: z1-pv2-zendure1
+                from: z1-pv2
+                to: zendure1
+                invert: false
+              - id: batterie1-zendure1
+                from: batterie1
+                to: zendure1
+                invert: false
+              - id: zendure1-grid1
+                from: zendure1
+                to: grid1
+                invert: false
+              - id: z2-pv1-zendure2
+                from: z2-pv1
+                to: zendure2
+                invert: false
+              - id: z2-pv2-zendure2
+                from: z2-pv2
+                to: zendure2
+                invert: false
+              - id: batterie2-zendure2
+                from: batterie2
+                to: zendure2
+                invert: false
+              - id: zendure2-grid2
+                from: zendure2
+                to: grid2
+                invert: false
+              - id: grid1-haus
+                from: grid1
+                to: haus
+                invert: false
+              - id: grid2-haus
+                from: grid2
+                to: haus
+                invert: false
+              - id: netz-haus
+                from: netz
+                to: haus
+                invert: false
+            layout:
+              z1-pv1:
+                x: 70
+                'y': 100
+              z1-pv2:
+                x: 270
+                'y': 100
+              zendure1:
+                x: 170
+                'y': 250
+              batterie1:
+                x: 70
+                'y': 450
+              grid1:
+                x: 350
+                'y': 250
+              z2-pv1:
+                x: 670
+                'y': 100
+              z2-pv2:
+                x: 870
+                'y': 100
+              zendure2:
+                x: 770
+                'y': 250
+              batterie2:
+                x: 870
+                'y': 450
+              grid2:
+                x: 590
+                'y': 250
+              haus:
+                x: 470
+                'y': 410
+              netz:
+                x: 470
+                'y': 600
+            flow_min_visible_value: 1
+            flow_max_value: 3000
+            label_style: straight
+            leaf_routing: funnel
+            scaling_mode: fit-width
+            width: 750
+            height: 500
+            grid_options:
+              columns: full
+        card_mod:
+          style: |
+            :host {
+              padding-left: 8px;
+              padding-right: 8px;
+              box-sizing: border-box;
+              margin-left: -14px;
+              margin-right: -14px;
+            }
+    show_icon_and_title: true
+    cards: []
+    max_columns: 3
+  - title: WLAN
+    path: wlan
+    icon: mdi:wifi
+    type: sections
+    sections:
+      - type: grid
+        cards: []
+    show_icon_and_title: true
+    max_columns: 3
+  - title: Zigbee
+    path: zigbee
+    icon: mdi:zigbee
+    type: sections
+    sections:
+      - type: grid
+        cards: []
+    show_icon_and_title: true
+    max_columns: 3
+  - title: Heizung
+    path: heizung
+    icon: mdi:radiator
+    type: sections
+    sections:
+      - type: grid
+        cards: []
+    show_icon_and_title: true
+    max_columns: 3

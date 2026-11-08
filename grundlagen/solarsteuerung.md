@@ -169,6 +169,19 @@ Die maximal **freigegebene** AC-Leistung berücksichtigt die PV-Leistung und den
 
 Die Grenze beträgt **800 W je Gerät**. Unterhalb des geplanten Mindest-SoC werden nur **50 % der aktuellen PV-Leistung** für die AC-Ausgabe freigegeben; die übrige PV-Leistung soll vorrangig zum Laden des Akkus zur Verfügung stehen. Sobald der geplante Mindest-SoC erreicht ist, wird wieder die gesamte PV-Leistung berücksichtigt; erst **oberhalb** davon kommt die Batteriefreigabe hinzu.
 
+### Statusanzeige der PV-Begrenzung
+
+Zwei zusätzliche Template-Sensoren machen sichtbar, ob die 50-%-PV-Regel für das jeweilige Gerät rechnerisch aktiv ist:
+
+| Sensor | SoC unter Mindest-SoC | SoC gleich oder über Mindest-SoC |
+|---|---|---|
+| `sensor.zendure_1_pv_begrenzung` | `aktiv: 50 %` | `Inaktiv` |
+| `sensor.zendure_2_pv_begrenzung` | `aktiv: 50 %` | `Inaktiv` |
+
+Die Sensoren vergleichen den aktuellen Batterie-SoC mit dem jeweiligen geplanten Mindest-SoC. Sie dienen ausschließlich der Statusanzeige und steuern die Geräte nicht selbst.
+
+Die tatsächliche Begrenzung erfolgt weiterhin über die Berechnung der maximal freigegebenen AC-Leistung. Der Status `aktiv: 50 %` bezeichnet die rechnerische PV-Freigabe, nicht eine bestätigte tatsächliche Akkuladeleistung.
+
 | Beispiel je Gerät | PV | Batterie-SoC / geplant | Batteriefreigabe | Maximale AC-Leistung |
 |---|---:|---:|---:|---:|
 | Entladung erlaubt | 350 W | 45 % / 15 % | 600 W | 800 W |

@@ -17,6 +17,7 @@ Dieses Repository dokumentiert den Aufbau meines Smart Homes mit Home Assistant.
 ### Grundlagen
 
 - [Backups](grundlagen/backups.md) – Backup-Strategie und Aufbewahrung der Home-Assistant-Backups
+- [Dashboard](grundlagen/dashboard.md) – Visualisierung der Zendure-Solaranlage mit Statusanzeigen, Wetterinformationen und Energieflussdiagramm
 - [Solarsteuerung](grundlagen/solarsteuerung.md) – Dynamische AC-Leistungsregelung mit zwei Zendure SolarFlow 800 Plus, wetterabhängiger Mindest-SoC-Steuerung und automatischer Leistungsverteilung
 
 ### Apps & Integrationen
@@ -29,6 +30,12 @@ Dieses Repository dokumentiert den Aufbau meines Smart Homes mit Home Assistant.
 - [Zendure](apps/zendure.md) – Einbindung der SolarFlow 800 Plus mit lokaler MQTT-Kommunikation
 - [Zigbee2MQTT](apps/zigbee2mqtt.md) – Einbindung von Zigbee-Geräten über MQTT
 
+### Marketplace
+
+- [Config Template Card](marketplace/config-template-card.md) – Dynamische Darstellung des geplanten Mindest-SoC in den Batterie-Rundinstrumenten
+- [card-mod](marketplace/card-mod.md) – Individuelle Gestaltung der Dashboard-Karten und farbliche Statusanzeigen
+- [Home Flow Card](marketplace/home-flow-card.md) – Grafische Darstellung der Energieflüsse zwischen PV, Batterien, Haus und Netz
+
 ### Externe Systeme
 
 - [DHCP-Zuweisungen in der Freebox](externe-systeme/freebox/dhcp-zuweisungen.md) – feste DHCP-Zuweisungen für die beteiligten Netzwerkgeräte
@@ -37,6 +44,10 @@ Dieses Repository dokumentiert den Aufbau meines Smart Homes mit Home Assistant.
 ## Skripte und Konfigurationen
 
 ### Home Assistant
+
+**Dashboard**
+
+- [Dashboard-Konfiguration](skripte/home-assistant/dashboard.yaml) – YAML-Konfiguration der Dashboard-Ansichten, Karten und Energieflussdarstellung
 
 **Automationen**
 

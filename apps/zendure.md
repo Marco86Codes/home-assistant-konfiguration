@@ -195,7 +195,9 @@ Die Solarsteuerung verwendet Template-Sensoren zur Berechnung des Hausverbrauchs
 | Sensor | Berechnung und Zweck |
 |---|---|
 | `sensor.zendure_1_pv_leistung` | Summiert die Leistung beider PV-Eingänge von Zendure 1. |
+| `sensor.zendure_1_pv_begrenzung` | Zeigt `aktiv: 50 %`, wenn der SoC von Zendure 1 unter dem geplanten Mindest-SoC liegt; andernfalls `Inaktiv`. |
 | `sensor.zendure_2_pv_leistung` | Summiert die Leistung beider PV-Eingänge von Zendure 2. |
+| `sensor.zendure_2_pv_begrenzung` | Zeigt `aktiv: 50 %`, wenn der SoC von Zendure 2 unter dem geplanten Mindest-SoC liegt; andernfalls `Inaktiv`. |
 | `sensor.zendure_1_maximale_batterieleistung` | Gibt 600 W frei, wenn der Batterie-SoC von Zendure 1 über dem geplanten Mindest-SoC liegt. Andernfalls 0 W. |
 | `sensor.zendure_2_maximale_batterieleistung` | Gibt 600 W frei, wenn der Batterie-SoC von Zendure 2 über dem geplanten Mindest-SoC liegt. Andernfalls 0 W. |
 | `sensor.zendure_1_maximale_ac_leistung` | Berechnet die maximal freigegebene AC-Leistung von Zendure 1. Oberhalb des geplanten Mindest-SoC werden PV- und Batterieleistung addiert, bei genau erreichtem Mindest-SoC nur die PV-Leistung berücksichtigt und unterhalb des Mindest-SoC die PV-Leistung auf 50 % reduziert. Maximal 800 W. |
@@ -221,6 +223,8 @@ Die Solarsteuerung verwendet Template-Sensoren zur Berechnung des Hausverbrauchs
 | `input_datetime.zendure_letzte_min_soc_berechnung` | Speichert den Zeitpunkt der letzten erfolgreichen Mindest-SoC-Berechnung. |
 
 Die geplanten Mindest-SoC-Werte werden bereits bei der Berechnung der verfügbaren Batterieleistung berücksichtigt, unabhängig davon, ob sie bereits an die Zendure-Geräte übertragen wurden.
+
+Die beiden PV-Begrenzungs-Sensoren dienen der **Statusanzeige**. Sie vergleichen jeweils den aktuellen Batterie-SoC mit dem geplanten Mindest-SoC (`input_number.zendure_1_neuer_min_soc` beziehungsweise `input_number.zendure_2_neuer_min_soc`). Unterhalb des Grenzwerts zeigen sie `aktiv: 50 %`, bei gleichem oder höherem SoC `Inaktiv`. Die tatsächliche Begrenzung der AC-Freigabe erfolgt weiterhin über die Sensoren für die maximale AC-Leistung.
 
 
 ### Automationen
