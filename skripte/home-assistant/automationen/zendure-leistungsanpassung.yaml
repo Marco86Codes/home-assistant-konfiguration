@@ -1,5 +1,7 @@
 alias: Zendure Leistungsanpassung
-description: 'Leistungsanpassung von Zendure 1 und Zendure 2 bei Abweichung zwischen berechneter AC-Soll-Leistung und eingestelltem Ausgangslimit.'
+description: >-
+  Leistungsanpassung von Zendure 1 und Zendure 2 bei Abweichung zwischen
+  berechneter AC-Soll-Leistung und eingestelltem Ausgangslimit.
 triggers:
   - trigger: time_pattern
     seconds: /5

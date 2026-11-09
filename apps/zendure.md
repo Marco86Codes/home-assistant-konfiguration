@@ -195,13 +195,15 @@ Die Solarsteuerung verwendet Template-Sensoren zur Berechnung des Hausverbrauchs
 | Sensor | Berechnung und Zweck |
 |---|---|
 | `sensor.zendure_1_pv_leistung` | Summiert die Leistung beider PV-Eingänge von Zendure 1. |
-| `sensor.zendure_1_pv_begrenzung` | Zeigt `aktiv: 50 %`, wenn der SoC von Zendure 1 unter dem geplanten Mindest-SoC liegt; andernfalls `Inaktiv`. |
+| `sensor.zendure_1_pv_begrenzung` | Berechnet die PV-Reserve von 0 bis 100 %. Je Prozentpunkt unter dem geplanten Mindest-SoC werden 20 % reserviert. Liegt der aktuelle SoC unter dem am Gerät eingestellten Mindest-SoC, beträgt die Reserve 100 %. |
+| `sensor.zendure_1_pv_begrenzung_anzeige` | Zeigt den Status der PV-Reserve im Dashboard an. |
 | `sensor.zendure_2_pv_leistung` | Summiert die Leistung beider PV-Eingänge von Zendure 2. |
-| `sensor.zendure_2_pv_begrenzung` | Zeigt `aktiv: 50 %`, wenn der SoC von Zendure 2 unter dem geplanten Mindest-SoC liegt; andernfalls `Inaktiv`. |
+| `sensor.zendure_2_pv_begrenzung` | Berechnet die PV-Reserve von 0 bis 100 %. Je Prozentpunkt unter dem geplanten Mindest-SoC werden 20 % reserviert. Liegt der aktuelle SoC unter dem am Gerät eingestellten Mindest-SoC, beträgt die Reserve 100 %. |
+| `sensor.zendure_2_pv_begrenzung_anzeige` | Zeigt den Status der PV-Reserve im Dashboard an. |
 | `sensor.zendure_1_maximale_batterieleistung` | Gibt 600 W frei, wenn der Batterie-SoC von Zendure 1 über dem geplanten Mindest-SoC liegt. Andernfalls 0 W. |
 | `sensor.zendure_2_maximale_batterieleistung` | Gibt 600 W frei, wenn der Batterie-SoC von Zendure 2 über dem geplanten Mindest-SoC liegt. Andernfalls 0 W. |
-| `sensor.zendure_1_maximale_ac_leistung` | Berechnet die maximal freigegebene AC-Leistung von Zendure 1. Oberhalb des geplanten Mindest-SoC werden PV- und Batterieleistung addiert, bei genau erreichtem Mindest-SoC nur die PV-Leistung berücksichtigt und unterhalb des Mindest-SoC die PV-Leistung auf 50 % reduziert. Maximal 800 W. |
-| `sensor.zendure_2_maximale_ac_leistung` | Berechnet die maximal freigegebene AC-Leistung von Zendure 2. Oberhalb des geplanten Mindest-SoC werden PV- und Batterieleistung addiert, bei genau erreichtem Mindest-SoC nur die PV-Leistung berücksichtigt und unterhalb des Mindest-SoC die PV-Leistung auf 50 % reduziert. Maximal 800 W. |
+| `sensor.zendure_1_maximale_ac_leistung` | Berechnet die maximal freigegebene AC-Leistung von Zendure 1. Bei 0 % PV-Reserve werden PV- und verfügbare Batterieleistung addiert. Bei einer Reserve über 0 % wird nur der nicht reservierte PV-Anteil freigegeben. Maximal 800 W. |
+| `sensor.zendure_2_maximale_ac_leistung` | Berechnet die maximal freigegebene AC-Leistung von Zendure 2. Bei 0 % PV-Reserve werden PV- und verfügbare Batterieleistung addiert. Bei einer Reserve über 0 % wird nur der nicht reservierte PV-Anteil freigegeben. Maximal 800 W. |
 | `sensor.zendure_gesamt_maximale_ac_leistung` | Summiert die maximal verfügbare AC-Leistung beider Zendure. |
 
 #### Dynamische Leistungsaufteilung
@@ -224,7 +226,7 @@ Die Solarsteuerung verwendet Template-Sensoren zur Berechnung des Hausverbrauchs
 
 Die geplanten Mindest-SoC-Werte werden bereits bei der Berechnung der verfügbaren Batterieleistung berücksichtigt, unabhängig davon, ob sie bereits an die Zendure-Geräte übertragen wurden.
 
-Die beiden PV-Begrenzungs-Sensoren dienen der **Statusanzeige**. Sie vergleichen jeweils den aktuellen Batterie-SoC mit dem geplanten Mindest-SoC (`input_number.zendure_1_neuer_min_soc` beziehungsweise `input_number.zendure_2_neuer_min_soc`). Unterhalb des Grenzwerts zeigen sie `aktiv: 50 %`, bei gleichem oder höherem SoC `Inaktiv`. Die tatsächliche Begrenzung der AC-Freigabe erfolgt weiterhin über die Sensoren für die maximale AC-Leistung.
+Die numerischen PV-Begrenzungs-Sensoren berechnen die PV-Reserve für die AC-Leistungsfreigabe. Die separaten Anzeigesensoren `sensor.zendure_1_pv_begrenzung_anzeige` und `sensor.zendure_2_pv_begrenzung_anzeige` zeigen `Inaktiv`, wenn die tatsächliche AC-Ausgangsleistung 0 W beträgt oder keine PV-Reserve vorgesehen ist. Andernfalls zeigen sie `Aktiv: XX %`. Sie dienen ausschließlich der Anzeige im Dashboard.
 
 
 ### Automationen
@@ -247,7 +249,7 @@ Dabei werden folgende Faktoren berücksichtigt:
 
 Aus der verfügbaren PV-Leistung und der abhängig vom Batterieladestand nutzbaren Batterieleistung wird zunächst die maximal freigegebene AC-Leistung jedes Geräts ermittelt.
 
-Liegt der Batterieladestand unter dem geplanten Mindest-SoC, werden nur 50 % der aktuellen PV-Leistung für die AC-Ausgabe freigegeben. Die verbleibende PV-Leistung soll vorrangig zum Wiederaufladen der Batterie zur Verfügung stehen.
+Liegt der Batterieladestand unter dem geplanten Mindest-SoC, wird pro Prozentpunkt Differenz eine PV-Reserve von 20 % berücksichtigt, maximal 100 %. Liegt der SoC unter dem tatsächlich am Gerät eingestellten Mindest-SoC, beträgt die Reserve unabhängig vom geplanten Wert 100 %. Bei einer PV-Reserve über 0 % wird ausschließlich der nicht reservierte PV-Anteil für die AC-Ausgabe freigegeben; die Batterieleistung wird nicht hinzugerechnet.
 
 Anschließend werden die prozentualen Leistungsanteile berechnet und der gesamte AC-Leistungsbedarf entsprechend auf beide SolarFlow 800 Plus verteilt. Die jeweiligen AC-Soll-Leistungen werden dabei auf die zuvor berechneten maximal freigegebenen AC-Leistungen begrenzt.
 
@@ -259,7 +261,7 @@ Dadurch wird die Leistungsaufteilung automatisch an die unterschiedlichen Erzeug
 
 Berechnet den geplanten Mindest-SoC beider Zendure anhand der Bewölkungsprognose.
 
-Die Berechnung erfolgt zu Sonnenaufgang, mittags und zwei Stunden vor Sonnenuntergang. Bei einer Bewölkungsprognose von mehr als 75 % wird ein Mindest-SoC von 15 % vorgesehen, andernfalls 10 %.
+Die Berechnung verwendet die stündliche Bewölkungsprognose (`weather.get_forecasts`) und bildet den Durchschnitt für die Stunden von 08:00 bis 18:00 Uhr einschließlich. Zu Sonnenaufgang wird der heutige Tag, um 12:00 Uhr werden die verbleibenden Stunden des heutigen Tages und zwei Stunden vor Sonnenuntergang wird der morgige Tag berücksichtigt. Bei einer durchschnittlichen Bewölkung von mehr als 75 % wird ein Mindest-SoC von 15 % vorgesehen, andernfalls 10 %.
 
 Nach erfolgreicher Berechnung wird der Zeitstempel aktualisiert und die Übernahme-Automation aktiviert.
 
@@ -360,12 +362,12 @@ Der **Zendure Manager bleibt auf „Aus“**.
 
 ## Nützliche Links & Quellen
 
-- [Solarsteuerung – Sensoren und Helfer](../../skripte/home-assistant/sensors/solarsteuerung.yaml)
+- [Solarsteuerung – Sensoren und Helfer](../skripte/home-assistant/sensoren/solarsteuerung.yaml)
 - [Zendure Home Assistant Installationsanleitung](https://github.com/Zendure/Zendure-HA/wiki/Installation)
 - [Zendure Home Assistant Integration – GitHub](https://github.com/Zendure/Zendure-HA)
-- [Zendure – Leistungsanpassung](../../skripte/home-assistant/automationen/zendure-leistungsanpassung.yaml)
-- [Zendure – Mindest-SoC-Berechnung](../../skripte/home-assistant/automationen/zendure-mindest-soc-berechnung.yaml)
-- [Zendure – Mindest-SoC-Übernahme](../../skripte/home-assistant/automationen/zendure-mindest-soc-uebernahme.yaml)
+- [Zendure – Leistungsanpassung](../skripte/home-assistant/automationen/zendure-leistungsanpassung.yaml)
+- [Zendure – Mindest-SoC-Berechnung](../skripte/home-assistant/automationen/zendure-mindest-soc-berechnung.yaml)
+- [Zendure – Mindest-SoC-Übernahme](../skripte/home-assistant/automationen/zendure-mindest-soc-uebernahme.yaml)
 
 ## 🔗 Verwendung & Verknüpfungen
 
@@ -377,4 +379,4 @@ Der **Zendure Manager bleibt auf „Aus“**.
 
 ---
 
-- [⬅️ Zurück zur Übersicht](README.md)
+- [⬅️ Zurück zur Übersicht](../README.md)

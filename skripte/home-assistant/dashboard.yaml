@@ -28,6 +28,7 @@ views:
           - type: custom:config-template-card
             entities:
               - input_number.zendure_1_neuer_min_soc
+              - number.solarflow_800_plus_1_min_soc
             card:
               type: gauge
               entity: sensor.solarflow_800_plus_1_electric_level
@@ -40,7 +41,17 @@ views:
               segments:
                 - from: 0
                   color: '#E74C3C'
-                - from: ${Number(states['input_number.zendure_1_neuer_min_soc'].state)}
+                - from: ${Number(states['number.solarflow_800_plus_1_min_soc'].state)}
+                  color: >-
+                    ${Number(states['input_number.zendure_1_neuer_min_soc'].state)
+                    >
+                      Number(states['number.solarflow_800_plus_1_min_soc'].state)
+                      ? '#3498DB' : '#E0E0E0'}
+                - from: |-
+                    ${Math.max(
+                      Number(states['number.solarflow_800_plus_1_min_soc'].state),
+                      Number(states['input_number.zendure_1_neuer_min_soc'].state)
+                    )}
                   color: '#E0E0E0'
               card_mod:
                 style: |
@@ -162,6 +173,7 @@ views:
                     border-radius: 0 !important;
                     margin-top: -4px !important;
                     margin-bottom: -8px !important;
+                    overflow: hidden !important;
                     scrollbar-width: none !important;
                   }
                 ha-markdown$: |
@@ -174,7 +186,7 @@ views:
             columns: 3
             cards:
               - type: tile
-                entity: number.solarflow_800_plus_1_output_limit
+                entity: sensor.solarflow_800_plus_1_output_home_power
                 name: Einspeisung
                 icon: none
                 show_entity_picture: false
@@ -329,7 +341,7 @@ views:
                         font-size: 16px !important;
                       }
               - type: tile
-                entity: sensor.zendure_1_pv_begrenzung
+                entity: sensor.zendure_1_pv_begrenzung_anzeige
                 name: PV Begrenzung
                 icon: none
                 show_entity_picture: false
@@ -341,7 +353,7 @@ views:
                   style:
                     .: |
                       ha-card {
-                        {% if is_state('sensor.zendure_1_pv_begrenzung', 'aktiv: 50 %') %}
+                        {% if not is_state('sensor.zendure_1_pv_begrenzung_anzeige', 'Inaktiv') %}
                           background: #F4D03F !important;
                         {% else %}
                           background: transparent !important;
@@ -357,13 +369,13 @@ views:
                     ha-tile-info$: |
                       .primary {
                         font-size: 14px !important;
-                        {% if is_state('sensor.zendure_1_pv_begrenzung', 'aktiv: 50 %') %}
+                        {% if not is_state('sensor.zendure_1_pv_begrenzung_anzeige', 'Inaktiv') %}
                           color: black !important;
                         {% endif %}
                       }
                       .secondary {
                         font-size: 16px !important;
-                        {% if is_state('sensor.zendure_1_pv_begrenzung', 'aktiv: 50 %') %}
+                        {% if not is_state('sensor.zendure_1_pv_begrenzung_anzeige', 'Inaktiv') %}
                           color: black !important;
                         {% endif %}
                       }
@@ -381,6 +393,7 @@ views:
                     border-radius: 0 !important;
                     margin-top: -4px !important;
                     margin-bottom: -8px !important;
+                    overflow: hidden !important;
                     scrollbar-width: none !important;
                   }
                 ha-markdown$: |
@@ -533,6 +546,7 @@ views:
           - type: custom:config-template-card
             entities:
               - input_number.zendure_2_neuer_min_soc
+              - number.solarflow_800_plus_2_min_soc
             card:
               type: gauge
               entity: sensor.solarflow_800_plus_2_electric_level
@@ -545,7 +559,17 @@ views:
               segments:
                 - from: 0
                   color: '#E74C3C'
-                - from: ${Number(states['input_number.zendure_2_neuer_min_soc'].state)}
+                - from: ${Number(states['number.solarflow_800_plus_2_min_soc'].state)}
+                  color: >-
+                    ${Number(states['input_number.zendure_2_neuer_min_soc'].state)
+                    >
+                      Number(states['number.solarflow_800_plus_2_min_soc'].state)
+                      ? '#3498DB' : '#E0E0E0'}
+                - from: |-
+                    ${Math.max(
+                      Number(states['number.solarflow_800_plus_2_min_soc'].state),
+                      Number(states['input_number.zendure_2_neuer_min_soc'].state)
+                    )}
                   color: '#E0E0E0'
               card_mod:
                 style: |
@@ -667,6 +691,7 @@ views:
                     border-radius: 0 !important;
                     margin-top: -4px !important;
                     margin-bottom: -8px !important;
+                    overflow: hidden !important;
                     scrollbar-width: none !important;
                   }
                 ha-markdown$: |
@@ -679,7 +704,7 @@ views:
             columns: 3
             cards:
               - type: tile
-                entity: number.solarflow_800_plus_2_output_limit
+                entity: sensor.solarflow_800_plus_2_output_home_power
                 name: Einspeisung
                 icon: none
                 show_entity_picture: false
@@ -834,7 +859,7 @@ views:
                         font-size: 16px !important;
                       }
               - type: tile
-                entity: sensor.zendure_2_pv_begrenzung
+                entity: sensor.zendure_2_pv_begrenzung_anzeige
                 name: PV Begrenzung
                 icon: none
                 show_entity_picture: false
@@ -846,7 +871,7 @@ views:
                   style:
                     .: |
                       ha-card {
-                        {% if is_state('sensor.zendure_2_pv_begrenzung', 'aktiv: 50 %') %}
+                        {% if not is_state('sensor.zendure_2_pv_begrenzung_anzeige', 'Inaktiv') %}
                           background: #F4D03F !important;
                         {% else %}
                           background: transparent !important;
@@ -862,13 +887,13 @@ views:
                     ha-tile-info$: |
                       .primary {
                         font-size: 14px !important;
-                        {% if is_state('sensor.zendure_2_pv_begrenzung', 'aktiv: 50 %') %}
+                        {% if not is_state('sensor.zendure_2_pv_begrenzung_anzeige', 'Inaktiv') %}
                           color: black !important;
                         {% endif %}
                       }
                       .secondary {
                         font-size: 16px !important;
-                        {% if is_state('sensor.zendure_2_pv_begrenzung', 'aktiv: 50 %') %}
+                        {% if not is_state('sensor.zendure_2_pv_begrenzung_anzeige', 'Inaktiv') %}
                           color: black !important;
                         {% endif %}
                       }
@@ -886,6 +911,7 @@ views:
                     border-radius: 0 !important;
                     margin-top: -4px !important;
                     margin-bottom: -8px !important;
+                    overflow: hidden !important;
                     scrollbar-width: none !important;
                   }
                 ha-markdown$: |
@@ -1099,8 +1125,8 @@ views:
                 kind: leaf
                 label: Zendure1
                 flow_mode: bidirectional
-                incoming_entity: sensor.solarflow_800_plus_1_output_pack_power
-                outgoing_entity: sensor.solarflow_800_plus_1_pack_input_power
+                incoming_entity: sensor.solarflow_800_plus_1_pack_input_power
+                outgoing_entity: sensor.solarflow_800_plus_1_output_pack_power
                 invert: false
                 allowed_flow: both
                 radius: 60
@@ -1130,7 +1156,7 @@ views:
                 color: '#F4D03F'
               - id: z2-pv2
                 kind: leaf
-                label: PV 1
+                label: PV 2
                 entity: sensor.solarflow_800_plus_2_solar_power2
                 invert: false
                 flowDirection: supply
@@ -1152,8 +1178,8 @@ views:
                 kind: leaf
                 label: Zendure2
                 flow_mode: bidirectional
-                incoming_entity: sensor.solarflow_800_plus_2_output_pack_power
-                outgoing_entity: sensor.solarflow_800_plus_2_pack_input_power
+                incoming_entity: sensor.solarflow_800_plus_2_pack_input_power
+                outgoing_entity: sensor.solarflow_800_plus_2_output_pack_power
                 invert: false
                 allowed_flow: both
                 radius: 60

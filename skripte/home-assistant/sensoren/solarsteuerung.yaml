@@ -107,11 +107,10 @@ template:
         state_class: measurement
         state: >
           {% set pv = states('sensor.zendure_1_pv_leistung') | float(0) %}
-          {% set soc = states('sensor.solarflow_800_plus_1_electric_level') | float(0) %}
-          {% set min_soc = states('input_number.zendure_1_neuer_min_soc') | float(10) %}
+          {% set limit = states('sensor.zendure_1_pv_begrenzung') | float(0) %}
           {% set batterie = states('sensor.zendure_1_maximale_batterieleistung') | float(0) %}
-          {% if soc < min_soc %}
-            {{ [pv * 0.5, 800] | min | round(0) }}
+          {% if limit > 0 %}
+            {{ [pv * (1 - limit / 100), 800] | min | round(0) }}
           {% else %}
             {{ [pv + batterie, 800] | min | round(0) }}
           {% endif %}
@@ -140,15 +139,36 @@ template:
           {% set gesamt = states('sensor.zendure_gesamt_maximale_ac_leistung') | float(0) %}
           {{ (maximal / gesamt * 100) | round(2) if gesamt > 0 else 0 }}
 
+
       # ------------------------------------------------------
       # ZENDURE 1 – PV-BEGRENZUNG
       # ------------------------------------------------------
       - name: "Zendure 1 PV Begrenzung"
         unique_id: zendure_1_pv_begrenzung
+        unit_of_measurement: "%"
         state: >
           {% set soc = states('sensor.solarflow_800_plus_1_electric_level') | float(0) %}
           {% set min_soc = states('input_number.zendure_1_neuer_min_soc') | float(10) %}
-          {{ 'aktiv: 50 %' if soc < min_soc else 'Inaktiv' }}
+          {% set zen_soc = states('number.solarflow_800_plus_1_min_soc') | float(0) %}
+          {% if soc < zen_soc %}
+            100
+          {% else %}
+            {{ [[(min_soc - soc) * 20, 0] | max, 100] | min | round(0) }}
+          {% endif %}
+
+      # ------------------------------------------------------
+      # ZENDURE 1 – PV-BEGRENZUNG-ANZEIGE
+      # ------------------------------------------------------
+      - name: "Zendure 1 PV Begrenzung Anzeige"
+        unique_id: zendure_1_pv_begrenzung_anzeige
+        state: >
+          {% set leistung = states('sensor.solarflow_800_plus_1_output_home_power') | float(0) %}
+          {% set limit = states('sensor.zendure_1_pv_begrenzung') | float(0) %}
+          {% if leistung == 0 or limit == 0 %}
+            Inaktiv
+          {% else %}
+            Aktiv: {{ limit | round(0) | int }} %
+          {% endif %}
 
       # ------------------------------------------------------
       # ZENDURE 1 – PV-LEISTUNG
@@ -187,11 +207,10 @@ template:
         state_class: measurement
         state: >
           {% set pv = states('sensor.zendure_2_pv_leistung') | float(0) %}
-          {% set soc = states('sensor.solarflow_800_plus_2_electric_level') | float(0) %}
-          {% set min_soc = states('input_number.zendure_2_neuer_min_soc') | float(10) %}
+          {% set limit = states('sensor.zendure_2_pv_begrenzung') | float(0) %}
           {% set batterie = states('sensor.zendure_2_maximale_batterieleistung') | float(0) %}
-          {% if soc < min_soc %}
-            {{ [pv * 0.5, 800] | min | round(0) }}
+          {% if limit > 0 %}
+            {{ [pv * (1 - limit / 100), 800] | min | round(0) }}
           {% else %}
             {{ [pv + batterie, 800] | min | round(0) }}
           {% endif %}
@@ -225,10 +244,30 @@ template:
       # ------------------------------------------------------
       - name: "Zendure 2 PV Begrenzung"
         unique_id: zendure_2_pv_begrenzung
+        unit_of_measurement: "%"
         state: >
           {% set soc = states('sensor.solarflow_800_plus_2_electric_level') | float(0) %}
           {% set min_soc = states('input_number.zendure_2_neuer_min_soc') | float(10) %}
-          {{ 'aktiv: 50 %' if soc < min_soc else 'Inaktiv' }}
+          {% set zen_soc = states('number.solarflow_800_plus_2_min_soc') | float(0) %}
+          {% if soc < zen_soc %}
+            100
+          {% else %}
+            {{ [[(min_soc - soc) * 20, 0] | max, 100] | min | round(0) }}
+          {% endif %}
+
+      # ------------------------------------------------------
+      # ZENDURE 2 – PV-BEGRENZUNG-ANZEIGE
+      # ------------------------------------------------------
+      - name: "Zendure 2 PV Begrenzung Anzeige"
+        unique_id: zendure_2_pv_begrenzung_anzeige
+        state: >
+          {% set leistung = states('sensor.solarflow_800_plus_2_output_home_power') | float(0) %}
+          {% set limit = states('sensor.zendure_2_pv_begrenzung') | float(0) %}
+          {% if leistung == 0 or limit == 0 %}
+            Inaktiv
+          {% else %}
+            Aktiv: {{ limit | round(0) | int }} %
+          {% endif %}
 
       # ------------------------------------------------------
       # ZENDURE 2 – PV-LEISTUNG

@@ -1,8 +1,8 @@
 alias: Zendure Mindest-SoC Berechnung
 description: >-
   Berechnet zu diversen Zeiten den neuen Mindest-SoC beider Zendure anhand der
-  Bewölkungsprognose und aktualisiert den Zeitpunkt der letzten erfolgreichen
-  Berechnung.
+  durchschnittlichen Bewölkung zwischen 08:00 und 18:00 Uhr und aktualisiert den
+  Zeitpunkt der letzten erfolgreichen Berechnung.
 triggers:
   - trigger: sun.sunrise
     id: Sonnenaufgang
@@ -26,28 +26,41 @@ actions:
       entity_id: weather.forecast_home
     data:
       type: hourly
-    response_variable: stündlicher_forecast
+    response_variable: stuendlicher_forecast
   - variables:
-      ziel_zeit: |
+      ziel_datum: |
         {% if trigger.id == 'Sonnenuntergang-2h' %}
-          {{ (now() + timedelta(days=1)).replace(hour=12, minute=0, second=0).strftime('%Y-%m-%dT%H') }}
+          {{ (now() + timedelta(days=1)).strftime('%Y-%m-%d') }}
         {% else %}
-          {{ now().replace(hour=12, minute=0, second=0).strftime('%Y-%m-%dT%H') }}
+          {{ now().strftime('%Y-%m-%d') }}
         {% endif %}
+  - variables:
       wolkenanteil: >
-        {% set info = stündlicher_forecast['weather.forecast_home'].forecast %}
-        {% set treffer = info | selectattr('datetime', 'search', ziel_zeit) |
-        map(attribute='cloud_coverage') | list %} {{ treffer[0] if treffer |
-        length > 0 else -1 }}
+        {% set info = stuendlicher_forecast['weather.forecast_home'].forecast %}
+        {% set ns = namespace(werte=[]) %}
+
+        {% for eintrag in info %}
+          {% set zeit = as_local(as_datetime(eintrag.datetime)) %}
+
+          {% if zeit.strftime('%Y-%m-%d') == ziel_datum
+                and 8 <= zeit.hour <= 18
+                and eintrag.cloud_coverage is defined
+                and is_number(eintrag.cloud_coverage) %}
+            {% set ns.werte = ns.werte + [eintrag.cloud_coverage | float] %}
+          {% endif %}
+        {% endfor %}
+
+        {{ ((ns.werte | sum) / (ns.werte | count)) | round(1)
+           if ns.werte | count > 0 else -1 }}
   - choose:
       - conditions:
           - condition: template
-            value_template: '{{ wolkenanteil | float(0) < 0 }}'
+            value_template: '{{ wolkenanteil | float(-1) < 0 }}'
         sequence:
-          - stop: Keine Wettervorhersage für den gewünschten Zeitpunkt verfügbar
+          - stop: Keine gültige Bewölkungsprognose verfügbar
       - conditions:
           - condition: template
-            value_template: '{{ wolkenanteil | float(0) > 75 }}'
+            value_template: '{{ wolkenanteil | float(-1) > 75 }}'
         sequence:
           - action: input_number.set_value
             target:
@@ -75,7 +88,6 @@ actions:
         data:
           timestamp: '{{ now().timestamp() }}'
   - action: automation.turn_on
-    metadata: {}
     target:
       entity_id: automation.zendure_ubernahme_neue_mindest_soc
     data: {}

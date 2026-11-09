@@ -159,34 +159,40 @@ Der **geplante** Mindest-SoC ist entscheidend, auch wenn er noch nicht an Zendur
 
 ## Maximale AC-Leistung je Zendure
 
-Die maximal **freigegebene** AC-Leistung berücksichtigt die PV-Leistung und den Batteriezustand. Unterhalb des geplanten Mindest-SoC soll ein Teil der PV-Erzeugung für das Wiederaufladen verfügbar bleiben.
+Die maximal **freigegebene** AC-Leistung berücksichtigt die PV-Leistung, den Batteriezustand und eine dynamische PV-Reserve von **0 bis 100 %**. Diese Reserve wird für jedes Gerät getrennt berechnet.
 
-| Tatsächlicher Batterie-SoC | Maximale AC-Leistung |
-|---|---|
-| **Über** geplantem Mindest-SoC | `min(PV + 600 W, 800 W)` |
-| **Gleich** geplantem Mindest-SoC | `min(PV, 800 W)` |
-| **Unter** geplantem Mindest-SoC | `min(PV × 0,5, 800 W)` |
+| Bedingung | PV-Reserve | Maximale AC-Leistung |
+|---|---|---|
+| Batterie-SoC **unter** dem tatsächlich im Gerät eingestellten Mindest-SoC | 100 % | `0 W` |
+| Batterie-SoC mindestens auf dem eingestellten, aber **unter** dem geplanten Mindest-SoC | `min((geplanter Mindest-SoC − Batterie-SoC) × 20 %, 100 %)` | `min(PV × (1 − PV-Reserve / 100), 800 W)` |
+| Batterie-SoC **gleich** geplantem Mindest-SoC | 0 % | `min(PV, 800 W)` |
+| Batterie-SoC **über** geplantem Mindest-SoC | 0 % | `min(PV + 600 W, 800 W)` |
 
-Die Grenze beträgt **800 W je Gerät**. Unterhalb des geplanten Mindest-SoC werden nur **50 % der aktuellen PV-Leistung** für die AC-Ausgabe freigegeben; die übrige PV-Leistung soll vorrangig zum Laden des Akkus zur Verfügung stehen. Sobald der geplante Mindest-SoC erreicht ist, wird wieder die gesamte PV-Leistung berücksichtigt; erst **oberhalb** davon kommt die Batteriefreigabe hinzu.
+Die Grenze beträgt **800 W je Gerät**. Pro Prozentpunkt unter dem geplanten Mindest-SoC werden **20 % der PV-Leistung reserviert**, höchstens 100 %. Solange eine PV-Reserve aktiv ist, wird keine zusätzliche Batterieleistung zur maximalen AC-Leistung addiert. Unterhalb des tatsächlich eingestellten Mindest-SoC beträgt die PV-Reserve unabhängig vom geplanten Wert **100 %**.
 
 ### Statusanzeige der PV-Begrenzung
 
-Zwei zusätzliche Template-Sensoren machen sichtbar, ob die 50-%-PV-Regel für das jeweilige Gerät rechnerisch aktiv ist:
+Zwei numerische Template-Sensoren berechnen die dynamische PV-Reserve für die Leistungsregelung:
 
-| Sensor | SoC unter Mindest-SoC | SoC gleich oder über Mindest-SoC |
-|---|---|---|
-| `sensor.zendure_1_pv_begrenzung` | `aktiv: 50 %` | `Inaktiv` |
-| `sensor.zendure_2_pv_begrenzung` | `aktiv: 50 %` | `Inaktiv` |
+- `sensor.zendure_1_pv_begrenzung` – PV-Reserve Zendure 1 in Prozent (0–100 %).
+- `sensor.zendure_2_pv_begrenzung` – PV-Reserve Zendure 2 in Prozent (0–100 %).
 
-Die Sensoren vergleichen den aktuellen Batterie-SoC mit dem jeweiligen geplanten Mindest-SoC. Sie dienen ausschließlich der Statusanzeige und steuern die Geräte nicht selbst.
+Zwei separate Sensoren dienen ausschließlich der Statusanzeige im Dashboard:
 
-Die tatsächliche Begrenzung erfolgt weiterhin über die Berechnung der maximal freigegebenen AC-Leistung. Der Status `aktiv: 50 %` bezeichnet die rechnerische PV-Freigabe, nicht eine bestätigte tatsächliche Akkuladeleistung.
+| Sensor | Anzeige |
+|---|---|
+| `sensor.zendure_1_pv_begrenzung_anzeige` | `Inaktiv` bei 0 W tatsächlicher AC-Ausgangsleistung oder 0 % PV-Reserve; sonst `Aktiv: XX %` |
+| `sensor.zendure_2_pv_begrenzung_anzeige` | `Inaktiv` bei 0 W tatsächlicher AC-Ausgangsleistung oder 0 % PV-Reserve; sonst `Aktiv: XX %` |
+
+Die numerischen Sensoren steuern die Berechnung der maximal freigegebenen AC-Leistung. Die Anzeigesensoren beeinflussen die Regelung nicht. Eine angezeigte PV-Reserve bezeichnet keine bestätigte tatsächliche Akkuladeleistung.
 
 | Beispiel je Gerät | PV | Batterie-SoC / geplant | Batteriefreigabe | Maximale AC-Leistung |
 |---|---:|---:|---:|---:|
 | Entladung erlaubt | 350 W | 45 % / 15 % | 600 W | 800 W |
 | Mindest-SoC erreicht | 350 W | 15 % / 15 % | 0 W | 350 W |
-| Mindest-SoC unterschritten | 350 W | 12 % / 15 % | 0 W | 175 W |
+| Mindest-SoC unterschritten | 350 W | 12 % / 15 % | 0 W | 140 W |
+
+Die Beispiele setzen einen tatsächlich eingestellten Mindest-SoC von **10 %** voraus. Bei 12 % aktuellem und 15 % geplantem SoC beträgt die PV-Reserve **60 %**. Liegt der tatsächliche SoC dagegen unter dem eingestellten Geräteminimum, werden **100 %** reserviert.
 
 Sensoren: `sensor.zendure_1_maximale_ac_leistung`, `sensor.zendure_2_maximale_ac_leistung`.
 
@@ -282,11 +288,11 @@ Die Automation **Zendure Mindest-SoC Berechnung** wertet dreimal täglich eine s
 
 | Auslösung | Ausgewertete Bewölkung |
 |---|---|
-| Sonnenaufgang | Heute, 12:00 Uhr |
-| Mittag | Heute, 12:00 Uhr |
-| Zwei Stunden vor Sonnenuntergang | Morgen, 12:00 Uhr |
+| Sonnenaufgang | Heute, stündliche Prognosen von 08:00 bis 18:00 Uhr |
+| Mittag (12:00 Uhr) | Heute, verbleibende stündliche Prognosen bis 18:00 Uhr |
+| Zwei Stunden vor Sonnenuntergang | Morgen, stündliche Prognosen von 08:00 bis 18:00 Uhr |
 
-Verwendet werden `weather.get_forecasts`, die Entität `weather.forecast_home`, der Prognosetyp `hourly` und das Feld `cloud_coverage`.
+Verwendet werden `weather.get_forecasts`, die Entität `weather.forecast_home`, der Prognosetyp `hourly` und das Feld `cloud_coverage`. Aus den passenden Stundenwerten wird die **durchschnittliche Bewölkung** gebildet. Nur bei einem Durchschnitt **über 75 %** wird ein geplanter Mindest-SoC von 15 % gewählt.
 
 Die Wetter-Entität `weather.forecast_home` war bereits durch die Erstinstallation von Home Assistant vorhanden und musste nicht zusätzlich eingerichtet werden.
 
@@ -326,7 +332,7 @@ Nur dann wird der geplante Wert an das betreffende Gerät übertragen. Unterschi
 
 **Beispiel 1:** Aktueller SoC **40 %**, bisheriges Minimum **10 %**, neues geplantes Minimum **15 %**. Die Übertragung ist zulässig; die Leistungsberechnung berücksichtigt die neue Grenze bereits.
 
-**Beispiel 2:** Aktueller SoC **12 %**, bisheriges Minimum **10 %**, neues geplantes Minimum **15 %**. Die Geräteübernahme wartet. Die zusätzliche Batteriefreigabe ist bereits **0 W**, und die maximale AC-Leistung wird auf **50 % der PV-Leistung** begrenzt, damit der Akku vorrangig wieder aufladen kann. Sobald er mindestens **15 %** erreicht, darf die Übertragung erfolgen.
+**Beispiel 2:** Aktueller SoC **12 %**, bisheriges Minimum **10 %**, neues geplantes Minimum **15 %**. Die Geräteübernahme wartet. Die zusätzliche Batteriefreigabe ist bereits **0 W**, und die maximale AC-Leistung wird bei einem tatsächlich eingestellten Mindest-SoC von 10 % auf **40 % der PV-Leistung** begrenzt (60 % PV-Reserve), damit der Akku vorrangig wieder aufladen kann. Sobald er mindestens **15 %** erreicht, darf die Übertragung erfolgen.
 
 ### Sinkende Bewölkung: Mindest-SoC senken
 
@@ -342,7 +348,7 @@ Nach einem Automationsdurchlauf wird geprüft, ob **beide** eingestellten Mindes
 
 ## Zusammenspiel der Regelstrategien
 
-Die Wetterprognose beeinflusst die AC-Ausgabe **indirekt**: Sie ändert den geplanten Mindest-SoC. Dieser beeinflusst die Batteriefreigabe und gegebenenfalls die 50-%-PV-Regel; daraus folgen neue maximale AC-Leistungen, Leistungsanteile und AC-Sollwerte.
+Die Wetterprognose beeinflusst die AC-Ausgabe **indirekt**: Sie ändert den geplanten Mindest-SoC. Dieser beeinflusst die Batteriefreigabe und gegebenenfalls die dynamische PV-Reserve; daraus folgen neue maximale AC-Leistungen, Leistungsanteile und AC-Sollwerte.
 
 ### Beispiel: Geplanten Mindest-SoC von 10 % auf 15 % erhöhen
 
@@ -354,10 +360,10 @@ Die Batterie-SoCs und PV-Leistungen bleiben im Beispiel unverändert:
 | PV-Leistung | 100 W | 200 W |
 | **Maximum bei geplantem Mindest-SoC 10 %** | **700 W** | **800 W** |
 | Anteil bei 10 % | 46,67 % | 53,33 % |
-| **Maximum bei geplantem Mindest-SoC 15 %** | **50 W** | **800 W** |
-| Anteil bei 15 % | 5,88 % | 94,12 % |
+| **Maximum bei geplantem Mindest-SoC 15 %** | **40 W** | **800 W** |
+| Anteil bei 15 % | 4,76 % | 95,24 % |
 
-Vor der Änderung stehen rechnerisch **1.500 W** zur Verfügung, danach **850 W**. Zendure 1 liegt mit 12 % SoC unter dem neuen geplanten Minimum und erhält daher nur **50 % seiner 100 W PV-Leistung** als AC-Freigabe. Zendure 2 darf weiterhin PV- und Batterieleistung beitragen. Die Aufteilung verschiebt sich entsprechend.
+Vor der Änderung stehen rechnerisch **1.500 W** zur Verfügung, danach **840 W**. Bei einem tatsächlich eingestellten Mindest-SoC von 10 % liegt Zendure 1 mit 12 % SoC unter dem neuen geplanten Minimum und erhält wegen **60 % PV-Reserve nur 40 % seiner 100 W PV-Leistung** als AC-Freigabe. Zendure 2 darf weiterhin PV- und Batterieleistung beitragen. Die Aufteilung verschiebt sich entsprechend.
 
 ## Besonderheiten der gewählten Steuerung
 
@@ -369,7 +375,7 @@ Die wesentlichen Entscheidungen sind:
 - **Kleiner positiver Netzbezugs-Sollwert:** 10, 20 oder 30 W dienen als Regelreserve.
 - **Gesamtbedarf auf 900 W begrenzt:** Die eigene Steuerung fordert nicht mehr an.
 - **Wetterabhängige Reserve:** Geplanter Mindest-SoC von 10 oder 15 %.
-- **50-%-PV-Freigabe unter geplantem Mindest-SoC:** Ein Teil der Solarenergie soll für die Akkuladung verfügbar bleiben.
+- **Dynamische PV-Reserve von 0 bis 100 %:** Unter geplantem Mindest-SoC wird pro Prozentpunkt 20 % PV-Leistung reserviert; unter dem tatsächlich eingestellten Geräteminimum 100 %.
 - **Geräteweise Begrenzung der AC-Sollwerte:** Kein Sollwert über dem rechnerisch freigegebenen Gerätemaximum.
 - **Geplanter und eingestellter Mindest-SoC getrennt:** Neue Reserven wirken sofort auf die Leistungsberechnung; die Geräteübernahme kann warten.
 - **Unabhängige Mindest-SoC-Übernahme:** Unterschiedliche Akkuladestände werden einzeln geprüft.
@@ -378,7 +384,7 @@ Die wesentlichen Entscheidungen sind:
 
 Bei steigender Hauslast erhöht sich der AC-Gesamtbedarf bis zur 900-W-Grenze; bei sinkender Last reduziert er sich. Änderungen der PV-Leistung oder der Batterieladestände verändern die freigegebenen Leistungen und damit die prozentuale Aufteilung.
 
-Erreicht ein Akku seinen geplanten Mindest-SoC, entfällt die zusätzliche Batteriefreigabe. **Unterschreitet** er die geplante Grenze, sinkt seine maximale AC-Leistung auf **50 % der PV-Leistung**. Der andere Zendure kann entsprechend mehr übernehmen, soweit dessen eigenes Maximum und der gemeinsame Bedarf dies zulassen.
+Erreicht ein Akku seinen geplanten Mindest-SoC, entfällt die zusätzliche Batteriefreigabe. **Unterschreitet** er die geplante Grenze, sinkt seine maximale AC-Leistung entsprechend der dynamischen PV-Reserve; unter dem tatsächlich eingestellten Geräteminimum auf **0 W**. Der andere Zendure kann entsprechend mehr übernehmen, soweit dessen eigenes Maximum und der gemeinsame Bedarf dies zulassen.
 
 Parallel kann die Wetterberechnung die geplanten Mindest-SoC-Werte ändern und so unmittelbar neue AC-Sollwerte auslösen.
 
@@ -392,7 +398,7 @@ Parallel kann die Wetterberechnung die geplanten Mindest-SoC-Werte ändern und s
 | Hausverbrauch über der Regelgrenze | Der gemeinsame AC-Bedarf bleibt auf 900 W begrenzt. |
 | Verfügbare AC-Leistung unter dem Bedarf | Beide AC-Sollwerte werden auf ihre Gerätemaxima begrenzt; Restbedarf bleibt für Netz oder andere Quellen. |
 | Geplanter Mindest-SoC noch nicht erreichbar | Die Übernahme wartet, die neue Grenze gilt aber bereits für die Leistungsberechnung. |
-| 50-%-PV-Reserve | Die tatsächliche Akkuladung hängt vom internen Geräteverhalten ab. PV-Schwankungen können bis zur nächsten Leistungsanpassung (regulär spätestens nach 5 Sekunden) zu einer kurzfristigen Batterieentladung führen. |
+| Dynamische PV-Reserve | Die tatsächliche Akkuladung hängt vom internen Geräteverhalten ab. PV-Schwankungen können bis zur nächsten Leistungsanpassung (regulär spätestens nach 5 Sekunden) zu einer kurzfristigen Batterieentladung führen. |
 | Bewölkungsprognose | Keine vollständige Ertragsprognose unter Einbeziehung aller Module, Ausrichtungen und Verschattungen. |
 
 Die tatsächlich bereitgestellte AC-Leistung hängt weiterhin von den Betriebsbedingungen und geräteseitigen Grenzen ab.
@@ -401,7 +407,7 @@ Die tatsächlich bereitgestellte AC-Leistung hängt weiterhin von den Betriebsbe
 
 Die Solarsteuerung ist eingerichtet und wurde im laufenden Betrieb erfolgreich getestet. Die dynamische Aufteilung berücksichtigt die unterschiedlichen PV-Leistungen und Batterie-SoCs; die wetterabhängige Mindest-SoC-Berechnung und die geräteweise Übernahme sind Bestandteil der Steuerung. Der **Zendure Manager bleibt ausgeschaltet**.
 
-Die neu ergänzte 50-%-PV-Regel und die Begrenzung der AC-Sollwerte sollten zusätzlich im laufenden Betrieb beobachtet werden. Die bisherige Funktion bestätigt nicht automatisch alle Sonderfälle.
+Die dynamische PV-Reserve und die Begrenzung der AC-Sollwerte sollten zusätzlich im laufenden Betrieb beobachtet werden. Die bisherige Funktion bestätigt nicht automatisch alle Sonderfälle.
 
 MQTT-Verbindung, Gerätekommunikation und technische Einrichtung sind in der Zendure-Dokumentation beschrieben.
 
@@ -414,8 +420,9 @@ MQTT-Verbindung, Gerätekommunikation und technische Einrichtung sind in der Zen
 
 ## 🔗 Verwendung & Verknüpfungen
 
-- [Shelly](../integrationen/shelly.md) – Netzleistungsmessung als Grundlage der Solarsteuerung
-- [Zendure](../integrationen/zendure.md) – Einrichtung der SolarFlow-Geräte, Template-Sensoren, Helfer und Automationen
+- [Shelly](../apps/shelly.md) – Netzleistungsmessung als Grundlage der Solarsteuerung
+- [Solarsteuerung – Template-Sensoren](../skripte/home-assistant/sensoren/solarsteuerung.yaml) – YAML-Konfiguration der Sensoren und Berechnungslogik
+- [Zendure](../apps/zendure.md) – Einrichtung der SolarFlow-Geräte, Template-Sensoren, Helfer und Automationen
 
 ---
 

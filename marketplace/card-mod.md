@@ -27,7 +27,7 @@ Die farblichen Hervorhebungen werden über Templates abhängig von aktuellen Sen
 | Farbe | Bedingung |
 |---|---|
 | Blau | Berechnete AC-Soll-Leistung unterscheidet sich von der eingestellten AC-Ausgangsgrenze. |
-| Gelb | 50-%-PV-Begrenzung aktiv oder Batterieheizung eingeschaltet. |
+| Gelb | Dynamische PV-Begrenzung (0–100 %) aktiv oder Batterieheizung eingeschaltet. |
 | Rot | Wechselrichtertemperatur unter 0 °C oder über 60 °C beziehungsweise Batterietemperatur unter 0 °C oder über 40 °C. |
 
 Die übrigen Karten werden überwiegend transparent dargestellt, um ein einheitliches Erscheinungsbild zu erreichen.
@@ -36,7 +36,7 @@ Die übrigen Karten werden überwiegend transparent dargestellt, um ein einheitl
 
 Die vollständigen CSS- und Template-Anpassungen befinden sich in:
 
-[Home Assistant – dashboard.yaml](../../skripte/home-assistant/dashboard.yaml)
+[Home Assistant – dashboard.yaml](../skripte/home-assistant/dashboard.yaml)
 
 ## Nützliche Links & Quellen
 
@@ -44,7 +44,7 @@ Die vollständigen CSS- und Template-Anpassungen befinden sich in:
 
 ## 🔗 Verwendung & Verknüpfungen
 
-- [Dashboard-Konfiguration](../../skripte/home-assistant/dashboard.yaml) – CSS-Anpassungen und Statusfarben
+- [Dashboard-Konfiguration](../skripte/home-assistant/dashboard.yaml) – CSS-Anpassungen und Statusfarben
 
 ---
 

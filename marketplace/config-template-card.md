@@ -16,7 +16,7 @@ Die **Config Template Card** wurde über den Home Assistant Marketplace installi
 
 Im Solar-Dashboard wird die Config Template Card für die Batterie-Rundinstrumente beider Zendure SolarFlow 800 Plus verwendet.
 
-Der jeweils geplante Mindest-SoC wird dynamisch als Grenze zwischen dem roten und dem grauen Bereich dargestellt.
+Das Batterie-Rundinstrument verwendet drei Farbbereiche: Rot unterhalb des tatsächlich im Zendure-Gerät eingestellten Mindest-SoC, Blau zwischen diesem Wert und einem höheren geplanten Mindest-SoC sowie Grau oberhalb der Mindest-SoC-Grenzen. Sind beide Mindest-SoC-Werte gleich, entfällt der blaue Bereich.
 
 Verwendete Helfer:
 
@@ -29,7 +29,7 @@ Dadurch passt sich die Darstellung automatisch an die wetterabhängig berechnete
 
 Die vollständige Kartenkonfiguration befindet sich in:
 
-[Home Assistant – dashboard.yaml](../../skripte/home-assistant/dashboard.yaml)
+[Home Assistant – dashboard.yaml](../skripte/home-assistant/dashboard.yaml)
 
 ## Nützliche Links & Quellen
 
@@ -37,7 +37,7 @@ Die vollständige Kartenkonfiguration befindet sich in:
 
 ## 🔗 Verwendung & Verknüpfungen
 
-- [Dashboard-Konfiguration](../../skripte/home-assistant/dashboard.yaml) – Verwendung der Config Template Card
+- [Dashboard-Konfiguration](../skripte/home-assistant/dashboard.yaml) – Verwendung der Config Template Card
 
 ---
 

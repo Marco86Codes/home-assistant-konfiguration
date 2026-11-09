@@ -1,18 +1,18 @@
 alias: Aktualisierung Windows-Sicherung Zeitstempel
-description: Aktualisiert den Zeitstempel nach einer erfolgreichen Windows-Sicherung.
-
+description: ''
 triggers:
   - trigger: webhook
-    webhook_id: "<EIGENE-WEBHOOK-ID>"
     allowed_methods:
       - POST
+      - PUT
     local_only: true
-
+    webhook_id: -WN8RddHA3fK_nzt9m-_VG_M7
+conditions: []
 actions:
   - action: input_datetime.set_datetime
+    metadata: {}
     target:
       entity_id: input_datetime.letzte_windows_sicherung
     data:
-      datetime: "{{ now() }}"
-
+      datetime: '{{ now() }}'
 mode: single

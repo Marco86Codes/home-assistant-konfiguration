@@ -1,5 +1,8 @@
 alias: Zendure Mindest-SoC Übernahme
-description: 'Übernimmt den geplanten Mindest-SoC für beide Zendure unabhängig voneinander, sobald der jeweilige Batterie-SoC erreicht ist. Deaktiviert sich nach erfolgreicher Übernahme beider Werte.'
+description: >-
+  Übernimmt den geplanten Mindest-SoC für beide Zendure unabhängig voneinander,
+  sobald der jeweilige Batterie-SoC erreicht ist. Deaktiviert sich nach
+  erfolgreicher Übernahme beider Werte.
 triggers:
   - trigger: battery.level_changed
     target:

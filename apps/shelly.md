@@ -87,4 +87,4 @@ Die Gesamtleistung wird über den Template-Sensor `sensor.shelly_netzleistung_ge
 
 ---
 
-- [⬅️ Zurück zur Übersicht](README.md)
+- [⬅️ Zurück zur Übersicht](../README.md)

@@ -32,7 +32,7 @@ Die einzelnen Komponenten werden über Knoten und Verbindungen zu einem gemeinsa
 
 Die vollständige Konfiguration mit Knoten, Verbindungen, Positionen und Darstellungseinstellungen befindet sich in:
 
-[Home Assistant – dashboard.yaml](../../skripte/home-assistant/dashboard.yaml)
+[Home Assistant – dashboard.yaml](../skripte/home-assistant/dashboard.yaml)
 
 ## Nützliche Links & Quellen
 
@@ -40,7 +40,7 @@ Die vollständige Konfiguration mit Knoten, Verbindungen, Positionen und Darstel
 
 ## 🔗 Verwendung & Verknüpfungen
 
-- [Dashboard-Konfiguration](../../skripte/home-assistant/dashboard.yaml) – Energieflussdiagramm mit allen Knoten und Verbindungen
+- [Dashboard-Konfiguration](../skripte/home-assistant/dashboard.yaml) – Energieflussdiagramm mit allen Knoten und Verbindungen
 
 ---
 

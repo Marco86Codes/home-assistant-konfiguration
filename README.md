@@ -32,7 +32,7 @@ Dieses Repository dokumentiert den Aufbau meines Smart Homes mit Home Assistant.
 
 ### Marketplace
 
-- [Config Template Card](marketplace/config-template-card.md) – Dynamische Darstellung des geplanten Mindest-SoC in den Batterie-Rundinstrumenten
+- [Config Template Card](marketplace/config-template-card.md) – Dynamische Farbbereiche in den Batterie-Rundinstrumenten anhand des eingestellten und des geplanten Mindest-SoC
 - [card-mod](marketplace/card-mod.md) – Individuelle Gestaltung der Dashboard-Karten und farbliche Statusanzeigen
 - [Home Flow Card](marketplace/home-flow-card.md) – Grafische Darstellung der Energieflüsse zwischen PV, Batterien, Haus und Netz
 
@@ -58,7 +58,7 @@ Dieses Repository dokumentiert den Aufbau meines Smart Homes mit Home Assistant.
 
 **Sensoren**
 
-- [Solarsteuerung](skripte/home-assistant/sensors/solarsteuerung.yaml) – Template-Sensoren für Netzleistung, Hausverbrauch, PV-Leistung, Batteriefreigabe und dynamische AC-Leistungsverteilung
+- [Solarsteuerung](skripte/home-assistant/sensoren/solarsteuerung.yaml) – Template-Sensoren für Netzleistung, Hausverbrauch, PV-Leistung, Batteriefreigabe und dynamische AC-Leistungsverteilung
 
 ### Windows
 

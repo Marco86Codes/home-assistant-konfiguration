@@ -25,7 +25,7 @@ Die Solaransicht zeigt für beide Zendure-Geräte:
 - Aktuell eingestellte und neu berechnete AC-Ausgangsgrenze.
 - Prozentualen Leistungsanteil an der gesamten AC-Ausgabe.
 - Batterielade- und Entladeleistung.
-- Status der 50-%-PV-Begrenzung.
+- Status der dynamischen PV-Begrenzung (0–100 %).
 - Temperaturen von Wechselrichter und Akku.
 - Status der Batterieheizung.
 
@@ -38,7 +38,7 @@ Bestimmte Werte werden abhängig vom aktuellen Zustand farblich hervorgehoben:
 | Farbe | Bedeutung |
 |---|---|
 | Blau | Berechnete AC-Soll-Leistung weicht von der eingestellten AC-Ausgangsgrenze ab. |
-| Gelb | 50-%-PV-Begrenzung ist aktiv oder die Batterieheizung ist eingeschaltet. |
+| Gelb | Dynamische PV-Begrenzung ist aktiv oder die Batterieheizung ist eingeschaltet. |
 | Rot | Wechselrichtertemperatur außerhalb von 0 bis 60 °C oder Batterietemperatur außerhalb von 0 bis 40 °C. |
 
 Die farbliche Darstellung dient der schnellen Erkennung besonderer Betriebszustände.
@@ -74,7 +74,7 @@ Die Erweiterungen wurden über den Home Assistant Marketplace installiert.
 
 Die vollständige Dashboard-Konfiguration ist in der folgenden Datei hinterlegt:
 
-[Home Assistant – dashboard.yaml](../../skripte/home-assistant/dashboard.yaml)
+[Home Assistant – dashboard.yaml](../skripte/home-assistant/dashboard.yaml)
 
 Die Datei enthält die Ansichten, Karten, verwendeten Entitäten und Darstellungseinstellungen.
 
