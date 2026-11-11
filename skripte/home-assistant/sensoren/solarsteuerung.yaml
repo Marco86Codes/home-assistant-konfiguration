@@ -17,7 +17,6 @@ input_number:
     min: 0
     max: 100
     step: 1
-    initial: 10
     icon: mdi:weather-cloudy
 
   # ------------------------------------------------------
@@ -28,7 +27,6 @@ input_number:
     min: 0
     max: 100
     step: 1
-    initial: 10
     icon: mdi:weather-cloudy
 
 template:
@@ -84,6 +82,21 @@ template:
           {{ (a + b + c) | round(2) }}
 
       # ------------------------------------------------------
+      # SHELLY – NETZLEISTUNG GESAMT ANZEIGE
+      # ------------------------------------------------------
+      - name: "Shelly Netzleistung Gesamt Anzeige"
+        unique_id: shelly_netzleistung_gesamt_anzeige
+        default_entity_id: sensor.shelly_netzleistung_gesamt_anzeige
+        unit_of_measurement: "W"
+        device_class: power
+        state_class: measurement
+        state: >
+          {% set a = states('sensor.shelly3em_phase_a_leistung') | float(0) %}
+          {% set b = states('sensor.shelly3em_phase_b_leistung') | float(0) %}
+          {% set c = states('sensor.shelly3em_phase_c_leistung') | float(0) %}
+          {{ (a + b + c) | round(0) }}
+
+      # ------------------------------------------------------
       # ZENDURE 1 – AC-SOLL-LEISTUNG
       # ------------------------------------------------------
       - name: "Zendure 1 AC Soll-Leistung"
@@ -106,11 +119,17 @@ template:
         device_class: power
         state_class: measurement
         state: >
-          {% set pv = states('sensor.zendure_1_pv_leistung') | float(0) %}
-          {% set limit = states('sensor.zendure_1_pv_begrenzung') | float(0) %}
+          {% set soc = states('sensor.solarflow_800_plus_1_electric_level') | float(0) %}
+          {% set geplant = states('input_number.zendure_1_neuer_min_soc') | float(0) %}
+          {% set eingestellt = states('number.solarflow_800_plus_1_min_soc') | float(0) %}
+          {% set min_soc = [geplant, eingestellt] | max %}
+          {% set pv = states('sensor.solarflow_800_plus_1_pv_power') | float(0) %}
+          {% set reserve = states('sensor.zendure_1_pv_begrenzung') | float(0) %}
           {% set batterie = states('sensor.zendure_1_maximale_batterieleistung') | float(0) %}
-          {% if limit > 0 %}
-            {{ [pv * (1 - limit / 100), 800] | min | round(0) }}
+          {% if soc <= min_soc %}
+            0
+          {% elif reserve > 0 %}
+            {{ [pv * (1 - reserve / 100), 800] | min | round(0) }}
           {% else %}
             {{ [pv + batterie, 800] | min | round(0) }}
           {% endif %}
@@ -125,8 +144,9 @@ template:
         state_class: measurement
         state: >
           {% set soc = states('sensor.solarflow_800_plus_1_electric_level') | float(0) %}
-          {% set min_soc = states('input_number.zendure_1_neuer_min_soc') | float(100) %}
-          {{ 600 if soc > min_soc else 0 }}
+          {% set geplant = states('input_number.zendure_1_neuer_min_soc') | float(0) %}
+          {% set eingestellt = states('number.solarflow_800_plus_1_min_soc') | float(0) %}
+          {{ 600 if soc > [geplant, eingestellt] | max else 0 }}
 
       # ------------------------------------------------------
       # ZENDURE 1 – PROZENTUALER LEISTUNGSANTEIL
@@ -135,10 +155,34 @@ template:
         unique_id: zendure_1_leistungsanteil
         unit_of_measurement: "%"
         state: >
-          {% set maximal = states('sensor.zendure_1_maximale_ac_leistung') | float(0) %}
-          {% set gesamt = states('sensor.zendure_gesamt_maximale_ac_leistung') | float(0) %}
-          {{ (maximal / gesamt * 100) | round(2) if gesamt > 0 else 0 }}
-
+          {% set bedarf = states('sensor.zendure_gesamt_ac_leistungsbedarf') | float(0) %}
+          {% set max1 = states('sensor.zendure_1_maximale_ac_leistung') | float(0) %}
+          {% set max2 = states('sensor.zendure_2_maximale_ac_leistung') | float(0) %}
+          {% set soc1 = states('sensor.solarflow_800_plus_1_electric_level') | float(0) %}
+          {% set soc2 = states('sensor.solarflow_800_plus_2_electric_level') | float(0) %}
+          {% set min1 = [
+            states('input_number.zendure_1_neuer_min_soc') | float(0),
+            states('number.solarflow_800_plus_1_min_soc') | float(0)
+          ] | max %}
+          {% set min2 = [
+            states('input_number.zendure_2_neuer_min_soc') | float(0),
+            states('number.solarflow_800_plus_2_min_soc') | float(0)
+          ] | max %}
+          {% set pv1 = states('sensor.solarflow_800_plus_1_pv_power') | float(0) %}
+          {% set pv2 = states('sensor.solarflow_800_plus_2_pv_power') | float(0) %}
+          {% set batterie1 = 600 * (soc1 - min1) / (100 - min1) if soc1 > min1 and min1 < 100 else 0 %}
+          {% set batterie2 = 600 * (soc2 - min2) / (100 - min2) if soc2 > min2 and min2 < 100 else 0 %}
+          {% set gewicht1 = (batterie1 + [pv1, 0] | max) if max1 > 0 else 0 %}
+          {% set gewicht2 = (batterie2 + [pv2, 0] | max) if max2 > 0 else 0 %}
+          {% set gesamt = gewicht1 + gewicht2 %}
+          {% set ziel = [bedarf, max1 + max2] | min %}
+          {% if bedarf <= 0 or gesamt <= 0 %}
+            0
+          {% else %}
+            {% set anteil1 = ziel * gewicht1 / gesamt %}
+            {% set leistung1 = [max1, [ziel - max2, anteil1] | max] | min %}
+            {{ (leistung1 / bedarf * 100) | round(2) }}
+          {% endif %}
 
       # ------------------------------------------------------
       # ZENDURE 1 – PV-BEGRENZUNG
@@ -206,11 +250,17 @@ template:
         device_class: power
         state_class: measurement
         state: >
-          {% set pv = states('sensor.zendure_2_pv_leistung') | float(0) %}
-          {% set limit = states('sensor.zendure_2_pv_begrenzung') | float(0) %}
+          {% set soc = states('sensor.solarflow_800_plus_2_electric_level') | float(0) %}
+          {% set geplant = states('input_number.zendure_2_neuer_min_soc') | float(0) %}
+          {% set eingestellt = states('number.solarflow_800_plus_2_min_soc') | float(0) %}
+          {% set min_soc = [geplant, eingestellt] | max %}
+          {% set pv = states('sensor.solarflow_800_plus_2_pv_power') | float(0) %}
+          {% set reserve = states('sensor.zendure_2_pv_begrenzung') | float(0) %}
           {% set batterie = states('sensor.zendure_2_maximale_batterieleistung') | float(0) %}
-          {% if limit > 0 %}
-            {{ [pv * (1 - limit / 100), 800] | min | round(0) }}
+          {% if soc <= min_soc %}
+            0
+          {% elif reserve > 0 %}
+            {{ [pv * (1 - reserve / 100), 800] | min | round(0) }}
           {% else %}
             {{ [pv + batterie, 800] | min | round(0) }}
           {% endif %}
@@ -225,8 +275,9 @@ template:
         state_class: measurement
         state: >
           {% set soc = states('sensor.solarflow_800_plus_2_electric_level') | float(0) %}
-          {% set min_soc = states('input_number.zendure_2_neuer_min_soc') | float(100) %}
-          {{ 600 if soc > min_soc else 0 }}
+          {% set geplant = states('input_number.zendure_2_neuer_min_soc') | float(0) %}
+          {% set eingestellt = states('number.solarflow_800_plus_2_min_soc') | float(0) %}
+          {{ 600 if soc > [geplant, eingestellt] | max else 0 }}
 
       # ------------------------------------------------------
       # ZENDURE 2 – PROZENTUALER LEISTUNGSANTEIL
@@ -235,9 +286,35 @@ template:
         unique_id: zendure_2_leistungsanteil
         unit_of_measurement: "%"
         state: >
-          {% set maximal = states('sensor.zendure_2_maximale_ac_leistung') | float(0) %}
-          {% set gesamt = states('sensor.zendure_gesamt_maximale_ac_leistung') | float(0) %}
-          {{ (maximal / gesamt * 100) | round(2) if gesamt > 0 else 0 }}
+          {% set bedarf = states('sensor.zendure_gesamt_ac_leistungsbedarf') | float(0) %}
+          {% set max1 = states('sensor.zendure_1_maximale_ac_leistung') | float(0) %}
+          {% set max2 = states('sensor.zendure_2_maximale_ac_leistung') | float(0) %}
+          {% set soc1 = states('sensor.solarflow_800_plus_1_electric_level') | float(0) %}
+          {% set soc2 = states('sensor.solarflow_800_plus_2_electric_level') | float(0) %}
+          {% set min1 = [
+            states('input_number.zendure_1_neuer_min_soc') | float(0),
+            states('number.solarflow_800_plus_1_min_soc') | float(0)
+          ] | max %}
+          {% set min2 = [
+            states('input_number.zendure_2_neuer_min_soc') | float(0),
+            states('number.solarflow_800_plus_2_min_soc') | float(0)
+          ] | max %}
+          {% set pv1 = states('sensor.solarflow_800_plus_1_pv_power') | float(0) %}
+          {% set pv2 = states('sensor.solarflow_800_plus_2_pv_power') | float(0) %}
+          {% set batterie1 = 600 * (soc1 - min1) / (100 - min1) if soc1 > min1 and min1 < 100 else 0 %}
+          {% set batterie2 = 600 * (soc2 - min2) / (100 - min2) if soc2 > min2 and min2 < 100 else 0 %}
+          {% set gewicht1 = (batterie1 + [pv1, 0] | max) if max1 > 0 else 0 %}
+          {% set gewicht2 = (batterie2 + [pv2, 0] | max) if max2 > 0 else 0 %}
+          {% set gesamt = gewicht1 + gewicht2 %}
+          {% set ziel = [bedarf, max1 + max2] | min %}
+          {% if bedarf <= 0 or gesamt <= 0 %}
+            0
+          {% else %}
+            {% set anteil1 = ziel * gewicht1 / gesamt %}
+            {% set leistung1 = [max1, [ziel - max2, anteil1] | max] | min %}
+            {% set leistung2 = ziel - leistung1 %}
+            {{ (leistung2 / bedarf * 100) | round(2) }}
+          {% endif %}
 
       # ------------------------------------------------------
       # ZENDURE 2 – PV-BEGRENZUNG
@@ -306,6 +383,22 @@ template:
           {% set soc1 = states('sensor.solarflow_800_plus_1_electric_level') | float(0) %}
           {% set soc2 = states('sensor.solarflow_800_plus_2_electric_level') | float(0) %}
           {{ ((soc1 + soc2) / 2) | round(1) }}
+
+      # ---------------------------------------------------------
+      # ZENDURE GESAMT EINSPEISUNG
+      # ---------------------------------------------------------
+      - name: "Zendure Gesamt Einspeisung"
+        unique_id: zendure_gesamt_einspeisung
+        unit_of_measurement: "W"
+        device_class: power
+        state_class: measurement
+        state: >
+          {{
+            (
+              (states('sensor.solarflow_800_plus_1_output_home_power') | float(0))
+              + (states('sensor.solarflow_800_plus_2_output_home_power') | float(0))
+            ) | round(1)
+          }}
 
       # ------------------------------------------------------
       # ZENDURE – GESAMT MAXIMALE AC-LEISTUNG 

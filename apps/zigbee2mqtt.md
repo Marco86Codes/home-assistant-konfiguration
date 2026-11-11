@@ -46,7 +46,9 @@ Zigbee2MQTT verwendet die Home-Assistant-App **Mosquitto broker** als MQTT-Broke
 
 Als Broker-Adresse wird `mqtt://core-mosquitto:1883` verwendet.
 
-Für die Anmeldung wird der separat angelegte Home-Assistant-Benutzer ohne Administratorrechte verwendet.
+Für die Anmeldung wird der separat angelegte Home-Assistant-Benutzer `mqtt_z2m` ohne Administratorrechte verwendet.
+
+Für diesen Benutzer ist in Home Assistant die Option **„Nur lokaler Zugriff“** aktiviert.
 
 Als MQTT-Basisthema wird `zigbee2mqtt` verwendet.
 

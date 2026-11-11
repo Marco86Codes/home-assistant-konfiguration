@@ -1059,7 +1059,7 @@ views:
                 }
           - type: heading
             icon: ''
-            heading_style: subtitle
+            heading_style: title
           - show_current: false
             show_forecast: true
             type: weather-forecast
@@ -1075,6 +1075,151 @@ views:
                   box-shadow: none !important;
                   border: none !important;
                 }
+          - type: heading
+            icon: ''
+            heading_style: title
+          - type: markdown
+            content: |
+              ### Übersicht
+            card_mod:
+              style:
+                .: |
+                  ha-card {
+                    background: transparent !important;
+                    box-shadow: none !important;
+                    border: none !important;
+                    border-top: 2px solid #E0E0E0 !important;
+                    border-radius: 0 !important;
+                    margin-top: -8px !important;
+                    margin-bottom: -8px !important;
+                    overflow: hidden !important;
+                    scrollbar-width: none !important;
+                  }
+                ha-markdown$: |
+                  h3 {
+                    text-align: center !important;
+                    font-size: 18px !important;
+                  }
+          - square: false
+            type: grid
+            columns: 4
+            cards:
+              - type: tile
+                entity: sensor.hausverbrauch_gesamt
+                name: Gesamt
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.zendure_gesamt_einspeisung
+                name: Zendure
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.shelly_netzleistung_gesamt_anzeige
+                name: Netz
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.netzbezug_soll
+                name: Netz Soll
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
         card_mod:
           style: |
             :host {
@@ -1082,7 +1227,6 @@ views:
               border-right: 2px solid #B0B0B0;
               padding-left: 8px;
               padding-right: 8px;
-              margin-left: -14px;
               margin-left: -14px;
               box-sizing: border-box;
             }
@@ -1319,6 +1463,10 @@ views:
               margin-left: -14px;
               margin-right: -14px;
             }
+      - type: grid
+        cards:
+          - type: heading
+            heading: Neuer Abschnitt
     show_icon_and_title: true
     cards: []
     max_columns: 3

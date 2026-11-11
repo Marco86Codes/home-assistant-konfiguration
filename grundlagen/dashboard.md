@@ -20,9 +20,9 @@ Das Dashboard verwendet die Home-Assistant-Ansicht **Sections** und enthält fol
 
 Die Solaransicht zeigt für beide Zendure-Geräte:
 
-- Aktuellen Batterie-SoC als Rundinstrument mit dynamischer Mindest-SoC-Markierung.
+- Aktuellen Batterie-SoC als Rundinstrument mit dynamischen Farbbereichen für den eingestellten und geplanten Mindest-SoC.
 - PV-Leistung der beiden Eingänge und deren Gesamtleistung.
-- Aktuell eingestellte und neu berechnete AC-Ausgangsgrenze.
+- Tatsächliche AC-Ausgangsleistung und neu berechnete AC-Soll-Leistung.
 - Prozentualen Leistungsanteil an der gesamten AC-Ausgabe.
 - Batterielade- und Entladeleistung.
 - Status der dynamischen PV-Begrenzung (0–100 %).
@@ -30,6 +30,11 @@ Die Solaransicht zeigt für beide Zendure-Geräte:
 - Status der Batterieheizung.
 
 Zusätzlich werden eine tägliche und eine stündliche Wettervorhersage angezeigt.
+Eine zusätzliche Übersicht zeigt den gesamten Hausverbrauch, die aktuelle
+AC-Einspeiseleistung beider Zendure-Geräte als Summe, die aktuelle Netzleistung
+und den gewünschten Netzbezugs-Sollwert. Die Gesamteinspeisung wird über den
+Sensor `sensor.zendure_gesamt_einspeisung` erfasst und im Dashboard als
+„Zendure“ angezeigt.
 
 ### Statusfarben
 
@@ -61,7 +66,7 @@ Für die Darstellung werden drei zusätzliche benutzerdefinierte Dashboard-Karte
 
 | Erweiterung | Verwendung |
 |---|---|
-| Config Template Card | Dynamische Darstellung des geplanten Mindest-SoC im Batterie-Rundinstrument. |
+| Config Template Card | Dynamische Farbbereiche der Batterie-Rundinstrumente anhand des eingestellten und geplanten Mindest-SoC. |
 | card-mod | Anpassung von Hintergründen, Abständen, Schriftgrößen und zustandsabhängigen Farben. |
 | Home Flow Card | Grafische Darstellung der Energieflüsse zwischen PV, Batterien, Haus und Netz. |
 

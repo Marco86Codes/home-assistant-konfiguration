@@ -29,7 +29,7 @@ Der integrierte Zendure Manager wird für die Leistungsregelung nicht verwendet.
 Folgende Komponenten müssen bereits eingerichtet sein:
 
 - Mosquitto Broker
-- Home-Assistant-Benutzer mit lokalem Zugang für Zendure MQTT
+- Home-Assistant-Benutzer `mqtt_zendure` mit aktivierter Option „Nur lokaler Zugriff“
 - Shelly 3EM mit berechnetem Sensor für die gesamte Netzleistung
 - Beide SolarFlow 800 Plus in der Zendure-App erreichbar
 
@@ -53,7 +53,7 @@ Der Token wird später bei der Einrichtung der Home-Assistant-Integration benöt
 
 ### MQTT-Benutzer anlegen
 
-Für die Kommunikation wird ein separater Home-Assistant-Benutzer **ohne Administratorrechte** und **mit lokalem Zugang** verwendet.
+Für die Kommunikation wird der separate Home-Assistant-Benutzer `mqtt_zendure` **ohne Administratorrechte** verwendet. Für diesen Benutzer ist die Option **„Nur lokaler Zugriff“** aktiviert.
 
 Der Benutzer wird unter **Home Assistant → Einstellungen → Personen → Benutzer** angelegt.
 
@@ -176,58 +176,13 @@ Als Grundlage dienen:
 
 Die erforderlichen Template-Sensoren und Helfer sind zentral in der Datei `solarsteuerung.yaml` definiert.
 
-
 ### Sensoren und Helfer
 
-Die Solarsteuerung verwendet Template-Sensoren zur Berechnung des Hausverbrauchs, des Leistungsbedarfs und der dynamischen Leistungsaufteilung zwischen beiden Zendure-Geräten.
+Die selbst erstellten Template-Sensoren und Helfer sind zentral in `solarsteuerung.yaml` definiert.
 
-#### Netzleistung und Leistungsbedarf
+Dazu gehören die Berechnung des Hausverbrauchs, der gesamten AC-Einspeisung beider Zendure-Geräte, des AC-Leistungsbedarfs, der PV- und Batterieleistung, der dynamischen Leistungsaufteilung sowie der AC-Sollwerte und Mindest-SoC-Werte.
 
-| Sensor | Berechnung und Zweck |
-|---|---|
-| `sensor.shelly_netzleistung_gesamt` | Summiert die Netzleistung aller drei Shelly-Phasen. Positive Werte bedeuten Netzbezug, negative Werte Netzeinspeisung. |
-| `sensor.hausverbrauch_gesamt` | Addiert die Netzleistung und die tatsächliche AC-Ausgangsleistung beider Zendure. Ermittelt daraus den gesamten Hausverbrauch. |
-| `sensor.netzbezug_soll` | Legt abhängig vom durchschnittlichen Batterie-SoC einen Netzbezugs-Sollwert von 10, 20 oder 30 W fest. Sind beide geplanten Mindest-SoC-Werte auf 10 %, beträgt der Sollwert immer 10 W. |
-| `sensor.zendure_gesamt_ac_leistungsbedarf` | Berechnet den Hausverbrauch abzüglich des Netzbezugs-Sollwerts. Das Ergebnis wird auf 0 bis 900 W begrenzt. |
-
-#### PV- und Batterieleistung
-
-| Sensor | Berechnung und Zweck |
-|---|---|
-| `sensor.zendure_1_pv_leistung` | Summiert die Leistung beider PV-Eingänge von Zendure 1. |
-| `sensor.zendure_1_pv_begrenzung` | Berechnet die PV-Reserve von 0 bis 100 %. Je Prozentpunkt unter dem geplanten Mindest-SoC werden 20 % reserviert. Liegt der aktuelle SoC unter dem am Gerät eingestellten Mindest-SoC, beträgt die Reserve 100 %. |
-| `sensor.zendure_1_pv_begrenzung_anzeige` | Zeigt den Status der PV-Reserve im Dashboard an. |
-| `sensor.zendure_2_pv_leistung` | Summiert die Leistung beider PV-Eingänge von Zendure 2. |
-| `sensor.zendure_2_pv_begrenzung` | Berechnet die PV-Reserve von 0 bis 100 %. Je Prozentpunkt unter dem geplanten Mindest-SoC werden 20 % reserviert. Liegt der aktuelle SoC unter dem am Gerät eingestellten Mindest-SoC, beträgt die Reserve 100 %. |
-| `sensor.zendure_2_pv_begrenzung_anzeige` | Zeigt den Status der PV-Reserve im Dashboard an. |
-| `sensor.zendure_1_maximale_batterieleistung` | Gibt 600 W frei, wenn der Batterie-SoC von Zendure 1 über dem geplanten Mindest-SoC liegt. Andernfalls 0 W. |
-| `sensor.zendure_2_maximale_batterieleistung` | Gibt 600 W frei, wenn der Batterie-SoC von Zendure 2 über dem geplanten Mindest-SoC liegt. Andernfalls 0 W. |
-| `sensor.zendure_1_maximale_ac_leistung` | Berechnet die maximal freigegebene AC-Leistung von Zendure 1. Bei 0 % PV-Reserve werden PV- und verfügbare Batterieleistung addiert. Bei einer Reserve über 0 % wird nur der nicht reservierte PV-Anteil freigegeben. Maximal 800 W. |
-| `sensor.zendure_2_maximale_ac_leistung` | Berechnet die maximal freigegebene AC-Leistung von Zendure 2. Bei 0 % PV-Reserve werden PV- und verfügbare Batterieleistung addiert. Bei einer Reserve über 0 % wird nur der nicht reservierte PV-Anteil freigegeben. Maximal 800 W. |
-| `sensor.zendure_gesamt_maximale_ac_leistung` | Summiert die maximal verfügbare AC-Leistung beider Zendure. |
-
-#### Dynamische Leistungsaufteilung
-
-| Sensor | Berechnung und Zweck |
-|---|---|
-| `sensor.zendure_1_leistungsanteil` | Berechnet den prozentualen Anteil von Zendure 1 an der gesamten verfügbaren AC-Leistung. |
-| `sensor.zendure_2_leistungsanteil` | Berechnet den prozentualen Anteil von Zendure 2 an der gesamten verfügbaren AC-Leistung. |
-| `sensor.zendure_1_ac_soll_leistung` | Berechnet den anteiligen AC-Leistungsbedarf von Zendure 1 und begrenzt ihn auf die maximal freigegebene AC-Leistung dieses Geräts. |
-| `sensor.zendure_2_ac_soll_leistung` | Berechnet den anteiligen AC-Leistungsbedarf von Zendure 2 und begrenzt ihn auf die maximal freigegebene AC-Leistung dieses Geräts. |
-
-#### Batterieladestand und Helfer
-
-| Entität | Berechnung und Zweck |
-|---|---|
-| `sensor.zendure_gesamt_soc_durchschnitt` | Berechnet den durchschnittlichen Batterieladestand beider Zendure. |
-| `input_number.zendure_1_neuer_min_soc` | Speichert den wetterabhängig geplanten Mindest-SoC für Zendure 1. |
-| `input_number.zendure_2_neuer_min_soc` | Speichert den wetterabhängig geplanten Mindest-SoC für Zendure 2. |
-| `input_datetime.zendure_letzte_min_soc_berechnung` | Speichert den Zeitpunkt der letzten erfolgreichen Mindest-SoC-Berechnung. |
-
-Die geplanten Mindest-SoC-Werte werden bereits bei der Berechnung der verfügbaren Batterieleistung berücksichtigt, unabhängig davon, ob sie bereits an die Zendure-Geräte übertragen wurden.
-
-Die numerischen PV-Begrenzungs-Sensoren berechnen die PV-Reserve für die AC-Leistungsfreigabe. Die separaten Anzeigesensoren `sensor.zendure_1_pv_begrenzung_anzeige` und `sensor.zendure_2_pv_begrenzung_anzeige` zeigen `Inaktiv`, wenn die tatsächliche AC-Ausgangsleistung 0 W beträgt oder keine PV-Reserve vorgesehen ist. Andernfalls zeigen sie `Aktiv: XX %`. Sie dienen ausschließlich der Anzeige im Dashboard.
-
+Die vollständige Berechnungslogik und die zugehörigen Sensoren sind in der [Solarsteuerung](../grundlagen/solarsteuerung.md) dokumentiert.
 
 ### Automationen
 
@@ -235,27 +190,15 @@ Für die Steuerung werden drei Automationen verwendet.
 
 **Zendure Leistungsanpassung**
 
-Die standardmäßige 50:50-Leistungsaufteilung der Zendure-App berücksichtigt die unterschiedlichen Bedingungen der beiden Solaranlagen nicht ausreichend. Durch verschieden leistungsstarke PV-Module, unterschiedliche Ausrichtungen und standortbedingte Verschattung steht beiden SolarFlow-Geräten nicht immer dieselbe Leistung zur Verfügung.
+Die Automation überträgt die von der eigenen Solarsteuerung berechneten AC-Soll-Leistungen an beide SolarFlow 800 Plus.
 
-Die eigene Home-Assistant-Steuerung ersetzt diese feste Aufteilung durch eine **dynamische, prozentuale Leistungsverteilung**.
+Die dynamische Leistungsaufteilung berücksichtigt die aktuelle PV-Leistung, die nutzbare Batterieladung oberhalb des wirksamen Mindest-SoC sowie die maximal freigegebene AC-Leistung jedes Geräts.
 
-Dabei werden folgende Faktoren berücksichtigt:
+Kann ein Gerät seinen berechneten Anteil nicht vollständig liefern, wird die Differenz dem anderen Gerät zugeteilt, soweit dessen Leistungsgrenze dies erlaubt.
 
-- Die aktuell verfügbare PV-Leistung jedes SolarFlow-Geräts
-- Der jeweilige Batterieladestand (SoC)
-- Der geplante Mindest-SoC beider Batterien
-- Der gesamte AC-Leistungsbedarf des Hauses
-- Der dynamische Netzbezugs-Sollwert
+Die Automation überprüft regelmäßig die eingestellten AC-Ausgangsgrenzen und passt sie bei Abweichungen an.
 
-Aus der verfügbaren PV-Leistung und der abhängig vom Batterieladestand nutzbaren Batterieleistung wird zunächst die maximal freigegebene AC-Leistung jedes Geräts ermittelt.
-
-Liegt der Batterieladestand unter dem geplanten Mindest-SoC, wird pro Prozentpunkt Differenz eine PV-Reserve von 20 % berücksichtigt, maximal 100 %. Liegt der SoC unter dem tatsächlich am Gerät eingestellten Mindest-SoC, beträgt die Reserve unabhängig vom geplanten Wert 100 %. Bei einer PV-Reserve über 0 % wird ausschließlich der nicht reservierte PV-Anteil für die AC-Ausgabe freigegeben; die Batterieleistung wird nicht hinzugerechnet.
-
-Anschließend werden die prozentualen Leistungsanteile berechnet und der gesamte AC-Leistungsbedarf entsprechend auf beide SolarFlow 800 Plus verteilt. Die jeweiligen AC-Soll-Leistungen werden dabei auf die zuvor berechneten maximal freigegebenen AC-Leistungen begrenzt.
-
-Die Automation überprüft regelmäßig, ob die eingestellten AC-Ausgangsgrenzen von den berechneten Soll-Werten abweichen, und passt diese bei Bedarf an.
-
-Dadurch wird die Leistungsaufteilung automatisch an die unterschiedlichen Erzeugungsbedingungen und Batterieladestände angepasst, anstatt beide Geräte unabhängig von ihrer verfügbaren Leistung gleichmäßig zu belasten.
+Die vollständige Berechnungslogik ist in der [Solarsteuerung](../grundlagen/solarsteuerung.md) beschrieben.
 
 **Zendure Mindest-SoC Berechnung**
 
@@ -269,12 +212,12 @@ Nach erfolgreicher Berechnung wird der Zeitstempel aktualisiert und die Übernah
 
 Überträgt den geplanten Mindest-SoC unabhängig für beide Zendure.
 
-Der neu berechnete Mindest-SoC wird bereits vor der Übertragung an die Geräte als **Referenz für die Batterieentladung** verwendet.
+Der neu berechnete Mindest-SoC wird bereits vor der Übertragung an die Geräte als **Referenz für die Batterieentladung** verwendet. Für die Freigabe der Batterie- und AC-Leistung gilt jedoch immer der höhere Wert aus geplantem und tatsächlich am Gerät eingestelltem Mindest-SoC.
 
 Dabei werden zwei Situationen berücksichtigt:
 
 - **Steigende Bewölkung:** Wird der geplante Mindest-SoC angehoben, wird die Entnahme aus der jeweiligen Batterie bereits beim neuen Grenzwert begrenzt. Dadurch bleibt eine größere Energiereserve erhalten.
-- **Sinkende Bewölkung:** Wird der geplante Mindest-SoC gesenkt, darf die Batterie weiter entladen werden. Dadurch wird zusätzliche gespeicherte Energie genutzt und gleichzeitig mehr Speicherkapazität für die erwartete höhere Solarproduktion freigegeben.
+- **Sinkende Bewölkung:** Wird der geplante Mindest-SoC gesenkt, bleibt zunächst der höhere, tatsächlich am Gerät eingestellte Mindest-SoC für die Freigabe der Batterie- und AC-Leistung maßgeblich. Erst nach der Übernahme des niedrigeren Mindest-SoC kann die Batterie weiter entladen werden. Dadurch wird zusätzliche gespeicherte Energie genutzt und gleichzeitig mehr Speicherkapazität für die erwartete höhere Solarproduktion freigegeben.
 
 Die tatsächliche Übertragung an Zendure erfolgt nur, wenn sich der geplante Wert vom eingestellten Mindest-SoC unterscheidet und der aktuelle Batterieladestand mindestens dem geplanten Wert entspricht.
 
@@ -306,12 +249,11 @@ Nach der Einrichtung wurde das Protokoll des Mosquitto-Brokers überprüft.
 Beide SolarFlow 800 Plus haben sich erfolgreich mit dem separat angelegten Benutzer verbunden. Im Mosquitto-Protokoll wurden für beide Geräte erfolgreiche Verbindungen auf Port `1883` bestätigt.
 
 Erkennbar sind diese beispielsweise an folgenden Meldungen:
-
 ```text
 New connection from <GERÄTE-IP>:<PORT> on port 1883.
+
 New client connected from <GERÄTE-IP>:<PORT> as <CLIENT-ID> (...).
 ```
-
 Damit ist die MQTT-Authentifizierung beider Geräte am lokalen Broker nachgewiesen.
 
 ### Messwerte und Gerätereport
@@ -336,11 +278,9 @@ Die Felder und ihre Werte lassen sich anhand der empfangenen JSON-Meldungen übe
 #### Lokalen HTTP-Report prüfen
 
 Für die Diagnose der lokalen HTTP-Schnittstelle kann folgende Adresse im Browser aufgerufen werden:
-
 ```text
 http://<GERÄTE-IP>/properties/report
 ```
-
 `<GERÄTE-IP>` wird durch die lokale IP-Adresse des jeweiligen SolarFlow 800 Plus ersetzt. Die Adresse muss von einem Gerät im selben Heimnetz aufgerufen werden.
 
 ### Steuerung

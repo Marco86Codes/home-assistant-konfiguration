@@ -65,7 +65,7 @@ Die Steuerung verwendet:
 ```
 
 
-Die Berechnung erfolgt in dieser Reihenfolge: Netzleistung → Hausverbrauch → Netzbezugs-Sollwert → AC-Gesamtbedarf → PV-Leistung → freigegebene Batterieleistung → maximale AC-Leistung → Leistungsanteile → begrenzte AC-Sollwerte → Übertragung.
+Die Berechnung erfolgt in dieser Reihenfolge: Netzleistung → Hausverbrauch → Netzbezugs-Sollwert → AC-Gesamtbedarf → PV-Leistung und Batterie-SoC → maximale AC-Leistung und SoC-/PV-Gewichtung → Leistungsaufteilung mit Umverteilung bei Leistungsgrenzen → begrenzte AC-Sollwerte → Übertragung.
 
 ## Netzleistung und Hausverbrauch
 
@@ -76,6 +76,10 @@ Netzleistung gesamt = Phase A + Phase B + Phase C
 ```
 
 `sensor.shelly_netzleistung_gesamt`
+
+Für die Anzeige im Dashboard wird zusätzlich der Sensor `sensor.shelly_netzleistung_gesamt_anzeige` verwendet. Er berechnet die Summe der drei Shelly-Phasenleistungen und rundet das Ergebnis auf ganze Watt (0 Nachkommastellen).
+
+Der Anzeigesensor dient ausschließlich der Darstellung im Dashboard. Die Solarsteuerung verwendet weiterhin `sensor.shelly_netzleistung_gesamt` mit der ursprünglichen Messgenauigkeit.
 
 | Netzleistung | Bedeutung |
 |---|---|
@@ -146,16 +150,16 @@ Sensoren: `sensor.zendure_1_pv_leistung`, `sensor.zendure_2_pv_leistung`.
 
 ### Freigegebene Batterieleistung
 
-Je Gerät werden rechnerisch **600 W zusätzliche Batterieleistung** freigegeben, solange der tatsächliche SoC **über** dem in Home Assistant geplanten Mindest-SoC liegt. Bei gleichem oder niedrigerem SoC beträgt die Freigabe **0 W**.
+Je Gerät werden rechnerisch **600 W zusätzliche Batterieleistung** freigegeben, solange der tatsächliche SoC **über** dem höheren Wert aus dem in Home Assistant geplanten und dem tatsächlich am Gerät eingestellten Mindest-SoC liegt. Bei gleichem oder niedrigerem SoC beträgt die Freigabe **0 W**.
 
 ```text
-Batterie-SoC > geplanter Mindest-SoC → 600 W
-Batterie-SoC ≤ geplanter Mindest-SoC →   0 W
+Batterie-SoC > max(geplanter Mindest-SoC, eingestellter Mindest-SoC) → 600 W
+Batterie-SoC ≤ max(geplanter Mindest-SoC, eingestellter Mindest-SoC) →   0 W
 ```
 
 Sensoren: `sensor.zendure_1_maximale_batterieleistung`, `sensor.zendure_2_maximale_batterieleistung`.
 
-Der **geplante** Mindest-SoC ist entscheidend, auch wenn er noch nicht an Zendure übertragen wurde. So reagiert die Leistungsregelung unmittelbar auf eine neue Wetterprognose.
+Maßgeblich ist der höhere Wert aus **geplantem** und **tatsächlich eingestelltem** Mindest-SoC. So reagiert die Leistungsregelung unmittelbar auf eine neue Wetterprognose, ohne bereits vor der Übernahme eines niedrigeren Mindest-SoC Batterieleistung freizugeben.
 
 ## Maximale AC-Leistung je Zendure
 
@@ -164,11 +168,11 @@ Die maximal **freigegebene** AC-Leistung berücksichtigt die PV-Leistung, den Ba
 | Bedingung | PV-Reserve | Maximale AC-Leistung |
 |---|---|---|
 | Batterie-SoC **unter** dem tatsächlich im Gerät eingestellten Mindest-SoC | 100 % | `0 W` |
-| Batterie-SoC mindestens auf dem eingestellten, aber **unter** dem geplanten Mindest-SoC | `min((geplanter Mindest-SoC − Batterie-SoC) × 20 %, 100 %)` | `min(PV × (1 − PV-Reserve / 100), 800 W)` |
-| Batterie-SoC **gleich** geplantem Mindest-SoC | 0 % | `min(PV, 800 W)` |
-| Batterie-SoC **über** geplantem Mindest-SoC | 0 % | `min(PV + 600 W, 800 W)` |
+| Batterie-SoC mindestens auf dem eingestellten, aber **unter** dem geplanten Mindest-SoC | `min((geplanter Mindest-SoC − Batterie-SoC) × 20 %, 100 %)` | `0 W` |
+| Batterie-SoC **gleich** dem höheren Wert aus geplantem und eingestelltem Mindest-SoC | Abhängig vom geplanten Mindest-SoC | `0 W` |
+| Batterie-SoC **über** dem höheren Wert aus geplantem und eingestelltem Mindest-SoC | 0 % | `min(PV + 600 W, 800 W)` |
 
-Die Grenze beträgt **800 W je Gerät**. Pro Prozentpunkt unter dem geplanten Mindest-SoC werden **20 % der PV-Leistung reserviert**, höchstens 100 %. Solange eine PV-Reserve aktiv ist, wird keine zusätzliche Batterieleistung zur maximalen AC-Leistung addiert. Unterhalb des tatsächlich eingestellten Mindest-SoC beträgt die PV-Reserve unabhängig vom geplanten Wert **100 %**.
+Die Grenze beträgt **800 W je Gerät**. Pro Prozentpunkt unter dem geplanten Mindest-SoC werden **20 % der PV-Leistung reserviert**, höchstens 100 %. Solange eine PV-Reserve aktiv ist, wird keine zusätzliche Batterieleistung zur maximalen AC-Leistung addiert. Unterhalb des tatsächlich eingestellten Mindest-SoC beträgt die PV-Reserve unabhängig vom geplanten Wert **100 %**. Die maximale AC-Leistung beträgt grundsätzlich **0 W**, solange der Batterie-SoC nicht über dem höheren Wert aus geplantem und eingestelltem Mindest-SoC liegt.
 
 ### Statusanzeige der PV-Begrenzung
 
@@ -189,8 +193,8 @@ Die numerischen Sensoren steuern die Berechnung der maximal freigegebenen AC-Lei
 | Beispiel je Gerät | PV | Batterie-SoC / geplant | Batteriefreigabe | Maximale AC-Leistung |
 |---|---:|---:|---:|---:|
 | Entladung erlaubt | 350 W | 45 % / 15 % | 600 W | 800 W |
-| Mindest-SoC erreicht | 350 W | 15 % / 15 % | 0 W | 350 W |
-| Mindest-SoC unterschritten | 350 W | 12 % / 15 % | 0 W | 140 W |
+| Mindest-SoC erreicht | 350 W | 15 % / 15 % | 0 W | 0 W |
+| Mindest-SoC unterschritten | 350 W | 12 % / 15 % | 0 W | 0 W |
 
 Die Beispiele setzen einen tatsächlich eingestellten Mindest-SoC von **10 %** voraus. Bei 12 % aktuellem und 15 % geplantem SoC beträgt die PV-Reserve **60 %**. Liegt der tatsächliche SoC dagegen unter dem eingestellten Geräteminimum, werden **100 %** reserviert.
 
@@ -305,14 +309,18 @@ Die geplanten Werte stehen in:
 
 Der Zeitpunkt der letzten erfolgreichen Berechnung steht in `input_datetime.zendure_letzte_min_soc_berechnung`.
 
+Für die beiden Mindest-SoC-Helfer ist kein fester Initialwert definiert. Dadurch werden die zuletzt gespeicherten Werte nach einem Neustart von Home Assistant wiederhergestellt.
+
 **Fehlt eine passende gültige Prognose**, wird die Berechnung abgebrochen: Die bisherigen geplanten Werte bleiben bestehen, und der Zeitstempel wird nicht aktualisiert.
 
 ## Geplanter und tatsächlich eingestellter Mindest-SoC
 
 Die Steuerung unterscheidet bewusst zwischen:
 
-- **Geplantem Mindest-SoC:** Von Home Assistant berechnete Grenze; wirkt **sofort** auf Batteriefreigabe und maximale AC-Leistung.
+- **Geplantem Mindest-SoC:** Von Home Assistant berechnete Grenze; wird **sofort** bei der Leistungsberechnung berücksichtigt.
 - **Eingestelltem Mindest-SoC:** Tatsächlicher Grenzwert im Zendure-Gerät; wird erst übertragen, wenn die Übernahmebedingungen erfüllt sind.
+
+Für die Freigabe der Batterie- und AC-Leistung ist immer der **höhere der beiden Mindest-SoC-Werte** maßgeblich.
 
 Der Grund: Wird der geplante Mindest-SoC beispielsweise von **10 % auf 15 %** erhöht, während der Akku erst **12 %** erreicht hat, soll eine sofortige Änderung am Gerät keine unerwünschte Nachladung aus dem Stromnetz auslösen. Home Assistant berücksichtigt die höhere Reserve bereits, wartet mit der Geräteübernahme aber auf ausreichenden SoC.
 
@@ -332,11 +340,11 @@ Nur dann wird der geplante Wert an das betreffende Gerät übertragen. Unterschi
 
 **Beispiel 1:** Aktueller SoC **40 %**, bisheriges Minimum **10 %**, neues geplantes Minimum **15 %**. Die Übertragung ist zulässig; die Leistungsberechnung berücksichtigt die neue Grenze bereits.
 
-**Beispiel 2:** Aktueller SoC **12 %**, bisheriges Minimum **10 %**, neues geplantes Minimum **15 %**. Die Geräteübernahme wartet. Die zusätzliche Batteriefreigabe ist bereits **0 W**, und die maximale AC-Leistung wird bei einem tatsächlich eingestellten Mindest-SoC von 10 % auf **40 % der PV-Leistung** begrenzt (60 % PV-Reserve), damit der Akku vorrangig wieder aufladen kann. Sobald er mindestens **15 %** erreicht, darf die Übertragung erfolgen.
+**Beispiel 2:** Aktueller SoC **12 %**, bisheriges Minimum **10 %**, neues geplantes Minimum **15 %**. Die Geräteübernahme wartet. Die zusätzliche Batteriefreigabe und die maximale AC-Leistung betragen bereits **0 W**, da der aktuelle SoC unter dem höheren der beiden Mindest-SoC-Werte liegt. Die berechnete PV-Reserve beträgt weiterhin **60 %**. Sobald der Akku mindestens **15 %** erreicht, darf die Übertragung erfolgen.
 
 ### Sinkende Bewölkung: Mindest-SoC senken
 
-**Beispiel:** Aktueller SoC **12 %**, bisheriges Minimum **15 %**, neues geplantes Minimum **10 %**. Da der Akku über dem neuen geplanten Wert liegt, werden in Home Assistant wieder **600 W Batterieleistung** freigegeben. Die neue Grenze kann auch direkt an das Gerät übertragen werden. Die Batterie darf anschließend bis zum geplanten Minimum von **10 %** zur AC-Ausgabe beitragen.
+**Beispiel:** Aktueller SoC **12 %**, bisheriges Minimum **15 %**, neues geplantes Minimum **10 %**. Solange am Gerät noch 15 % eingestellt sind, bleiben die Batterie- und AC-Leistung in Home Assistant auf **0 W** begrenzt. Die neue Grenze kann direkt an das Gerät übertragen werden. Erst nach der Übernahme des niedrigeren Mindest-SoC werden wieder **600 W Batterieleistung** freigegeben. Die Batterie darf anschließend bis zum geplanten Minimum von **10 %** zur AC-Ausgabe beitragen.
 
 Die Übernahmebedingung ist für beide Richtungen gleich. Die besondere Wartezeit bei einer Erhöhung dient dazu, eine mögliche unerwünschte Netzladung zu vermeiden.
 
@@ -348,7 +356,7 @@ Nach einem Automationsdurchlauf wird geprüft, ob **beide** eingestellten Mindes
 
 ## Zusammenspiel der Regelstrategien
 
-Die Wetterprognose beeinflusst die AC-Ausgabe **indirekt**: Sie ändert den geplanten Mindest-SoC. Dieser beeinflusst die Batteriefreigabe und gegebenenfalls die dynamische PV-Reserve; daraus folgen neue maximale AC-Leistungen, Leistungsanteile und AC-Sollwerte.
+Die Wetterprognose beeinflusst die AC-Ausgabe **indirekt**: Sie ändert den geplanten Mindest-SoC. Dieser beeinflusst die Batteriefreigabe, die nutzbare Batterieladung für die Leistungsgewichtung und gegebenenfalls die dynamische PV-Reserve. Daraus folgen neue maximale AC-Leistungen, Leistungsanteile und AC-Sollwerte.
 
 ### Beispiel: Geplanten Mindest-SoC von 10 % auf 15 % erhöhen
 
@@ -360,16 +368,16 @@ Die Batterie-SoCs und PV-Leistungen bleiben im Beispiel unverändert:
 | PV-Leistung | 100 W | 200 W |
 | **Maximum bei geplantem Mindest-SoC 10 %** | **700 W** | **800 W** |
 | Anteil bei 10 % | 46,67 % | 53,33 % |
-| **Maximum bei geplantem Mindest-SoC 15 %** | **40 W** | **800 W** |
-| Anteil bei 15 % | 4,76 % | 95,24 % |
+| **Maximum bei geplantem Mindest-SoC 15 %** | **0 W** | **800 W** |
+| Anteil bei 15 % | 0 % | 100 % |
 
-Vor der Änderung stehen rechnerisch **1.500 W** zur Verfügung, danach **840 W**. Bei einem tatsächlich eingestellten Mindest-SoC von 10 % liegt Zendure 1 mit 12 % SoC unter dem neuen geplanten Minimum und erhält wegen **60 % PV-Reserve nur 40 % seiner 100 W PV-Leistung** als AC-Freigabe. Zendure 2 darf weiterhin PV- und Batterieleistung beitragen. Die Aufteilung verschiebt sich entsprechend.
+Vor der Änderung stehen rechnerisch **1.500 W** zur Verfügung, danach **800 W**. Bei einem tatsächlich eingestellten Mindest-SoC von 10 % liegt Zendure 1 mit 12 % SoC unter dem neuen geplanten Minimum. Trotz einer berechneten PV-Reserve von **60 %** beträgt die maximale AC-Leistung **0 W**, da der aktuelle SoC nicht über dem höheren der beiden Mindest-SoC-Werte liegt. Zendure 2 darf weiterhin PV- und Batterieleistung beitragen und übernimmt damit 100 % der verfügbaren AC-Leistung.
 
 ## Besonderheiten der gewählten Steuerung
 
 Die wesentlichen Entscheidungen sind:
 
-- **Keine feste 50:50-Aufteilung:** Jeder Zendure erhält einen Anteil entsprechend seiner eigenen freigegebenen Leistung.
+- **Keine feste 50:50-Aufteilung:** Die aktuelle PV-Leistung und die nutzbare Batterieladung bestimmen die Gewichtung. Erreicht ein Gerät seine maximale AC-Leistung, wird der verbleibende Bedarf auf das andere Gerät umverteilt, soweit dessen Leistungsgrenze dies erlaubt.
 - **Getrennte Batteriebewertung:** Ein Akku kann geschützt werden, während der andere weiter Leistung liefert.
 - **Gemeinsamer Hausverbrauch:** Grundlage ist die Summe aus Netzleistung und beiden AC-Ist-Leistungen.
 - **Kleiner positiver Netzbezugs-Sollwert:** 10, 20 oder 30 W dienen als Regelreserve.
@@ -382,9 +390,9 @@ Die wesentlichen Entscheidungen sind:
 
 ## Regelverhalten im laufenden Betrieb
 
-Bei steigender Hauslast erhöht sich der AC-Gesamtbedarf bis zur 900-W-Grenze; bei sinkender Last reduziert er sich. Änderungen der PV-Leistung oder der Batterieladestände verändern die freigegebenen Leistungen und damit die prozentuale Aufteilung.
+Bei steigender Hauslast erhöht sich der AC-Gesamtbedarf bis zur 900-W-Grenze; bei sinkender Last reduziert er sich. Änderungen der PV-Leistung und der nutzbaren Batterieladung beeinflussen die prozentuale Gewichtung. Die maximal freigegebenen AC-Leistungen begrenzen die Zuteilung. Kann ein Gerät seinen gewichteten Anteil nicht vollständig liefern, übernimmt das andere die Differenz, soweit dessen Leistungsgrenze dies erlaubt.
 
-Erreicht ein Akku seinen geplanten Mindest-SoC, entfällt die zusätzliche Batteriefreigabe. **Unterschreitet** er die geplante Grenze, sinkt seine maximale AC-Leistung entsprechend der dynamischen PV-Reserve; unter dem tatsächlich eingestellten Geräteminimum auf **0 W**. Der andere Zendure kann entsprechend mehr übernehmen, soweit dessen eigenes Maximum und der gemeinsame Bedarf dies zulassen.
+Erreicht ein Akku den höheren Wert aus geplantem und tatsächlich eingestelltem Mindest-SoC, entfallen sowohl die zusätzliche Batteriefreigabe als auch die maximale AC-Leistung. Beide betragen dann **0 W**. Die dynamische PV-Reserve wird weiterhin berechnet, führt jedoch erst bei ausreichendem Batterie-SoC zu einer AC-Freigabe. Der andere Zendure kann entsprechend mehr übernehmen, soweit dessen eigenes Maximum und der gemeinsame Bedarf dies zulassen.
 
 Parallel kann die Wetterberechnung die geplanten Mindest-SoC-Werte ändern und so unmittelbar neue AC-Sollwerte auslösen.
 
