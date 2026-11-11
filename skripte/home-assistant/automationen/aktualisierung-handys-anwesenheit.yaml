@@ -1,0 +1,44 @@
+alias: "Handys – Anwesenheit aktualisieren"
+description: >-
+  Aktualisiert die Anwesenheits-Booleans aller Personen anhand ihrer Handy-Tracker. Bei home wird die Person als anwesend, bei not_home als
+  abwesend markiert. Bei unknown oder unavailable bleibt der letzte Anwesenheitsstatus erhalten.
+triggers:
+  - trigger: state
+    entity_id:
+      - device_tracker.person1_handy
+      - device_tracker.person2_handy
+      - device_tracker.person3_handy
+      - device_tracker.person4_handy
+      - device_tracker.person5_handy
+  - trigger: homeassistant
+    event: start
+conditions: []
+actions:
+  - repeat:
+      for_each:
+        - person1
+        - person2
+        - person3
+        - person4
+        - person5
+      sequence:
+        - choose:
+            - conditions:
+                - condition: template
+                  value_template: >-
+                    {{ is_state('device_tracker.' ~ repeat.item ~ '_handy',
+                    'home') }}
+              sequence:
+                - action: input_boolean.turn_on
+                  target:
+                    entity_id: "input_boolean.anwesend_{{ repeat.item }}"
+            - conditions:
+                - condition: template
+                  value_template: >-
+                    {{ is_state('device_tracker.' ~ repeat.item ~ '_handy',
+                    'not_home') }}
+              sequence:
+                - action: input_boolean.turn_off
+                  target:
+                    entity_id: "input_boolean.anwesend_{{ repeat.item }}"
+mode: restart

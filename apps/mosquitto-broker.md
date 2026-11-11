@@ -24,6 +24,8 @@ Für die Kommunikation zwischen Zigbee2MQTT und dem MQTT-Broker wird ein separat
 
 Der Benutzer wird unter **Home Assistant → Einstellungen → Personen → Benutzer** angelegt.
 
+Für diesen Benutzer ist in Home Assistant die Option **„Nur lokaler Zugriff“** aktiviert.
+
 ## Konfiguration
 
 Für Mosquitto werden die vorgesehenen Standardeinstellungen verwendet.
