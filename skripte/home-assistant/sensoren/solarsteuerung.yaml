@@ -168,8 +168,8 @@ template:
             states('input_number.zendure_2_neuer_min_soc') | float(0),
             states('number.solarflow_800_plus_2_min_soc') | float(0)
           ] | max %}
-          {% set pv1 = states('sensor.solarflow_800_plus_1_pv_power') | float(0) %}
-          {% set pv2 = states('sensor.solarflow_800_plus_2_pv_power') | float(0) %}
+          {% set pv1 = states('sensor.zendure_1_pv_leistung') | float(0) %}
+          {% set pv2 = states('sensor.zendure_2_pv_leistung') | float(0) %} 
           {% set batterie1 = 600 * (soc1 - min1) / (100 - min1) if soc1 > min1 and min1 < 100 else 0 %}
           {% set batterie2 = 600 * (soc2 - min2) / (100 - min2) if soc2 > min2 and min2 < 100 else 0 %}
           {% set gewicht1 = (batterie1 + [pv1, 0] | max) if max1 > 0 else 0 %}
@@ -299,8 +299,8 @@ template:
             states('input_number.zendure_2_neuer_min_soc') | float(0),
             states('number.solarflow_800_plus_2_min_soc') | float(0)
           ] | max %}
-          {% set pv1 = states('sensor.solarflow_800_plus_1_pv_power') | float(0) %}
-          {% set pv2 = states('sensor.solarflow_800_plus_2_pv_power') | float(0) %}
+          {% set pv1 = states('sensor.zendure_1_pv_leistung') | float(0) %}
+          {% set pv2 = states('sensor.zendure_2_pv_leistung') | float(0) %} 
           {% set batterie1 = 600 * (soc1 - min1) / (100 - min1) if soc1 > min1 and min1 < 100 else 0 %}
           {% set batterie2 = 600 * (soc2 - min2) / (100 - min2) if soc2 > min2 and min2 < 100 else 0 %}
           {% set gewicht1 = (batterie1 + [pv1, 0] | max) if max1 > 0 else 0 %}

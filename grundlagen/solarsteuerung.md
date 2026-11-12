@@ -146,7 +146,7 @@ PV Zendure 1 = PV-Eingang 1 + PV-Eingang 2 von Zendure 1
 PV Zendure 2 = PV-Eingang 1 + PV-Eingang 2 von Zendure 2
 ```
 
-Sensoren: `sensor.zendure_1_pv_leistung`, `sensor.zendure_2_pv_leistung`.
+Sensoren: `sensor.solarflow_800_plus_1_pv_power`, `sensor.solarflow_800_plus_2_pv_power`.
 
 ### Freigegebene Batterieleistung
 
@@ -210,12 +210,19 @@ Gesamtmaximum = maximale AC-Leistung Zendure 1 + maximale AC-Leistung Zendure 2
 
 ## Dynamische Leistungsaufteilung und AC-Sollwerte
 
-Die Verteilung erfolgt proportional zur maximal freigegebenen AC-Leistung, nicht nach einer festen 50:50-Quote:
+Die Verteilung erfolgt anhand einer kombinierten Gewichtung aus aktueller PV-Leistung und nutzbarer Batterieladung.
 
-```text
-Anteil Zendure 1 = Maximum Zendure 1 / Gesamtmaximum × 100
-Anteil Zendure 2 = Maximum Zendure 2 / Gesamtmaximum × 100
-```
+Für jedes Gerät wird zunächst der höhere Wert aus geplantem und eingestelltem Mindest-SoC bestimmt.
+
+Batteriegewicht = 600 × (aktueller SoC − Mindest-SoC) / (100 − Mindest-SoC)
+
+Das Batteriegewicht beträgt 0, wenn der aktuelle SoC nicht über dem wirksamen Mindest-SoC liegt.
+
+Gesamtgewicht je Gerät = Batteriegewicht + aktuelle PV-Leistung
+
+Die Gewichte bestimmen zunächst die proportionale Leistungsaufteilung. Überschreitet die Zuteilung die maximale AC-Leistung eines Geräts, wird die überschüssige Leistung dem anderen Gerät zugewiesen, soweit dessen Leistungsgrenze dies erlaubt.
+
+Die prozentualen Leistungsanteile beziehen sich auf den ursprünglichen AC-Gesamtbedarf. Bei unzureichender Gesamtleistung können ihre Summen deshalb unter 100 % liegen.
 
 Sensoren: `sensor.zendure_1_leistungsanteil`, `sensor.zendure_2_leistungsanteil`.
 

@@ -78,7 +78,7 @@ Ein erfolgreicher Praxistest der Standorterkennung ist noch nicht dokumentiert.
 
 ## 🔗 Verwendung & Verknüpfungen
 
-- [Anwesenheits-Automation](../../skripte/home-assistant/automationen/aktualisierung-handys-anwesenheit.yaml) – aktualisiert die Anwesenheits-Helfer anhand der Handy-Tracker
+- [Anwesenheits-Automation](../../skripte/home-assistant/automationen/aktualisierung-anwesenheit_home.yaml) – aktualisiert die Anwesenheits-Helfer anhand der Handy-Tracker
 - [Mobilgeräte-Sensoren](../../skripte/home-assistant/sensoren/mobilgeraete.yaml) – definiert die Anwesenheits-Helfer für die eingebundenen Mobilgeräte
 
 ---
