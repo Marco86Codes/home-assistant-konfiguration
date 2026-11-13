@@ -1,8 +1,9 @@
+
 # MQTT
 
 Diese Dokumentation beschreibt die Einrichtung der **MQTT**-Integration in Home Assistant.
 
-Die Integration stellt die Verbindung zwischen Home Assistant und dem MQTT-Broker her. In dieser Installation wird sie insbesondere für die Kommunikation mit Zigbee2MQTT verwendet.
+Die Integration verbindet Home Assistant mit einem MQTT-Broker und ermöglicht die Kommunikation mit verschiedenen MQTT-basierten Geräten und Anwendungen.
 
 ## Einrichtung
 
@@ -15,19 +16,23 @@ Eine manuelle Eingabe von Broker-Adresse, Port oder Zugangsdaten war dabei nicht
 > [!WICHTIG]
 > **MQTT** wird in Home Assistant als Integration eingerichtet. Es handelt sich nicht um eine separat installierte Home-Assistant-App.
 
-## Verwendung
+## Konfiguration
 
 Als MQTT-Broker wird die Home-Assistant-App **Mosquitto broker** verwendet.
 
-Zigbee2MQTT verbindet sich mit diesem Broker und veröffentlicht darüber seine MQTT-Nachrichten.
+Die Integration stellt die Verbindung zwischen Home Assistant und dem Broker her.
 
-Die aktivierte Home-Assistant-Unterstützung von Zigbee2MQTT ermöglicht die automatische Bereitstellung der entsprechenden Geräte und Entitäten über MQTT Discovery.
+Über **MQTT Discovery** können kompatible Geräte und Anwendungen ihre Geräte und Entitäten automatisch in Home Assistant bereitstellen.
 
-## Funktionstest
+Die jeweiligen MQTT-Verbindungen, Zugangsdaten und gerätespezifischen Einstellungen werden in den Dokumentationen der betreffenden Komponenten beschrieben.
 
-Nach der Einrichtung von Zigbee2MQTT wurde die **Zigbee2MQTT Bridge** über die **MQTT**-Integration automatisch in Home Assistant erkannt.
+## Funktionsprüfung
 
-Damit wurde die Kommunikation zwischen Zigbee2MQTT, Mosquitto broker und der MQTT-Integration erfolgreich geprüft.
+Die Verbindung zum **Mosquitto broker** wurde erfolgreich hergestellt.
+
+Über **MQTT Discovery** wurden Geräte und Entitäten in Home Assistant erkannt.
+
+Damit wurde die grundlegende Kommunikation zwischen dem Broker und der **MQTT**-Integration erfolgreich geprüft.
 
 ## Nützliche Links & Quellen
 
@@ -36,7 +41,8 @@ Damit wurde die Kommunikation zwischen Zigbee2MQTT, Mosquitto broker und der MQT
 ## 🔗 Verwendung & Verknüpfungen
 
 - [Mosquitto broker](mosquitto-broker.md) – stellt den verwendeten MQTT-Broker bereit
-- [Zigbee2MQTT](zigbee2mqtt.md) – verwendet MQTT für die Kommunikation mit Home Assistant
+- [Zendure](zendure.md) – verwendet MQTT für die Kommunikation mit den SolarFlow-Geräten
+- [Zigbee2MQTT](zigbee2mqtt.md) – bindet Zigbee-Geräte über MQTT in Home Assistant ein
 
 ---
 

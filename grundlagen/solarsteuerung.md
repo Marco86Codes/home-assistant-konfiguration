@@ -8,7 +8,7 @@ Die technische Einrichtung ist in den Komponenten-Dokumentationen beschrieben.
 
 Die beiden SolarFlow-Geräte besitzen jeweils eigene PV-Eingänge, einen Akku, eine AC-Ausgangsgrenze und einen einstellbaren Mindest-SoC. Da sich PV-Module, Ausrichtung und Verschattung unterscheiden, liefern sie nicht immer gleich viel Leistung.
 
-Die feste **50:50-Aufteilung** des Zendure Managers berücksichtigt diese Unterschiede nicht ausreichend. Beispielsweise würden bei 400 W Gesamtbedarf beide Geräte je 200 W liefern, obwohl Zendure 1 gerade 400 W PV-Leistung und Zendure 2 nur 100 W erzeugt. Eine dynamische Aufteilung von **320 W zu 80 W** entspricht in diesem Fall besser der verfügbaren Leistung und vermeidet eine unnötige Belastung des zweiten Akkus.
+Die feste **50:50-Aufteilung** des Zendure Managers berücksichtigt weder die unterschiedlichen PV-Leistungen noch die nutzbaren Batteriereserven ausreichend. Die eigene Steuerung kombiniert beide Größen und berücksichtigt zusätzlich die SoC-Differenz, damit ein stärker geladener Akku bei Bedarf mehr Last übernimmt. Die Verteilung bleibt durch den AC-Bedarf und die jeweiligen Gerätegrenzen beschränkt.
 
 Deshalb bleibt der **Zendure Manager ausgeschaltet**. Home Assistant berechnet die Ausgangsgrenzen für beide Geräte unabhängig, aber auf Basis des gemeinsamen Hausverbrauchs.
 
@@ -38,8 +38,8 @@ Die Steuerung verwendet:
         | PV + SoC        |
         |                 |
         v                 |
-    Maximale AC-          |
-    Leistung je Gerät     |
+    AC-Maxima und          |
+    PV-/SoC-Gewichte      |
         |                 |
         v                 |
     Leistungsanteile      |
@@ -65,7 +65,7 @@ Die Steuerung verwendet:
 ```
 
 
-Die Berechnung erfolgt in dieser Reihenfolge: Netzleistung → Hausverbrauch → Netzbezugs-Sollwert → AC-Gesamtbedarf → PV-Leistung und Batterie-SoC → maximale AC-Leistung und SoC-/PV-Gewichtung → Leistungsaufteilung mit Umverteilung bei Leistungsgrenzen → begrenzte AC-Sollwerte → Übertragung.
+Die Berechnung erfolgt in dieser Reihenfolge: Netzleistung → Hausverbrauch → Netzbezugs-Sollwert → AC-Gesamtbedarf → PV-Leistung und Batterie-SoC → maximale AC-Leistung und PV-/Batteriegewichtung mit SoC-Ausgleich → Leistungsaufteilung mit Umverteilung bei Leistungsgrenzen → begrenzte AC-Sollwerte → Übertragung.
 
 ## Netzleistung und Hausverbrauch
 
@@ -146,7 +146,7 @@ PV Zendure 1 = PV-Eingang 1 + PV-Eingang 2 von Zendure 1
 PV Zendure 2 = PV-Eingang 1 + PV-Eingang 2 von Zendure 2
 ```
 
-Sensoren: `sensor.solarflow_800_plus_1_pv_power`, `sensor.solarflow_800_plus_2_pv_power`.
+Sensoren für die Summe der jeweils zwei PV-Eingänge: `sensor.zendure_1_pv_leistung`, `sensor.zendure_2_pv_leistung`. Für die maximale AC-Leistung werden zusätzlich die Gerätewerte `sensor.solarflow_800_plus_1_pv_power` und `sensor.solarflow_800_plus_2_pv_power` verwendet.
 
 ### Freigegebene Batterieleistung
 
@@ -200,75 +200,115 @@ Die Beispiele setzen einen tatsächlich eingestellten Mindest-SoC von **10 %** v
 
 Sensoren: `sensor.zendure_1_maximale_ac_leistung`, `sensor.zendure_2_maximale_ac_leistung`.
 
-Die Summe bildet die **gesamte maximal freigegebene AC-Leistung**:
-
-```text
-Gesamtmaximum = maximale AC-Leistung Zendure 1 + maximale AC-Leistung Zendure 2
-```
-
-`sensor.zendure_gesamt_maximale_ac_leistung`
+Die beiden Maximalwerte werden bei der Leistungsaufteilung direkt addiert. Ein eigener Sensor für die Summe ist nicht mehr vorhanden.
 
 ## Dynamische Leistungsaufteilung und AC-Sollwerte
 
-Die Verteilung erfolgt anhand einer kombinierten Gewichtung aus aktueller PV-Leistung und nutzbarer Batterieladung.
+Die Aufteilung kombiniert die aktuelle PV-Leistung mit der nutzbaren Batterie-SoC-Reserve beider Geräte. Zusätzlich verschiebt ein SoC-Ausgleich die Last zugunsten des stärker geladenen Akkus. Die endgültige Verteilung berücksichtigt die maximal freigegebene AC-Leistung beider Geräte.
 
-Für jedes Gerät wird zunächst der höhere Wert aus geplantem und eingestelltem Mindest-SoC bestimmt.
+### Gemeinsame PV- und Batteriegewichtung
 
-Batteriegewicht = 600 × (aktueller SoC − Mindest-SoC) / (100 − Mindest-SoC)
+Für jedes Gerät gilt der höhere Wert aus geplantem und tatsächlich eingestelltem Mindest-SoC als **wirksamer Mindest-SoC**.
 
-Das Batteriegewicht beträgt 0, wenn der aktuelle SoC nicht über dem wirksamen Mindest-SoC liegt.
+```text
+Nutzbare SoC-Reserve = max(aktueller SoC − wirksamer Mindest-SoC, 0)
+Batteriegewicht = nutzbare SoC-Reserve × 19,2
+Gerätegewicht = Batteriegewicht + PV-Leistung
+Gesamtgewicht = Gerätegewicht Zendure 1 + Gerätegewicht Zendure 2
+```
 
-Gesamtgewicht je Gerät = Batteriegewicht + aktuelle PV-Leistung
+Der Faktor 19,2 ergibt sich aus der nominellen Kapazität von 1,92 kWh (1.920 Wh) je AB2000-Akkupack. Ein Prozentpunkt Batterieladung entspricht damit rechnerisch 19,2 Wh.
 
-Die Gewichte bestimmen zunächst die proportionale Leistungsaufteilung. Überschreitet die Zuteilung die maximale AC-Leistung eines Geräts, wird die überschüssige Leistung dem anderen Gerät zugewiesen, soweit dessen Leistungsgrenze dies erlaubt.
+Für die Leistungsaufteilung wird die nutzbare SoC-Reserve mit diesem Faktor multipliziert und zur aktuellen PV-Leistung addiert. Das Ergebnis dient als rechnerische Gewichtungsgröße und stellt keine physikalisch gemessene Energie oder unmittelbar verfügbare Leistung dar.
 
-Die prozentualen Leistungsanteile beziehen sich auf den ursprünglichen AC-Gesamtbedarf. Bei unzureichender Gesamtleistung können ihre Summen deshalb unter 100 % liegen.
+Der Sensor sensor.zendure_gesamt_energie bildet die Summe der Gewichte beider Geräte und rundet sie auf ganze Zahlen. Obwohl er in der YAML mit der Einheit W deklariert ist, wird er ausschließlich als Gewichtungsgröße verwendet.
+
+### SoC-Ausgleich und Leistungsgrenzen
+
+Zunächst wird das Grundgewicht von Zendure 1 aus seinem Gerätegewicht und dem Gesamtgewicht berechnet. Ist das Gesamtgewicht 0, gilt zunächst eine Aufteilung von 50:50.
+
+```text
+Grundanteil Zendure 1 = Gerätegewicht 1 / Gesamtgewicht
+SoC-Ausgleich = (SoC Zendure 1 − SoC Zendure 2) × 0,01
+Korrigierter Anteil Zendure 1 = begrenzen(Grundanteil + SoC-Ausgleich, 0, 1)
+```
+
+**Jeder Prozentpunkt SoC-Differenz verschiebt den Anteil um einen Prozentpunkt.** Hat Zendure 1 beispielsweise 11 Prozentpunkte mehr SoC, erhöht sich sein Anteil gegenüber der Grundgewichtung um 11 Prozentpunkte. Der Faktor ist ein gewählter Regelparameter und garantiert keinen sofortigen oder vollständigen SoC-Gleichstand.
+
+Der zu verteilende Bedarf ist auf die Summe der beiden AC-Maximalwerte begrenzt:
+
+```text
+Ziel = min(AC-Gesamtbedarf, AC-Maximum 1 + AC-Maximum 2)
+
+Leistung Zendure 1 = min(
+    AC-Maximum 1,
+    max(Ziel − AC-Maximum 2, Ziel × korrigierter Anteil 1)
+)
+
+Leistung Zendure 2 = Ziel − Leistung Zendure 1
+```
+
+Damit übernimmt ein Gerät innerhalb seines AC-Maximums den Anteil, den das andere nicht liefern kann. Ist die verfügbare Gesamtleistung geringer als der Bedarf, werden beide Gerätemaxima ausgeschöpft.
+
+Die prozentualen Leistungsanteile beziehen sich auf die **tatsächlich zugewiesene AC-Gesamtleistung**. Ihre Summe beträgt daher **100 %**, sofern Leistung bereitgestellt werden kann. Ist keine Leistung verfügbar, betragen beide Anteile 0 %.
+
+Die Berechnung von Zendure 2 verwendet den gerundeten Prozentanteil von Zendure 1. Dadurch sind kleine Rundungsabweichungen möglich. Bei 0 W Bedarf oder einer Summe der Gerätemaxima von 0 W werden beide Anteile auf 0 % gesetzt.
 
 Sensoren: `sensor.zendure_1_leistungsanteil`, `sensor.zendure_2_leistungsanteil`.
 
-**Beispiel:** Bei 600 W Maximum für Zendure 1 und 200 W für Zendure 2 ergeben sich **75 % zu 25 %**. Ändert sich die PV-Leistung oder erreicht eine Batterie ihren geplanten Mindest-SoC, ändern sich die Anteile automatisch. Ist das Gesamtmaximum 0 W, werden beide Anteile auf **0 %** gesetzt, um eine Division durch 0 zu vermeiden.
-
-Die endgültigen AC-Sollwerte werden zusätzlich **je Gerät begrenzt**:
+Die endgültigen AC-Sollwerte werden aus den Anteilen an der zuteilbaren Gesamtleistung berechnet und zusätzlich je Gerät begrenzt:
 
 ```text
-AC-Soll Zendure 1 =
-    min(AC-Gesamtbedarf × Anteil Zendure 1 / 100, Maximum Zendure 1)
+Zuteilbare Gesamtleistung = min(AC-Gesamtbedarf, AC-Maximum 1 + AC-Maximum 2)
 
-AC-Soll Zendure 2 =
-    min(AC-Gesamtbedarf × Anteil Zendure 2 / 100, Maximum Zendure 2)
+AC-Soll Zendure 1 = min(Zuteilbare Gesamtleistung × Anteil 1 / 100, AC-Maximum 1)
+AC-Soll Zendure 2 = min(Zuteilbare Gesamtleistung × Anteil 2 / 100, AC-Maximum 2)
 ```
 
-Die Ergebnisse werden auf ganze Watt gerundet.
+Die AC-Sollwerte werden auf ganze Watt gerundet.
 
 Sensoren: `sensor.zendure_1_ac_soll_leistung`, `sensor.zendure_2_ac_soll_leistung`.
 
 ### Berechnungsbeispiel
 
-Bei **650 W Hausverbrauch** und **10 W Netzbezugs-Sollwert** beträgt der AC-Gesamtbedarf **640 W**.
+Bei **650 W Hausverbrauch** und **10 W Netzbezugs-Sollwert** beträgt der AC-Gesamtbedarf **640 W**. Beide Geräte haben einen wirksamen Mindest-SoC von 10 %.
 
 | Eigenschaft | Zendure 1 | Zendure 2 |
 |---|---:|---:|
+| Batterie-SoC | 40 % | 35 % |
 | PV-Leistung | 400 W | 100 W |
-| Batteriefreigabe | 600 W | 0 W |
-| Maximale AC-Leistung | 800 W | 100 W |
-| Leistungsanteil | 88,89 % | 11,11 % |
-| **AC-Soll-Leistung** | **569 W** | **71 W** |
+| Batteriegewicht | 576 | 480 |
+| Gerätegewicht | 976 | 580 |
+| Maximale AC-Leistung | 800 W | 700 W |
+| Grundanteil | 62,72 % | 37,28 % |
+| SoC-Ausgleich | +5 Prozentpunkte | −5 Prozentpunkte |
+| Leistungsanteil | 67,72 % | 32,28 % |
+| **AC-Soll-Leistung** | **433 W** | **207 W** |
 
-Die gemeinsame Anforderung beträgt **640 W** und entspricht dem Bedarf. Die individuellen Maximalwerte werden nicht überschritten.
+Die gesamte Anforderung beträgt nach Rundung **640 W**. Beide Geräte bleiben unter ihrem jeweiligen AC-Maximum.
+
+### Umverteilung bei begrenzter Geräteleistung
+
+Bei **900 W AC-Gesamtbedarf** und einer gewichteten Zielverteilung von etwa 65 % zu 35 % kann Zendure 2 nur 200 W bereitstellen:
+
+| Eigenschaft | Zendure 1 | Zendure 2 |
+|---|---:|---:|
+| Gewichtete Leistung ohne Begrenzung | 585 W | 315 W |
+| Maximale AC-Leistung | 800 W | 200 W |
+| **Zugewiesene AC-Leistung** | **700 W** | **200 W** |
+
+Zendure 1 übernimmt die fehlenden 115 W, sodass der gesamte Bedarf von 900 W gedeckt werden kann.
 
 ### Unzureichende Gesamtleistung
 
-Wenn der Bedarf höher ist als die gesamte freigegebene Leistung, greifen die geräteweisen Begrenzungen:
-
 | Eigenschaft | Zendure 1 | Zendure 2 |
 |---|---:|---:|
+| AC-Gesamtbedarf | 600 W | 600 W |
 | Maximale AC-Leistung | 200 W | 100 W |
-| Leistungsanteil | 66,67 % | 33,33 % |
-| Gesamtbedarf | 600 W | 600 W |
-| Unbegrenzter rechnerischer Sollwert | 400 W | 200 W |
-| **Begrenzter AC-Sollwert** | **200 W** | **100 W** |
+| **Leistungsanteil** | **66,67 %** | **33,33 %** |
+| **AC-Soll-Leistung** | **200 W** | **100 W** |
 
-Es werden zusammen nur **300 W** angefordert. Die fehlenden **300 W** müssen aus dem öffenlichen Netz kommen. Die maximalen AC-Leistungen dienen somit **sowohl der Gewichtung als auch der Begrenzung**.
+Zusammen werden nur **300 W** angefordert. Die verbleibenden **300 W** müssen aus dem Netz oder anderen Quellen kommen.
 
 ## Automatische Leistungsanpassung
 
@@ -367,24 +407,24 @@ Die Wetterprognose beeinflusst die AC-Ausgabe **indirekt**: Sie ändert den gepl
 
 ### Beispiel: Geplanten Mindest-SoC von 10 % auf 15 % erhöhen
 
-Die Batterie-SoCs und PV-Leistungen bleiben im Beispiel unverändert:
+Die Batterie-SoCs und PV-Leistungen bleiben im Beispiel unverändert; der tatsächlich eingestellte Mindest-SoC beträgt jeweils 10 %.
 
 | Eigenschaft | Zendure 1 | Zendure 2 |
 |---|---:|---:|
-| Batterie-SoC | 12 % | 50 % |
+| Batterie-SoC | 12 % | 20 % |
 | PV-Leistung | 100 W | 200 W |
-| **Maximum bei geplantem Mindest-SoC 10 %** | **700 W** | **800 W** |
-| Anteil bei 10 % | 46,67 % | 53,33 % |
-| **Maximum bei geplantem Mindest-SoC 15 %** | **0 W** | **800 W** |
-| Anteil bei 15 % | 0 % | 100 % |
+| **AC-Maximum bei geplantem Mindest-SoC 10 %** | **700 W** | **800 W** |
+| **AC-Maximum bei geplantem Mindest-SoC 15 %** | **0 W** | **800 W** |
 
-Vor der Änderung stehen rechnerisch **1.500 W** zur Verfügung, danach **800 W**. Bei einem tatsächlich eingestellten Mindest-SoC von 10 % liegt Zendure 1 mit 12 % SoC unter dem neuen geplanten Minimum. Trotz einer berechneten PV-Reserve von **60 %** beträgt die maximale AC-Leistung **0 W**, da der aktuelle SoC nicht über dem höheren der beiden Mindest-SoC-Werte liegt. Zendure 2 darf weiterhin PV- und Batterieleistung beitragen und übernimmt damit 100 % der verfügbaren AC-Leistung.
+Bei einem AC-Gesamtbedarf von **600 W** ergibt sich bei 10 % geplantem Mindest-SoC ein Gerätegewicht von 138,4 für Zendure 1 und 392 für Zendure 2. Nach dem SoC-Ausgleich von −8 Prozentpunkten erhält Zendure 1 ungefähr **18,09 %** und Zendure 2 **81,91 %** des Bedarfs.
+
+Nach der Erhöhung auf 15 % liegt Zendure 1 mit 12 % SoC unter dem neuen geplanten Minimum. Trotz einer berechneten PV-Reserve von 60 % beträgt seine maximale AC-Leistung 0 W. Zendure 2 übernimmt bei ausreichendem Gerätemaximum den gesamten Bedarf. Die neue Grenze wirkt sofort, auch wenn sie noch nicht an Zendure 1 übertragen wurde.
 
 ## Besonderheiten der gewählten Steuerung
 
 Die wesentlichen Entscheidungen sind:
 
-- **Keine feste 50:50-Aufteilung:** Die aktuelle PV-Leistung und die nutzbare Batterieladung bestimmen die Gewichtung. Erreicht ein Gerät seine maximale AC-Leistung, wird der verbleibende Bedarf auf das andere Gerät umverteilt, soweit dessen Leistungsgrenze dies erlaubt.
+- **Keine feste 50:50-Aufteilung:** Die aktuelle PV-Leistung und die nutzbare SoC-Reserve bestimmen gemeinsam die Gewichtung; ein zusätzlicher SoC-Ausgleich berücksichtigt unterschiedliche Batteriestände. Erreicht ein Gerät seine maximale AC-Leistung, wird der verbleibende Bedarf auf das andere Gerät umverteilt, soweit dessen Leistungsgrenze dies erlaubt.
 - **Getrennte Batteriebewertung:** Ein Akku kann geschützt werden, während der andere weiter Leistung liefert.
 - **Gemeinsamer Hausverbrauch:** Grundlage ist die Summe aus Netzleistung und beiden AC-Ist-Leistungen.
 - **Kleiner positiver Netzbezugs-Sollwert:** 10, 20 oder 30 W dienen als Regelreserve.
@@ -397,7 +437,7 @@ Die wesentlichen Entscheidungen sind:
 
 ## Regelverhalten im laufenden Betrieb
 
-Bei steigender Hauslast erhöht sich der AC-Gesamtbedarf bis zur 900-W-Grenze; bei sinkender Last reduziert er sich. Änderungen der PV-Leistung und der nutzbaren Batterieladung beeinflussen die prozentuale Gewichtung. Die maximal freigegebenen AC-Leistungen begrenzen die Zuteilung. Kann ein Gerät seinen gewichteten Anteil nicht vollständig liefern, übernimmt das andere die Differenz, soweit dessen Leistungsgrenze dies erlaubt.
+Bei steigender Hauslast erhöht sich der AC-Gesamtbedarf bis zur 900-W-Grenze; bei sinkender Last reduziert er sich. Änderungen der PV-Leistung, der nutzbaren SoC-Reserve und der SoC-Differenz beeinflussen die prozentuale Gewichtung. Die maximal freigegebenen AC-Leistungen begrenzen die Zuteilung. Kann ein Gerät seinen gewichteten Anteil nicht vollständig liefern, übernimmt das andere die Differenz, soweit dessen Leistungsgrenze dies erlaubt.
 
 Erreicht ein Akku den höheren Wert aus geplantem und tatsächlich eingestelltem Mindest-SoC, entfallen sowohl die zusätzliche Batteriefreigabe als auch die maximale AC-Leistung. Beide betragen dann **0 W**. Die dynamische PV-Reserve wird weiterhin berechnet, führt jedoch erst bei ausreichendem Batterie-SoC zu einer AC-Freigabe. Der andere Zendure kann entsprechend mehr übernehmen, soweit dessen eigenes Maximum und der gemeinsame Bedarf dies zulassen.
 
@@ -408,7 +448,7 @@ Parallel kann die Wetterberechnung die geplanten Mindest-SoC-Werte ändern und s
 | Situation | Verhalten beziehungsweise Grenze |
 |---|---|
 | Fehlende gültige Wetterprognose | Berechnung wird abgebrochen; bisherige geplante Werte bleiben erhalten. |
-| Unterschiedliche Batterieladestände | Freigabe und Mindest-SoC-Übernahme erfolgen je Gerät unabhängig. |
+| Unterschiedliche Batterieladestände | Die Leistungsgewichtung berücksichtigt einen zusätzlichen SoC-Ausgleich; Freigabe und Mindest-SoC-Übernahme erfolgen je Gerät unabhängig. |
 | Beide AC-Maximalwerte = 0 W | Beide Leistungsanteile und AC-Sollwerte werden 0. |
 | Hausverbrauch über der Regelgrenze | Der gemeinsame AC-Bedarf bleibt auf 900 W begrenzt. |
 | Verfügbare AC-Leistung unter dem Bedarf | Beide AC-Sollwerte werden auf ihre Gerätemaxima begrenzt; Restbedarf bleibt für Netz oder andere Quellen. |

@@ -1464,36 +1464,934 @@ views:
               margin-right: -14px;
             }
       - type: grid
-        cards:
-          - type: heading
-            heading: Neuer Abschnitt
+        cards: []
     show_icon_and_title: true
     cards: []
     max_columns: 3
-  - title: WLAN
-    path: wlan
-    icon: mdi:wifi
+  - title: Klima
+    path: klima
+    icon: mdi:home-thermometer
     type: sections
     sections:
       - type: grid
-        cards: []
+        cards:
+          - square: false
+            type: grid
+            columns: 5
+            cards:
+              - type: tile
+                entity: input_boolean.anwesend_marco
+                name: Marco
+                icon: mdi:home
+                color: green
+                show_entity_picture: false
+                hide_state: true
+                vertical: true
+                tap_action:
+                  action: none
+                icon_tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style: |
+                    ha-card {
+                      background: transparent !important;
+                      box-shadow: none !important;
+                      border: none !important;
+                      --tile-color: {{ '#3498DB' if is_state(config.entity, 'home') else '#9E9E9E' }};
+                    }
+                    ha-tile-icon {
+                      --mdc-icon-size: 40px;
+                    }
+              - type: tile
+                entity: input_boolean.anwesend_josiane
+                name: Josiane
+                icon: mdi:home
+                color: green
+                show_entity_picture: false
+                hide_state: true
+                vertical: true
+                tap_action:
+                  action: none
+                icon_tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style: |
+                    ha-card {
+                      background: transparent !important;
+                      box-shadow: none !important;
+                      border: none !important;
+                      --tile-color: {{ '#3498DB' if is_state(config.entity, 'home') else '#9E9E9E' }};
+                    }
+                    ha-tile-icon {
+                      --mdc-icon-size: 40px;
+                    }
+              - type: tile
+                entity: input_boolean.anwesend_victor
+                name: Victor
+                icon: mdi:home
+                color: green
+                show_entity_picture: false
+                hide_state: true
+                vertical: true
+                tap_action:
+                  action: none
+                icon_tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style: |
+                    ha-card {
+                      background: transparent !important;
+                      box-shadow: none !important;
+                      border: none !important;
+                      --tile-color: {{ '#3498DB' if is_state(config.entity, 'home') else '#9E9E9E' }};
+                    }
+                    ha-tile-icon {
+                      --mdc-icon-size: 40px;
+                    }
+              - type: tile
+                entity: input_boolean.anwesend_rowan
+                name: Rowan
+                icon: mdi:home
+                color: green
+                show_entity_picture: false
+                hide_state: true
+                vertical: true
+                tap_action:
+                  action: none
+                icon_tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style: |
+                    ha-card {
+                      background: transparent !important;
+                      box-shadow: none !important;
+                      border: none !important;
+                      --tile-color: {{ '#3498DB' if is_state(config.entity, 'home') else '#9E9E9E' }};
+                    }
+                    ha-tile-icon {
+                      --mdc-icon-size: 40px;
+                    }
+              - type: tile
+                entity: input_boolean.anwesend_tamara
+                name: Tamara
+                icon: mdi:home
+                color: green
+                show_entity_picture: false
+                hide_state: true
+                vertical: true
+                tap_action:
+                  action: none
+                icon_tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style: |
+                    ha-card {
+                      background: transparent !important;
+                      box-shadow: none !important;
+                      border: none !important;
+                      --tile-color: {{ '#3498DB' if is_state(config.entity, 'home') else '#9E9E9E' }};
+                    }
+                    ha-tile-icon {
+                      --mdc-icon-size: 40px;
+                    }
+          - square: false
+            type: grid
+            columns: 5
+            cards:
+              - type: tile
+                entity: device_tracker.marco_marcoowntracks
+                name: Marco
+                icon: mdi:home
+                color: green
+                show_entity_picture: false
+                hide_state: false
+                vertical: true
+                tap_action:
+                  action: none
+                icon_tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style: |
+                    ha-card {
+                      background: transparent !important;
+                      box-shadow: none !important;
+                      border: none !important;
+                      --tile-color: {{ '#3498DB' if is_state(config.entity, 'home') else '#9E9E9E' }};
+                    }
+                    ha-tile-icon {
+                      --mdc-icon-size: 40px;
+                    }
+              - type: tile
+                entity: device_tracker.josiane_josianeowntracks
+                name: Josiane
+                icon: mdi:home
+                color: green
+                show_entity_picture: false
+                hide_state: false
+                vertical: true
+                tap_action:
+                  action: none
+                icon_tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style: |
+                    ha-card {
+                      background: transparent !important;
+                      box-shadow: none !important;
+                      border: none !important;
+                      --tile-color: {{ '#3498DB' if is_state(config.entity, 'home') else '#9E9E9E' }};
+                    }
+                    ha-tile-icon {
+                      --mdc-icon-size: 40px;
+                    }
+              - type: tile
+                entity: device_tracker.victor_victorowntracks
+                name: Victor
+                icon: mdi:home
+                color: green
+                show_entity_picture: false
+                hide_state: false
+                vertical: true
+                tap_action:
+                  action: none
+                icon_tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style: |
+                    ha-card {
+                      background: transparent !important;
+                      box-shadow: none !important;
+                      border: none !important;
+                      --tile-color: {{ '#3498DB' if is_state(config.entity, 'home') else '#9E9E9E' }};
+                    }
+                    ha-tile-icon {
+                      --mdc-icon-size: 40px;
+                    }
+              - type: tile
+                entity: device_tracker.rowan_rowanowntracks
+                name: Rowan
+                icon: mdi:home
+                color: green
+                show_entity_picture: false
+                hide_state: false
+                vertical: true
+                tap_action:
+                  action: none
+                icon_tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style: |
+                    ha-card {
+                      background: transparent !important;
+                      box-shadow: none !important;
+                      border: none !important;
+                      --tile-color: {{ '#3498DB' if is_state(config.entity, 'home') else '#9E9E9E' }};
+                    }
+                    ha-tile-icon {
+                      --mdc-icon-size: 40px;
+                    }
+              - type: tile
+                entity: device_tracker.tamara_tamaraowntracks
+                name: Tamara
+                icon: mdi:home
+                color: green
+                show_entity_picture: false
+                hide_state: false
+                vertical: true
+                tap_action:
+                  action: none
+                icon_tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style: |
+                    ha-card {
+                      background: transparent !important;
+                      box-shadow: none !important;
+                      border: none !important;
+                      --tile-color: {{ '#3498DB' if is_state(config.entity, 'home') else '#9E9E9E' }};
+                    }
+                    ha-tile-icon {
+                      --mdc-icon-size: 40px;
+                    }
+      - type: grid
+        cards:
+          - type: heading
+            heading: Neuer Abschnitt
+          - type: tile
+            entity: binary_sensor.192_168_1_82
+            vertical: true
+            features_position: bottom
     show_icon_and_title: true
+    cards: []
     max_columns: 3
-  - title: Zigbee
-    path: zigbee
-    icon: mdi:zigbee
+  - title: Netzwerk
+    path: netzwerk
+    icon: mdi:lan
     type: sections
     sections:
       - type: grid
-        cards: []
-    show_icon_and_title: true
-    max_columns: 3
-  - title: Heizung
-    path: heizung
-    icon: mdi:radiator
-    type: sections
-    sections:
+        cards:
+          - type: markdown
+            content: |
+              ### Kontaktsensoren
+            text_only: true
+            card_mod:
+              style:
+                .: |
+                  ha-card {
+                    background: transparent !important;
+                    box-shadow: none !important;
+                    border: none !important;
+                  }
+                ha-markdown$: |
+                  h3 {
+                    text-align: center !important;
+                    font-size: 24px !important;
+                  }
+          - type: custom:flex-table-card
+            title: ''
+            card_mod:
+              style: |
+                ha-card {
+                  background: transparent !important;
+                  box-shadow: none !important;
+                  border: none !important;
+                  margin-top: 0px !important;
+                  margin-bottom: -4px !important;
+                }
+
+                table tr,
+                table tr:nth-child(even),
+                table tr:nth-child(odd),
+                table td {
+                  background: transparent !important;
+                }
+
+                {% set batterien = states.sensor
+                  | selectattr('entity_id', 'match', 'sensor\\.kontakt.*_battery$')
+                  | sort(attribute='name') | list %}
+
+                {% for batterie in batterien %}
+                  {% set wert = batterie.state | float(100) %}
+
+                  {% if wert < 25 %}
+                    table tbody tr:nth-child({{ loop.index }}) td {
+                      color: #E74C3C !important;
+                    }
+                  {% elif wert < 50 %}
+                    table tbody tr:nth-child({{ loop.index }}) td:nth-child(2) {
+                      color: #3498DB !important;
+                    }
+                  {% endif %}
+                {% endfor %}
+            entities:
+              include:
+                - sensor.kontakt*_battery
+            css:
+              table+: 'width: 100%; table-layout: fixed;'
+              thead tr th:nth-child(1)+: 'width: 5%;'
+              thead tr th:nth-child(2)+: 'width: 65%;'
+              thead tr th:nth-child(3)+: 'width: 25%;'
+            columns:
+              - name: ''
+                data: friendly_name
+                modify: ''''''
+              - name: Gerätename
+                data: friendly_name
+                modify: |-
+                  x.replace(/_/g, ' ')
+                   .replace(/ Batterie$/i, '')
+                   .replace(/ Battery$/i, '')
+              - name: Batterie
+                data: state
+                modify: x + ' %'
+            sort_by: Gerätename
       - type: grid
-        cards: []
+        cards:
+          - type: markdown
+            content: |
+              ### Thermostate
+            text_only: true
+            card_mod:
+              style:
+                .: |
+                  ha-card {
+                    background: transparent !important;
+                    box-shadow: none !important;
+                    border: none !important;
+                  }
+                ha-markdown$: |
+                  h3 {
+                    text-align: center !important;
+                    font-size: 24px !important;
+                  }
+          - type: custom:flex-table-card
+            title: ''
+            card_mod:
+              style: |
+                ha-card {
+                  background: transparent !important;
+                  box-shadow: none !important;
+                  border: none !important;
+                  margin-top: 0px !important;
+                  margin-bottom: -4px !important;
+                }
+
+                table tr,
+                table tr:nth-child(even),
+                table tr:nth-child(odd),
+                table td {
+                  background: transparent !important;
+                }
+
+                {% set batterien = states.sensor
+                  | selectattr('entity_id', 'match', 'sensor\\.thermostat.*_battery$')
+                  | sort(attribute='name') | list %}
+
+                {% for batterie in batterien %}
+                  {% set wert = batterie.state | float(100) %}
+
+                  {% if wert < 25 %}
+                    table tbody tr:nth-child({{ loop.index }}) td {
+                      color: #E74C3C !important;
+                    }
+                  {% elif wert < 50 %}
+                    table tbody tr:nth-child({{ loop.index }}) td:nth-child(2) {
+                      color: #3498DB !important;
+                    }
+                  {% endif %}
+                {% endfor %}
+            entities:
+              include:
+                - sensor.thermostat*_battery
+            css:
+              table+: 'width: 100%; table-layout: fixed;'
+              thead tr th:nth-child(1)+: 'width: 5%;'
+              thead tr th:nth-child(2)+: 'width: 65%;'
+              thead tr th:nth-child(3)+: 'width: 25%;'
+            columns:
+              - name: ''
+                data: friendly_name
+                modify: ''''''
+              - name: Gerätename
+                data: friendly_name
+                modify: |-
+                  x.replace(/_/g, ' ')
+                   .replace(/ Batterie$/i, '')
+                   .replace(/ Battery$/i, '')
+              - name: Batterie
+                data: state
+                modify: x + ' %'
+            sort_by: Gerätename
+          - type: heading
+            icon: ''
+            heading_style: subtitle
+          - type: markdown
+            content: |
+              ### Heizkörperventile
+            text_only: true
+            card_mod:
+              style:
+                .: |
+                  ha-card {
+                    background: transparent !important;
+                    box-shadow: none !important;
+                    border: none !important;
+                  }
+                ha-markdown$: |
+                  h3 {
+                    text-align: center !important;
+                    font-size: 24px !important;
+                  }
+          - type: custom:flex-table-card
+            title: ''
+            card_mod:
+              style: |
+                ha-card {
+                  background: transparent !important;
+                  box-shadow: none !important;
+                  border: none !important;
+                  margin-top: 0px !important;
+                  margin-bottom: -4px !important;
+                }
+
+                table tr,
+                table tr:nth-child(even),
+                table tr:nth-child(odd),
+                table td {
+                  background: transparent !important;
+                }
+
+                {% set batterien = states.sensor
+                  | selectattr('entity_id', 'match', 'sensor\\.heizung.*_battery$')
+                  | sort(attribute='name') | list %}
+
+                {% for batterie in batterien %}
+                  {% set wert = batterie.state | float(100) %}
+
+                  {% if wert < 25 %}
+                    table tbody tr:nth-child({{ loop.index }}) td {
+                      color: #E74C3C !important;
+                    }
+                  {% elif wert < 50 %}
+                    table tbody tr:nth-child({{ loop.index }}) td:nth-child(2) {
+                      color: #3498DB !important;
+                    }
+                  {% endif %}
+                {% endfor %}
+            entities:
+              include:
+                - sensor.heizung*_battery
+            css:
+              table+: 'width: 100%; table-layout: fixed;'
+              thead tr th:nth-child(1)+: 'width: 5%;'
+              thead tr th:nth-child(2)+: 'width: 65%;'
+              thead tr th:nth-child(3)+: 'width: 25%;'
+            columns:
+              - name: ''
+                data: friendly_name
+                modify: ''''''
+              - name: Gerätename
+                data: friendly_name
+                modify: |-
+                  x.replace(/_/g, ' ')
+                   .replace(/ Batterie$/i, '')
+                   .replace(/ Battery$/i, '')
+              - name: Batterie
+                data: state
+                modify: x + ' %'
+            sort_by: Gerätename
+      - type: grid
+        cards:
+          - type: markdown
+            content: |
+              ### WLAN
+            text_only: true
+            card_mod:
+              style:
+                .: |
+                  ha-card {
+                    background: transparent !important;
+                    box-shadow: none !important;
+                    border: none !important;
+                  }
+                ha-markdown$: |
+                  h3 {
+                    text-align: center !important;
+                    font-size: 24px !important;
+                  }
+          - type: custom:flex-table-card
+            title: ''
+            card_mod:
+              style: |
+                ha-card {
+                  background: transparent !important;
+                  box-shadow: none !important;
+                  border: none !important;
+                  margin-top: 0px !important;
+                  margin-bottom: -4px !important;
+                }
+                table tr,
+                table tr:nth-child(even),
+                table tr:nth-child(odd),
+                table td {
+                  background: transparent !important;
+                }
+            entities:
+              include:
+                - device_tracker.*
+              exclude:
+                - device_tracker.josiane_josianeowntracks
+                - device_tracker.marco_handy
+                - device_tracker.marco_marcoowntracks
+                - device_tracker.rowan_rowanowntracks
+                - device_tracker.tamara_tamaraowntracks
+                - device_tracker.victor_victorowntracks
+            css:
+              table+: 'width: 100%; table-layout: fixed;'
+              thead tr th:nth-child(1)+: 'width: 5%;'
+              thead tr th:nth-child(2)+: 'width: 65%;'
+              thead tr th:nth-child(3)+: 'width: 25%;'
+            columns:
+              - name: ''
+                data: friendly_name
+                modify: ''''''
+              - name: Gerätename
+                data: friendly_name, state
+                modify: |-
+                  x.trim().endsWith(' home')
+                    ? x.replace(/home$/, '').trim()
+                    : '<span style="color:#E74C3C">' +
+                      x.replace(/(not_home|unavailable|unknown)$/, '').trim() +
+                      '</span>'
+              - name: Status
+                data: state
+                modify: |-
+                  x === 'home'
+                    ? 'Online'
+                    : '<span style="color:#E74C3C">Offline</span>'
+            sort_by: Gerätename-
+          - type: heading
+            icon: ''
+            heading_style: subtitle
+          - square: false
+            type: grid
+            columns: 3
+            cards:
+              - type: tile
+                entity: switch.freebox_v8_r1_wlan
+                name: WLAN
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        {% if not is_state('switch.freebox_v8_r1_wlan', 'on') %}
+                          background: #E74C3C !important;
+                        {% else %}
+                          background: transparent !important;
+                        {% endif %}
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.freebox_v8_r1_download_geschwindigkeit
+                name: Download
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.freebox_v8_r1_upload_geschwindigkeit
+                name: Upload
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+          - square: false
+            type: grid
+            columns: 3
+            cards:
+              - type: tile
+                entity: sensor.freebox_v8_r1_temperature_1
+                name: Temperatur 1
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.freebox_v8_r1_temperature_2
+                name: Temperatur 2
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.freebox_v8_r1_ventilateur_1
+                name: interner Ventilator
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+          - type: heading
+            icon: ''
+            heading_style: subtitle
+          - square: false
+            type: grid
+            columns: 3
+            cards:
+              - type: tile
+                entity: sensor.letztes_erfolgreiches_automatisches_backup_anzeige
+                name: letztes Backup
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: >
+                      {% set zeit =
+                      as_timestamp(states('input_datetime.letzte_windows_sicherung'),
+                      default=none) %}
+
+                      {% set alter = (as_timestamp(now()) - zeit) / 3600 if zeit
+                      is not none else 0 %}
+
+
+                      .primary {
+                        font-size: 14px !important;
+                      }
+
+                      .secondary {
+                        font-size: 16px !important;
+                        {% if alter > 48 %}
+                          color: #E74C3C !important;
+                        {% elif alter > 24 %}
+                          color: #3498DB !important;
+                        {% endif %}
+                      }
+              - type: tile
+                entity: sensor.nachstes_geplantes_automatisches_backup_datum
+                name: nächstes Backup
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.letzte_windows_sicherung_anzeige
+                name: letzte Sicherung
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: >
+                      {% set zeit =
+                      as_timestamp(states('input_datetime.letzte_windows_sicherung'),
+                      default=none) %}
+
+                      {% set alter = (as_timestamp(now()) - zeit) / 3600 if zeit
+                      is not none else 0 %}
+
+
+                      .primary {
+                        font-size: 14px !important;
+                      }
+
+                      .secondary {
+                        font-size: 16px !important;
+                        {% if alter > 48 %}
+                          color: #E74C3C !important;
+                        {% elif alter > 24 %}
+                          color: #3498DB !important;
+                        {% endif %}
+                      }
     show_icon_and_title: true
     max_columns: 3
+  - title: neu
+    path: neu
+    icon: mdi:set-none
+    type: sections
+    sections: []
+    show_icon_and_title: true
+    max_columns: 3
+  - type: panel
+    path: ''
+    cards:
+      - type: custom:flex-table-card
+        title: Zigbee Geräteübersicht
+        card_mod:
+          style: |
+            ha-card {
+              background: transparent !important;
+              box-shadow: none !important;
+              border: none !important;
+              margin-top: 0px !important;
+              margin-bottom: -4px !important;
+            }
+            table tr,
+            table tr:nth-child(even),
+            table tr:nth-child(odd),
+            table td {
+              background: transparent !important;
+            }
+        entities:
+          include:
+            - sensor.*_battery
+        columns:
+          - name: Gerät
+            data: friendly_name
+            modify: |-
+              x.replace(/_/g, ' ')
+               .replace(/ Batterie$/i, '')
+               .replace(/ Battery$/i, '')
+          - name: Batterie
+            data: state
+            modify: x + ' %'
+        sort_by: friendly_name

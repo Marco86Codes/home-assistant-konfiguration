@@ -1,14 +1,15 @@
+
 # Zigbee2MQTT
 
-Diese Dokumentation beschreibt die Einrichtung der Home-Assistant-App **Zigbee2MQTT**.
+Diese Dokumentation beschreibt die Installation und Konfiguration der Home-Assistant-App **Zigbee2MQTT**.
 
-Zigbee2MQTT stellt die Verbindung zwischen dem verwendeten Zigbee-Koordinator und dem MQTT-Broker her. Dadurch können Zigbee-Geräte über MQTT in Home Assistant eingebunden werden.
+Zigbee2MQTT verbindet den verwendeten Zigbee-Koordinator mit dem MQTT-Broker. Dadurch können Zigbee-Geräte über MQTT in Home Assistant eingebunden werden.
 
 ## Installation
 
-Zigbee2MQTT wird über das Home-Assistant-Repository von Zigbee2MQTT installiert.
+Zigbee2MQTT wird über das offizielle Home-Assistant-Repository von Zigbee2MQTT installiert.
 
-Nach der Installation wurden folgende App-Einstellungen verwendet:
+Nach der Installation wurden folgende App-Einstellungen festgelegt:
 
 | Einstellung | Konfiguration |
 | --- | --- |
@@ -23,36 +24,36 @@ Automatische Updates sind deaktiviert, damit Aktualisierungen bewusst durchgefü
 
 ## Zigbee-Koordinator
 
-Der Zigbee-Koordinator ist die zentrale Schnittstelle zwischen dem Zigbee-Funknetzwerk und Zigbee2MQTT.
+In dieser Installation wird ein über USB angeschlossener Zigbee-Koordinator verwendet.
 
-Er kommuniziert per Zigbee-Funk mit den eingebundenen Zigbee-Geräten und ist über USB mit dem Home-Assistant-System verbunden. Zigbee2MQTT greift auf den Koordinator zu und überträgt die Informationen der Zigbee-Geräte anschließend über MQTT.
-
-In dieser Installation wird ein USB-Zigbee-Koordinator verwendet.
-
-Für die Konfiguration wird der dauerhafte Gerätepfad unter `/dev/serial/by-id/` verwendet. Dadurch ist die Konfiguration nicht von der möglicherweise veränderlichen Zuordnung wie `/dev/ttyUSB0` abhängig.
+Für die Konfiguration wird der dauerhafte Gerätepfad unter `/dev/serial/by-id/` verwendet. Dadurch ist die Zuordnung unabhängig von möglicherweise wechselnden Gerätepfaden wie `/dev/ttyUSB0`.
 
 Verwendete Konfiguration:
 
 | Einstellung | Konfiguration |
 | --- | --- |
-| Port | `/dev/serial/by-id/usb-1a86_USB_Serial-if00-port0` |
+| Port | `/dev/serial/by-id/<ZIGBEE-KOORDINATOR>` |
 | Adapter | `ember` |
 | Baudrate | `115200` |
 | RTS/CTS | Deaktiviert |
 
-## MQTT
+## MQTT-Verbindung
 
 Zigbee2MQTT verwendet die Home-Assistant-App **Mosquitto broker** als MQTT-Broker.
 
-Als Broker-Adresse wird `mqtt://core-mosquitto:1883` verwendet.
+Verwendete Konfiguration:
 
-Für die Anmeldung wird der separat angelegte Home-Assistant-Benutzer `mqtt_z2m` ohne Administratorrechte verwendet.
+| Einstellung | Konfiguration |
+| --- | --- |
+| Broker-Adresse | `mqtt://core-mosquitto:1883` |
+| Benutzer | Separater Home-Assistant-Benutzer |
+| Administratorrechte | Keine |
+| Nur lokaler Zugriff | Aktiviert |
+| MQTT-Basisthema | `zigbee2mqtt` |
 
-Für diesen Benutzer ist in Home Assistant die Option **„Nur lokaler Zugriff“** aktiviert.
+Der MQTT-Benutzer wird unter **Home Assistant → Einstellungen → Personen → Benutzer** angelegt.
 
-Als MQTT-Basisthema wird `zigbee2mqtt` verwendet.
-
-## Home Assistant
+## Home-Assistant-Anbindung
 
 Die Home-Assistant-Unterstützung von Zigbee2MQTT ist aktiviert.
 
@@ -66,55 +67,59 @@ Verwendete Konfiguration:
 | Experimental Event Entities | Deaktiviert |
 | Legacy Action Sensor | Deaktiviert |
 
-Dadurch stellt Zigbee2MQTT unterstützte Geräte und Entitäten über MQTT Discovery für Home Assistant bereit.
+Dadurch stellt Zigbee2MQTT unterstützte Geräte und Entitäten über **MQTT Discovery** für Home Assistant bereit.
 
 ## Zigbee-Netzwerk
 
 Bei der Ersteinrichtung wurde ein neues Zigbee-Netzwerk erstellt.
 
-Zigbee2MQTT erzeugt und verwaltet dafür unter anderem den Network Key sowie die Netzwerkkennungen des Zigbee-Netzwerks.
+Zigbee2MQTT erzeugt und verwaltet dafür unter anderem den Network Key und die Netzwerkkennungen.
 
-Die Koordinator-Sicherung wird von Zigbee2MQTT unter `/config/zigbee2mqtt/coordinator_backup.json` gespeichert.
+Die Koordinator-Sicherung wird unter folgendem Pfad gespeichert:
 
-## Zigbee-Gerät einbinden
+`/config/zigbee2mqtt/coordinator_backup.json`
 
-Die Einbindung eines Zigbee-Geräts erfolgt über die Zigbee2MQTT-Oberfläche.
+## Zigbee-Geräte einbinden
 
-Dafür wird in Zigbee2MQTT der Beitritt neuer Geräte erlaubt. Anschließend wird das einzubindende Gerät in seinen Kopplungsmodus versetzt.
+Die Einbindung erfolgt über die Zigbee2MQTT-Oberfläche.
 
-Wie der Kopplungsmodus aktiviert wird, ist vom jeweiligen Gerät abhängig und wird daher nicht für jedes Gerät separat in dieser Dokumentation beschrieben.
+1. In Zigbee2MQTT den Beitritt neuer Geräte erlauben.
+2. Das einzubindende Gerät in den Kopplungsmodus versetzen.
+3. Die erfolgreiche Einbindung in Zigbee2MQTT prüfen.
+4. Prüfen, ob das Gerät und seine Entitäten in Home Assistant verfügbar sind.
 
-Nach erfolgreicher Einbindung erscheint das Gerät in Zigbee2MQTT.
-
-Durch die aktivierte Home-Assistant-Unterstützung wird das Gerät anschließend über MQTT Discovery automatisch für Home Assistant bereitgestellt.
-
-Nach der Einbindung wird geprüft, ob das Gerät und seine Entitäten in Home Assistant vorhanden sind.
+Wie der Kopplungsmodus aktiviert wird, hängt vom jeweiligen Gerät ab.
 
 Die tatsächlich eingesetzten Geräte werden zentral in der Hardwareübersicht dokumentiert.
 
-## Funktionstest
+## Funktionsprüfung
 
 Nach Abschluss der Einrichtung konnte Zigbee2MQTT den Zigbee-Koordinator erfolgreich öffnen und das Zigbee-Netzwerk starten.
 
-Anschließend wurde die Verbindung zum Mosquitto broker hergestellt und Zigbee2MQTT als online veröffentlicht.
+Anschließend wurde die Verbindung zum **Mosquitto broker** hergestellt und Zigbee2MQTT als online veröffentlicht.
 
 In Home Assistant wurde die **Zigbee2MQTT Bridge** automatisch über die **MQTT**-Integration erkannt.
 
-Zusätzlich wurde ein Zigbee-Gerät erfolgreich über Zigbee2MQTT eingebunden und anschließend mit seinen Entitäten in Home Assistant bereitgestellt.
+Zusätzlich wurde ein Zigbee-Gerät erfolgreich eingebunden und mit seinen Entitäten in Home Assistant bereitgestellt.
 
-Damit wurde die Kommunikationskette erfolgreich geprüft:
+Damit wurde die vollständige Kommunikationskette geprüft:
 
 ```text
 Zigbee-Gerät
-     ↓
+    │
+    ▼
 Zigbee-Koordinator
-     ↓
+    │
+    ▼
 Zigbee2MQTT
-     ↓
+    │
+    ▼
 Mosquitto broker
-     ↓
-MQTT
-     ↓
+    │
+    ▼
+MQTT-Integration
+    │
+    ▼
 Home Assistant
 ```
 
@@ -124,7 +129,7 @@ Home Assistant
 
 ## 🔗 Verwendung & Verknüpfungen
 
-- [Hardware & Geräte](../hardware.md) – Übersicht der eingesetzten Geräte und ihrer Einbindungsart
+- [Hardware & Geräte](../hardware.md) – Übersicht der eingesetzten Geräte
 - [Mosquitto broker](mosquitto-broker.md) – stellt den verwendeten MQTT-Broker bereit
 - [MQTT](mqtt.md) – Home-Assistant-Integration für die MQTT-Kommunikation
 

@@ -1,3 +1,4 @@
+
 # Backups
 
 Diese Dokumentation beschreibt die Backup-Strategie der Home-Assistant-Installation.
@@ -44,11 +45,11 @@ Windows-Aufgabenplanung
             └── Windows-Benachrichtigung: Sicherung erfolgreich
                     │
                     ▼
-        Lokaler Windows-Sicherungsordner
+         Lokaler Windows-Sicherungsordner
                     │
                     │ Proton Drive „Mein Computer“
                     ▼
-              Proton Drive
+               Proton Drive
 ```
 
 Dadurch befinden sich die Backups an drei unterschiedlichen Speicherorten:
@@ -56,6 +57,8 @@ Dadurch befinden sich die Backups an drei unterschiedlichen Speicherorten:
 1. auf dem internen Datenträger des Home-Assistant-Systems
 2. auf dem Windows-PC
 3. in Proton Drive
+
+Die einzelnen Schritte sind voneinander getrennt. Home Assistant erstellt die eigentlichen Backups, Windows übernimmt deren zusätzliche lokale Sicherung und Proton Drive synchronisiert den Windows-Sicherungsordner.
 
 ## Automatische Home-Assistant-Backups
 
@@ -75,10 +78,9 @@ Verwendete Einstellungen:
 | Medien | Enthalten |
 | Share-Ordner | Enthalten |
 
-
 Die Backups werden lokal auf dem Home-Assistant-System gespeichert.
 
-Die Begrenzung auf 10 automatische Backups betrifft ausschließlich die lokale Aufbewahrung in Home Assistant. Die längerfristige Aufbewahrung auf dem Windows-PC (und somit auch in Proton Drive) wird davon unabhängig verwaltet.
+Die Begrenzung auf 10 automatische Backups betrifft ausschließlich die lokale Aufbewahrung in Home Assistant. Die längerfristige Aufbewahrung auf dem Windows-PC und die anschließende Synchronisierung mit Proton Drive werden davon unabhängig verwaltet.
 
 ## Verschlüsselung
 
@@ -100,7 +102,7 @@ Stattdessen werden ausschließlich die dafür vorgesehenen beziehungsweise offiz
 - Home Assistant erstellt und verwaltet die eigentlichen Backups.
 - Die Home-Assistant-App **Samba share** stellt das Backup-Verzeichnis im lokalen Netzwerk bereit.
 - Windows kopiert die Backups mit einem lokalen PowerShell-Skript.
-- Die offizielle Proton-Drive-Anwendung synchronisiert den lokalen Sicherungsordner über **„Mein Computer“**.
+- Die offizielle **Proton Drive Windows-App** synchronisiert den lokalen Sicherungsordner über **„Mein Computer“**.
 
 Home Assistant selbst benötigt dadurch keinen Zugriff auf das Proton-Konto.
 
@@ -110,7 +112,7 @@ Für die einzelnen Speicherorte gelten unterschiedliche Aufbewahrungsregeln:
 
 | Speicherort | Aufbewahrung |
 | --- | --- |
-| Home Assistant | maximal 10 automatische Backups |
+| Home Assistant | Maximal 10 automatische Backups |
 | Windows-PC | 90 Tage |
 | Proton Drive | Synchronisierung des Windows-Sicherungsordners |
 
@@ -120,29 +122,53 @@ Wird ein Backup aufgrund der Begrenzung auf 10 Backups aus Home Assistant entfer
 
 Aus diesem Grund wird keine Spiegelung verwendet, bei der auf der Quelle gelöschte Backups automatisch auch auf dem Windows-PC entfernt würden.
 
+Die Bereinigung auf dem Windows-PC erfolgt anhand des Änderungsdatums der lokalen Backup-Dateien.
+
+Proton Drive synchronisiert den Windows-Sicherungsordner. Die dortige Aufbewahrung ist deshalb nicht als unabhängige zusätzliche 90-Tage-Regel zu verstehen.
+
 ## Sicherheitsverhalten der Windows-Sicherung
 
 Bevor alte lokale Sicherungen entfernt werden, prüft das PowerShell-Skript, ob die Samba-Freigabe von Home Assistant erreichbar ist.
 
 Ist sie nicht erreichbar, versucht das Skript zunächst, die Verbindung zur Samba-Freigabe neu herzustellen.
 
-Schlägt auch dieser Versuch fehl, wird der Sicherungsvorgang abgebrochen. Dadurch werden keine lokalen Backups aufgrund der 90-Tage-Regel gelöscht, wenn Home Assistant beziehungsweise dessen Backup-Freigabe nicht erreichbar ist.
+Schlägt auch dieser Versuch fehl, wird der Sicherungsvorgang abgebrochen.
+
+Dadurch werden keine lokalen Backups aufgrund der 90-Tage-Regel gelöscht, wenn Home Assistant beziehungsweise dessen Backup-Freigabe nicht erreichbar ist.
 
 Beim Start, bei einem Abbruch aufgrund einer nicht erreichbaren Freigabe, bei einem fehlgeschlagenen Kopiervorgang und nach erfolgreichem Abschluss informiert das Skript den angemeldeten Windows-Benutzer über entsprechende Benachrichtigungen.
 
-Die technische Umsetzung ist in der Windows-Backup-Dokumentation beschrieben.
+Eine fehlgeschlagene Übertragung wird nicht als erfolgreiche Sicherung an Home Assistant zurückgemeldet.
 
 ## Überwachung in Home Assistant
 
-Nach einer erfolgreichen Übertragung auf den Windows-PC meldet das PowerShell-Skript den erfolgreichen Kopiervorgang über einen Webhook an Home Assistant zurück.
+Nach einem erfolgreich abgeschlossenen Kopierlauf meldet das PowerShell-Skript das Ergebnis über einen Webhook an Home Assistant zurück.
 
 Eine Home-Assistant-Automation aktualisiert daraufhin den Helfer `input_datetime.letzte_windows_sicherung`.
 
-Der Helfer enthält dadurch Datum und Uhrzeit der letzten erfolgreichen Windows-Sicherung und kann später beispielsweise für eine Statusanzeige oder Überwachung im Home-Assistant-Dashboard verwendet werden.
+Der Helfer enthält dadurch Datum und Uhrzeit des letzten erfolgreich abgeschlossenen Windows-Sicherungslaufs.
 
-Kann nur die Rückmeldung an Home Assistant nicht ausgeführt werden, bleibt das zuvor erfolgreich erstellte Windows-Backup davon unberührt. Das PowerShell-Skript gibt in diesem Fall eine Warnung aus.
+Ein erfolgreicher Kopierlauf bedeutet nicht zwingend, dass neue Backup-Dateien übertragen wurden. Auch wenn bereits alle Dateien vorhanden sind und kein Kopierfehler festgestellt wird, kann der Zeitstempel aktualisiert werden.
 
-Die Einrichtung des Helfers, der Automation und des Webhooks ist in der Windows-Backup-Dokumentation beschrieben.
+Der Helfer enthält dadurch Datum und Uhrzeit der letzten erfolgreichen Windows-Sicherung.
+
+Der Zeitpunkt wird im Netzwerk-Dashboard angezeigt.
+
+Kann nur die Rückmeldung an Home Assistant nicht ausgeführt werden, bleibt die erfolgreich abgeschlossene Windows-Sicherung davon unberührt. Das PowerShell-Skript gibt in diesem Fall eine Warnung aus.
+
+### Template-Sensoren für die Backup-Anzeige
+
+Für die Darstellung der Backup-Zeitpunkte werden drei Template-Sensoren verwendet.
+
+| Sensor | Verwendung |
+|---|---|
+| `sensor.backup_last_successful_automatic_backup_anzeige` | Letztes erfolgreiches automatisches Home-Assistant-Backup |
+| `sensor.letzte_windows_sicherung_anzeige` | Letzte erfolgreiche Windows-Sicherung |
+| `sensor.backup_next_scheduled_automatic_backup_anzeige` | Nächstes geplantes automatisches Home-Assistant-Backup |
+
+Die Template-Sensoren bereiten die vorhandenen Zeitangaben im Format `TT.MM.JJJJ HH:MM` auf. Ist der jeweilige Ausgangswert nicht verfügbar, wird `Unbekannt` angezeigt.
+
+Die Sensoren sind direkt in der `configuration.yaml` definiert. Ihre YAML-Konfiguration ist separat im Repository dokumentiert.
 
 ## Wiederherstellung
 
@@ -156,14 +182,18 @@ befindet.
 
 Die konkrete Wiederherstellung richtet sich nach dem jeweiligen Fehlerfall und der zu diesem Zeitpunkt aktuellen Home-Assistant-Version.
 
+Bei verschlüsselten Backups muss der erforderliche Wiederherstellungs- beziehungsweise Verschlüsselungsschlüssel verfügbar sein.
+
 ## Nützliche Links & Quellen
 
 - [Home Assistant – Backups](https://www.home-assistant.io/common-tasks/general/backups/)
 
 ## 🔗 Verwendung & Verknüpfungen
 
+- [Backup-Template-Sensoren](../skripte/home-assistant/sensoren/backup_anzeige.yaml) – Aufbereitung der Backup-Zeitpunkte
+- [Dashboard – Netzwerk](dashboard_netzwerk.md) – Anzeige und Überwachung der letzten erfolgreichen Windows-Sicherung
 - [Samba share](../apps/samba-share.md) – Bereitstellung des Home-Assistant-Backup-Verzeichnisses im lokalen Netzwerk
-- [Windows-Backup-Synchronisation](../externe-systeme/windows/backup-synchronisation.md) – automatische Übertragung, Aufbewahrung, Überwachung und Synchronisierung der Backups
+- [Windows-Backup-Synchronisation](../externe-systeme/windows/backup-synchronisation.md) – technische Einrichtung der automatischen Windows-Sicherung und Synchronisierung mit Proton Drive
 
 ---
 

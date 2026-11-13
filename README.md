@@ -16,29 +16,39 @@ Dieses Repository dokumentiert den Aufbau meines Smart Homes mit Home Assistant.
 
 ### Grundlagen
 
+- [Anwesenheitserkennung](grundlagen/anwesenheitserkennung.md) – Standortbasierte Anwesenheitserkennung über OwnTracks und zentrale Anwesenheits-Helfer
 - [Backups](grundlagen/backups.md) – Backup-Strategie und Aufbewahrung der Home-Assistant-Backups
-- [Dashboard](grundlagen/dashboard.md) – Visualisierung der Zendure-Solaranlage mit Statusanzeigen, Wetterinformationen und Energieflussdiagramm
-- [Solarsteuerung](grundlagen/solarsteuerung.md) – Dynamische AC-Leistungsregelung mit zwei Zendure SolarFlow 800 Plus, wetterabhängiger Mindest-SoC-Steuerung und automatischer Leistungsverteilung
+- [Dashboard](grundlagen/dashboard.md) – Übersicht der Dashboard-Ansichten
+- [Dashboard – Netzwerk](grundlagen/dashboard_netzwerk.md) – Überwachung von Netzwerkgeräten und Backup-Status
+- [Dashboard – Solar](grundlagen/dashboard-solar.md) – Visualisierung der Solaranlage, Statusanzeigen und Energieflüsse
+- [Home-Assistant-Konfiguration](grundlagen/konfiguration.md) – Aufbau der `configuration.yaml`, YAML-Einbindungen und Home-Assistant-Packages
+- [Solarsteuerung](grundlagen/solarsteuerung.md) – Dynamische AC-Leistungsregelung und wetterabhängige Mindest-SoC-Steuerung
 
 ### Apps & Integrationen
 
-- [Mosquitto broker](apps/mosquitto-broker.md) – MQTT-Broker für die Kommunikation zwischen MQTT-Komponenten
+- [File editor](apps/file-editor.md) – Bearbeitung von YAML-Konfigurationsdateien, insbesondere auf Mobilgeräten
+- [Freebox](apps/freebox.md) – Einbindung der Freebox zur Überwachung von Netzwerkgeräten
+- [Mosquitto broker](apps/mosquitto-broker.md) – Zentraler MQTT-Broker für die Kommunikation zwischen MQTT-Komponenten
 - [MQTT](apps/mqtt.md) – Home-Assistant-Integration für die MQTT-Kommunikation
+- [OwnTracks](apps/own-tracks.md) – Einrichtung der OwnTracks-Integration für die Standortübertragung
 - [Samba share](apps/samba-share.md) – Bereitstellung des Backup-Verzeichnisses im lokalen Netzwerk
 - [Shelly](apps/shelly.md) – Einbindung des Shelly 3EM zur Messung der Netzleistung
-- [Studio Code Server](apps/studio-code-server.md) – Bearbeitung der Home-Assistant-Konfiguration über einen integrierten Code-Editor
+- [Studio Code Server](apps/studio-code-server.md) – Bearbeitung und Verwaltung der Home-Assistant-Konfiguration im Browser
 - [Zendure](apps/zendure.md) – Einbindung der SolarFlow 800 Plus mit lokaler MQTT-Kommunikation
 - [Zigbee2MQTT](apps/zigbee2mqtt.md) – Einbindung von Zigbee-Geräten über MQTT
 
-### Marketplace
+### Dashboard-Tools
 
-- [Config Template Card](marketplace/config-template-card.md) – Dynamische Farbbereiche in den Batterie-Rundinstrumenten anhand des eingestellten und des geplanten Mindest-SoC
-- [card-mod](marketplace/card-mod.md) – Individuelle Gestaltung der Dashboard-Karten und farbliche Statusanzeigen
-- [Home Flow Card](marketplace/home-flow-card.md) – Grafische Darstellung der Energieflüsse zwischen PV, Batterien, Haus und Netz
+- [card-mod](dashboard-tools/card-mod.md) – Individuelle Gestaltung der Dashboard-Karten und farbliche Statusanzeigen
+- [Config Template Card](dashboard-tools/config-template-card.md) – Dynamische Farbbereiche in den Batterie-Rundinstrumenten anhand des eingestellten und des geplanten Mindest-SoC
+- [Flex Table Card](dashboard-tools/flex-table-cards.md) – Tabellarische Darstellung von Entitätsinformationen im Dashboard
+- [Home Flow Card](dashboard-tools/home-flow-card.md) – Grafische Darstellung der Energieflüsse zwischen PV, Batterien, Haus und Netz
 
 ### Externe Systeme
 
 - [DHCP-Zuweisungen in der Freebox](externe-systeme/freebox/dhcp-zuweisungen.md) – feste DHCP-Zuweisungen für die beteiligten Netzwerkgeräte
+- [OwnTracks – Android](externe-systeme/mobilgeraete/own-tracks-android.md) – Konfiguration der Standortübertragung auf Android-Smartphones
+- [OwnTracks – iOS](externe-systeme/mobilgeraete/own-tracks-ios.md) – Konfiguration der Standortübertragung auf iPhones
 - [Windows-Backup-Synchronisation](externe-systeme/windows/backup-synchronisation.md) – automatische Übertragung der Backups auf einen Windows-PC und Synchronisierung mit Proton Drive
 
 ## Skripte und Konfigurationen
@@ -47,10 +57,13 @@ Dieses Repository dokumentiert den Aufbau meines Smart Homes mit Home Assistant.
 
 **Dashboard**
 
-- [Dashboard-Konfiguration](skripte/home-assistant/dashboard.yaml) – YAML-Konfiguration der Dashboard-Ansichten, Karten und Energieflussdarstellung
+- [Dashboard](grundlagen/dashboard.md) – Allgemeiner Aufbau und Übersicht der Dashboard-Ansichten
+- [Dashboard – Netzwerk](grundlagen/dashboard_netzwerk.md) – Überwachung der Netzwerkgeräte und des Backup-Status
+- [Dashboard – Solar](grundlagen/dashboard-solar.md) – Überwachung der Solaranlage mit Statusanzeigen, Wetterinformationen und Energieflussdiagramm
 
 **Automationen**
 
+- [Aktualisierung Anwesenheit Home](skripte/home-assistant/automationen/aktualisierung-anwesenheit_home.yaml) – Aktualisiert die Anwesenheits-Helfer anhand der OwnTracks-Geräte-Tracker
 - [Aktualisierung des Windows-Sicherungszeitstempels](skripte/home-assistant/automationen/aktualisierung-windows-sicherung-zeitstempel.yaml) – aktualisiert den Zeitpunkt der letzten erfolgreichen Windows-Sicherung
 - [Zendure Leistungsanpassung](skripte/home-assistant/automationen/zendure-leistungsanpassung.yaml) – überträgt die berechneten AC-Sollwerte an beide Wechselrichter
 - [Zendure Mindest-SoC Berechnung](skripte/home-assistant/automationen/zendure-mindest-soc-berechnung.yaml) – berechnet die geplanten Mindest-SoC-Werte anhand der Wetterprognose
@@ -58,7 +71,9 @@ Dieses Repository dokumentiert den Aufbau meines Smart Homes mit Home Assistant.
 
 **Sensoren**
 
+- [Backup-Anzeige](skripte/home-assistant/sensoren/backup_anzeige.yaml) – Template-Sensoren zur Darstellung der letzten erfolgreichen und der nächsten geplanten Home-Assistant-Sicherung sowie der letzten Windows-Sicherung
 - [Solarsteuerung](skripte/home-assistant/sensoren/solarsteuerung.yaml) – Template-Sensoren für Netzleistung, Hausverbrauch, PV-Leistung, Batteriefreigabe und dynamische AC-Leistungsverteilung
+
 
 ### Windows
 

@@ -1,3 +1,4 @@
+
 # DHCP-Zuweisungen in der Freebox
 
 Diese Dokumentation beschreibt die Verwendung fester DHCP-Zuweisungen in der Freebox und deren Bedeutung für die Home-Assistant-Installation.
@@ -6,9 +7,11 @@ Diese Dokumentation beschreibt die Verwendung fester DHCP-Zuweisungen in der Fre
 
 Im lokalen Netzwerk werden für alle Geräte feste DHCP-Zuweisungen verwendet.
 
-Die IP-Adressen werden weiterhin automatisch per DHCP vergeben. Durch die in der Freebox hinterlegte Reservierung erhält ein bekanntes Gerät jedoch dauerhaft dieselbe lokale IP-Adresse.
+Die IP-Adressen werden weiterhin automatisch per DHCP vergeben. Durch die in der Freebox hinterlegte Reservierung erhält ein bekanntes Gerät jedoch dauerhaft dieselbe lokale IPv4-Adresse.
 
 Die Verwaltung der lokalen IPv4-Adressen erfolgt dadurch zentral in der Freebox. Auf den einzelnen Geräten müssen keine statischen IPv4-Adressen manuell konfiguriert werden.
+
+Konkrete lokale IP-Adressen werden nicht im Repository dokumentiert, da sie ausschließlich für die jeweilige lokale Netzwerkkonfiguration relevant sind.
 
 ## Home Assistant
 
@@ -26,13 +29,11 @@ Da der PC sowohl über LAN als auch über WLAN mit dem lokalen Netzwerk verbunde
 
 Die dadurch konstanten lokalen IPv4-Adressen werden für die Zugriffsbeschränkung von **Samba share** verwendet.
 
-Konkrete lokale IP-Adressen werden nicht im Repository dokumentiert, da sie ausschließlich für die jeweilige lokale Netzwerkkonfiguration relevant sind.
-
 ## 🔗 Verwendung & Verknüpfungen
 
 - [Samba share](../../apps/samba-share.md) – verwendet die festen lokalen Adressen des Windows-PCs für die Zugriffsbeschränkung
 - [Windows-Backup-Synchronisation](../windows/backup-synchronisation.md) – verwendet die feste lokale Adresse von Home Assistant für den Zugriff auf die Backup-Freigabe
-- [Zendure](../../apps/zendure.md) – die feste lokale Adresse von Home Assistant für den Zugriff über MQTT
+- [Zendure](../../apps/zendure.md) – verwendet die feste lokale Adresse von Home Assistant für den Zugriff über MQTT
 
 ---
 

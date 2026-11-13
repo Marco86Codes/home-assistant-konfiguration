@@ -1,15 +1,16 @@
+
 # Windows-Backup-Synchronisation
 
-Diese Dokumentation beschreibt die automatische Übertragung der Home-Assistant-Backups auf einen Windows-PC und die anschließende Synchronisierung mit Proton Drive.
+Diese Dokumentation beschreibt die technische Einrichtung der automatischen Übertragung von Home-Assistant-Backups auf einen Windows-PC und die anschließende Synchronisierung mit Proton Drive.
 
-Die Automatisierung wird über ein PowerShell-Skript und die Windows-Aufgabenplanung ausgeführt.
+Die Übertragung erfolgt über ein PowerShell-Skript, das durch die Windows-Aufgabenplanung gestartet wird.
 
 ## Lokale Ordnerstruktur
 
 Für die Home-Assistant-Sicherung wird folgende lokale Ordnerstruktur verwendet:
 
 ```text
-C:\PC Sicherungen\HomeAssistant\
+<BACKUP-BASISPFAD>\HomeAssistant\
 ├── Backup\
 └── Skripte\
     ├── home-assistant-backup.ps1
@@ -18,7 +19,7 @@ C:\PC Sicherungen\HomeAssistant\
 
 Der Ordner `Backup` enthält die von Home Assistant übernommenen `.tar`-Backups.
 
-Im Ordner `Skripte` befinden sich das eigentliche PowerShell-Skript und die lokale Konfigurationsdatei.
+Im Ordner `Skripte` befinden sich das PowerShell-Skript und die lokale Konfigurationsdatei.
 
 ## Windows-Anmeldeinformationen
 
@@ -36,111 +37,111 @@ Eine dauerhaft eingebundene Netzwerkfreigabe beziehungsweise ein Netzlaufwerk is
 
 ## PowerShell-Skript
 
-Die Sicherung wird durch das Skript `home-assistant-backup.ps1` durchgeführt.
+Die Sicherung wird durch `home-assistant-backup.ps1` durchgeführt.
 
 Das Skript übernimmt folgende Aufgaben:
 
-1. lokale Konfiguration laden
-2. benötigte Windows-Komponenten laden
-3. Windows-Benachrichtigung zum Start anzeigen
-4. Samba-Freigabe auf Erreichbarkeit prüfen
-5. bei Bedarf die Verbindung zur Samba-Freigabe neu herstellen
-6. lokale Backups löschen, die älter als 90 Tage sind
-7. aktuelle Home-Assistant-Backups mit Robocopy kopieren
-8. Ergebnis von Robocopy prüfen
-9. Home Assistant über die erfolgreiche Sicherung informieren
-10. Windows-Benachrichtigung über den erfolgreichen Abschluss anzeigen
+1. Lokale Konfiguration und benötigte Windows-Komponenten laden
+2. Windows-Benachrichtigung zum Start anzeigen
+3. Samba-Freigabe auf Erreichbarkeit prüfen und bei Bedarf die Verbindung neu herstellen
+4. Lokale Backups löschen, die älter als 90 Tage sind
+5. Home-Assistant-Backups mit Robocopy kopieren
+6. Robocopy-Ergebnis prüfen
+7. Home Assistant über den erfolgreichen Kopierlauf informieren
+8. Windows-Benachrichtigung über den Abschluss anzeigen
 
-Das im Repository bereitgestellte Skript befindet sich unter `skripte/windows/home-assistant-backup.ps1`.
+Die technischen Einzelheiten sind im PowerShell-Skript selbst dokumentiert.
 
 ## Private Konfiguration
 
-Systemspezifische Werte werden nicht direkt im eigentlichen PowerShell-Skript gespeichert.
+Systemspezifische Werte werden nicht direkt im PowerShell-Skript gespeichert.
 
 Dafür wird die separate Datei `config.ps1` verwendet.
 
-Sie enthält die lokale Home-Assistant-Adresse sowie die vollständige Webhook-URL.
+Sie enthält:
 
-Das PowerShell-Skript lädt diese Datei beim Start.
+- die lokale IPv4-Adresse von Home Assistant
+- die vollständige Webhook-URL
 
-Im Repository wird lediglich eine Vorlage unter `skripte/windows/config.example.ps1` bereitgestellt.
+Das PowerShell-Skript lädt diese Datei beim Start aus seinem eigenen Verzeichnis.
 
-Diese kann lokal kopiert, in `config.ps1` umbenannt und anschließend mit den eigenen Werten ergänzt werden.
+Im Repository wird lediglich die Vorlage `config.example.ps1` bereitgestellt.
+
+Diese wird lokal kopiert, in `config.ps1` umbenannt und anschließend mit den eigenen Werten ergänzt.
 
 ## Prüfung der Samba-Freigabe
 
-Bevor lokale Backups aufgrund der Aufbewahrungsfrist gelöscht werden, prüft das Skript zunächst den Zugriff auf die Samba-Freigabe.
+Vor dem Löschen alter lokaler Backups prüft das PowerShell-Skript den Zugriff auf die Samba-Freigabe.
 
-Ist der erste Zugriff nicht möglich, wird eine möglicherweise bestehende Windows-Verbindung zu Home Assistant getrennt. Nach einer kurzen Wartezeit wird erneut versucht, auf die Freigabe zuzugreifen.
+Ist der erste Zugriff nicht möglich, wird eine möglicherweise bestehende Windows-Verbindung zu Home Assistant getrennt.
 
-Windows verwendet dabei die im Windows-Anmeldeinformationsmanager hinterlegten Zugangsdaten.
+Nach einer Wartezeit von zwei Sekunden wird der Zugriff erneut geprüft.
+
+Windows verwendet dabei die im **Windows-Anmeldeinformationsmanager** hinterlegten Zugangsdaten.
 
 Schlägt auch der zweite Zugriffsversuch fehl, wird die Sicherung abgebrochen.
 
-Es werden in diesem Fall weder alte lokale Backups gelöscht noch neue Backups kopiert.
+In diesem Fall werden weder alte lokale Backups gelöscht noch neue Backups kopiert.
 
 Zusätzlich wird eine Windows-Fehlerbenachrichtigung angezeigt.
 
 ## Lokale Aufbewahrung
 
-Backups auf dem Windows-PC werden 90 Tage aufbewahrt.
+Das PowerShell-Skript sucht im lokalen Backup-Verzeichnis nach `.tar`-Dateien, deren Änderungsdatum mehr als 90 Tage zurückliegt.
 
-Nach erfolgreicher Prüfung der Samba-Freigabe sucht das PowerShell-Skript im lokalen Backup-Verzeichnis nach `.tar`-Dateien, deren Änderungsdatum mehr als 90 Tage zurückliegt.
+Diese Dateien werden nach erfolgreicher Prüfung der Samba-Freigabe und vor dem anschließenden Kopiervorgang entfernt.
 
-Diese Dateien werden entfernt.
-
-Die Bereinigung findet bewusst vor dem anschließenden Kopiervorgang statt, jedoch erst nachdem die Erreichbarkeit der Home-Assistant-Freigabe erfolgreich geprüft wurde.
+Die grundsätzlichen Aufbewahrungsregeln der verschiedenen Speicherorte sind in der zentralen Backup-Dokumentation beschrieben.
 
 ## Kopieren mit Robocopy
 
-Die eigentliche Übertragung der Backup-Dateien erfolgt mit **Robocopy**.
+Die Übertragung der Backup-Dateien erfolgt mit **Robocopy**.
 
 Kopiert werden ausschließlich Dateien mit der Endung `.tar`.
 
-Für Wiederholungsversuche werden die Optionen `/R:3` und `/W:5` verwendet.
+Verwendete Optionen:
 
-`/R:3` begrenzt die Anzahl der Wiederholungsversuche bei einem fehlerhaften Kopiervorgang auf drei.
+| Option | Bedeutung |
+| --- | --- |
+| `*.tar` | Ausschließlich Backup-Dateien mit der Endung `.tar` |
+| `/R:3` | Drei Wiederholungsversuche bei Kopierfehlern |
+| `/W:5` | Fünf Sekunden Wartezeit zwischen Wiederholungsversuchen |
 
-`/W:5` legt eine Wartezeit von fünf Sekunden zwischen den Wiederholungsversuchen fest.
-
-Auf eine Spiegelung mit `/MIR` wird bewusst verzichtet.
-
-Dadurch werden Backups, die aufgrund der kürzeren Aufbewahrung bereits aus Home Assistant entfernt wurden, nicht automatisch auch vom Windows-PC gelöscht.
+Eine Spiegelung mit `/MIR` wird nicht verwendet.
 
 ### Robocopy-Exit-Codes
 
 Robocopy verwendet eigene Exit-Codes.
 
-Das PowerShell-Skript wertet deshalb den von Robocopy zurückgegebenen Exit-Code aus.
+Das PowerShell-Skript wertet deshalb den zurückgegebenen Exit-Code aus.
 
-Exit-Codes von `0` bis `7` werden nicht als fehlgeschlagener Kopiervorgang behandelt.
+| Exit-Code | Bewertung |
+| --- | --- |
+| `0` bis `7` | Kein als fehlgeschlagen gewerteter Kopiervorgang |
+| Ab `8` | Kopiervorgang fehlgeschlagen |
 
-Ab Exit-Code `8` wird der Sicherungsvorgang als fehlgeschlagen gewertet.
-
-In diesem Fall wird eine Windows-Fehlerbenachrichtigung angezeigt und das Skript mit dem entsprechenden Exit-Code beendet.
+Ab Exit-Code `8` wird eine Windows-Fehlerbenachrichtigung angezeigt und das Skript mit dem entsprechenden Exit-Code beendet.
 
 ## Windows-Benachrichtigungen
 
-Das PowerShell-Skript verwendet Windows-Benachrichtigungen, um den angemeldeten Benutzer über den Sicherungsvorgang zu informieren.
+Das PowerShell-Skript verwendet `System.Windows.Forms.NotifyIcon`, um den angemeldeten Windows-Benutzer über den Sicherungsvorgang zu informieren.
 
-Eine Benachrichtigung wird angezeigt:
+Benachrichtigungen erfolgen:
 
 - beim Start der Sicherung
-- wenn die Samba-Freigabe auch nach dem erneuten Verbindungsversuch nicht erreichbar ist
+- wenn die Samba-Freigabe auch nach einem erneuten Verbindungsversuch nicht erreichbar ist
 - wenn Robocopy den Kopiervorgang nicht erfolgreich abschließen konnte
 - nach erfolgreichem Abschluss der Sicherung
 
-Für die Benachrichtigungen wird `System.Windows.Forms.NotifyIcon` verwendet.
+Die benötigte Assembly `System.Windows.Forms` wird vor der Definition der Benachrichtigungsfunktion geladen.
 
-Die benötigte Assembly wird bereits vor der Definition der Benachrichtigungsfunktion geladen.
-
-Dies ist insbesondere bei der Ausführung über die Windows-Aufgabenplanung relevant, da dort eine neue PowerShell-Sitzung ohne bereits zuvor geladene Komponenten gestartet wird.
+Dies ist insbesondere bei der Ausführung über die Windows-Aufgabenplanung relevant, da dort eine neue PowerShell-Sitzung gestartet wird.
 
 ## Rückmeldung an Home Assistant
 
-Nach einem erfolgreichen Kopiervorgang meldet das PowerShell-Skript den Erfolg an Home Assistant zurück.
+Nach einem erfolgreich abgeschlossenen Kopierlauf ruft das PowerShell-Skript einen Home-Assistant-Webhook auf.
 
-Dadurch kann Home Assistant den Zeitpunkt der letzten erfolgreichen Windows-Sicherung speichern.
+Eine Automation aktualisiert daraufhin den Zeitstempel der letzten erfolgreichen Windows-Sicherung.
 
 ### Helfer erstellen
 
@@ -154,29 +155,33 @@ Verwendete Konfiguration:
 | Typ | Datum und Uhrzeit |
 | Entity-ID | `input_datetime.letzte_windows_sicherung` |
 
-Der Helfer speichert Datum und Uhrzeit der letzten erfolgreichen Übertragung auf den Windows-PC.
+Der Helfer speichert Datum und Uhrzeit des letzten erfolgreich abgeschlossenen Windows-Sicherungslaufs.
 
 ### Automation erstellen
 
-Für die Aktualisierung des Helfers wurde in Home Assistant die Automation `Aktualisierung Windows-Sicherung Zeitstempel` angelegt.
+Für die Aktualisierung des Helfers wurde die Automation `Aktualisierung Windows-Sicherung Zeitstempel` angelegt.
 
-Als Auslöser wird ein **Webhook** verwendet.
+Verwendete Konfiguration:
 
-Die Webhook-ID wird von Home Assistant erzeugt.
+| Einstellung | Konfiguration |
+| --- | --- |
+| Auslöser | Webhook |
+| Erlaubte Methoden | `POST`, `PUT` |
+| Lokaler Zugriff | Aktiviert |
+| Aktion | `input_datetime.set_datetime` |
+| Ziel | `input_datetime.letzte_windows_sicherung` |
+| Datum und Uhrzeit | `{{ now() }}` |
+| Modus | `single` |
 
-Als Aktion setzt die Automation Datum und Uhrzeit des Helfers `input_datetime.letzte_windows_sicherung` auf den aktuellen Zeitpunkt.
+Die Automation verwendet eine individuelle Webhook-ID.
 
-Dafür wird in der Automation `{{ now() }}` verwendet.
-
-Die im Repository bereitgestellte YAML-Konfiguration der Automation befindet sich unter `skripte/home-assistant/automationen/aktualisierung-windows-sicherung-zeitstempel.yaml`.
-
-Die veröffentlichte YAML-Datei enthält keine tatsächliche Webhook-ID. Ein entsprechender Platzhalter muss bei der Verwendung durch die eigene Webhook-ID ersetzt werden.
+Die YAML-Datei dient als technische Referenz für die tatsächlich eingerichtete Automation.
 
 ### Webhook im PowerShell-Skript
 
 Die von Home Assistant bereitgestellte vollständige Webhook-URL wird über die Kopierfunktion von Home Assistant übernommen und in der lokalen `config.ps1` gespeichert.
 
-Das PowerShell-Skript verwendet diese URL anschließend für einen HTTP-POST-Aufruf:
+Das PowerShell-Skript verwendet diese URL für einen HTTP-POST-Aufruf:
 
 ```powershell
 Invoke-WebRequest `
@@ -187,11 +192,13 @@ Invoke-WebRequest `
     Out-Null
 ```
 
-Die Webhook-Adresse wird bewusst vollständig aus der lokalen Konfiguration übernommen. Das PowerShell-Skript ergänzt selbst weder Protokoll noch Port oder andere Bestandteile der Adresse.
+Die Webhook-Adresse wird vollständig aus der lokalen Konfiguration übernommen.
 
-Dadurch wird genau die von Home Assistant bereitgestellte Adresse verwendet.
+Das PowerShell-Skript ergänzt weder Protokoll noch Port oder andere Bestandteile der Adresse.
 
-Kann der Webhook nach einem erfolgreichen Kopiervorgang nicht aufgerufen werden, wird eine Warnung ausgegeben. Das bereits erfolgreich erstellte Windows-Backup wird dadurch nicht als fehlgeschlagen behandelt.
+Kann der Webhook nach einem erfolgreichen Kopierlauf nicht aufgerufen werden, wird eine Warnung ausgegeben.
+
+Die Windows-Sicherung wird dadurch nicht nachträglich als fehlgeschlagen behandelt.
 
 ## Windows-Aufgabenplanung
 
@@ -215,8 +222,6 @@ Die Ausführung bei angemeldetem Benutzer ermöglicht die Anzeige der Windows-Be
 
 ### Trigger
 
-Die Aufgabe wird täglich ausgeführt:
-
 | Einstellung | Konfiguration |
 | --- | --- |
 | Zeitplan | Täglich |
@@ -231,16 +236,21 @@ Als Programm wird `powershell.exe` verwendet.
 Argumente:
 
 ```text
--NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File "C:\PC Sicherungen\HomeAssistant\Skripte\home-assistant-backup.ps1"
+-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File "<BACKUP-BASISPFAD>\HomeAssistant\Skripte\home-assistant-backup.ps1"
 ```
 
-Starten in: `C:\PC Sicherungen\HomeAssistant\Skripte`
+Starten in: <BACKUP-BASISPFAD>\HomeAssistant\Skripte
 
-`-NoProfile` verhindert das Laden eines persönlichen PowerShell-Profils.
+Verwendete Parameter:
 
-`-WindowStyle Hidden` startet die PowerShell-Sitzung mit ausgeblendetem Fenster. Beim Start kann das Fenster beziehungsweise dessen Eintrag kurz sichtbar sein und verschwindet anschließend wieder.
+| Parameter | Bedeutung |
+| --- | --- |
+| `-NoProfile` | Verhindert das Laden des persönlichen PowerShell-Profils |
+| `-WindowStyle Hidden` | Startet PowerShell mit ausgeblendetem Fenster |
+| `-ExecutionPolicy Bypass` | Umgeht die Ausführungsrichtlinie für diesen PowerShell-Prozess |
+| `-File` | Gibt das auszuführende PowerShell-Skript an |
 
-`-File` gibt das auszuführende PowerShell-Skript an.
+Beim Start kann das PowerShell-Fenster beziehungsweise dessen Eintrag kurz sichtbar sein und verschwindet anschließend wieder.
 
 ### Bedingungen
 
@@ -255,8 +265,6 @@ Insbesondere besteht keine Abhängigkeit von:
 
 ### Weitere Einstellungen
 
-Folgende Einstellungen werden verwendet:
-
 | Einstellung | Konfiguration |
 | --- | --- |
 | Ausführung bei Bedarf zulassen | Aktiviert |
@@ -267,19 +275,19 @@ Folgende Einstellungen werden verwendet:
 | Aufgabe ohne weiteren Zeitplan löschen | Deaktiviert |
 | Bei bereits laufender Aufgabe | Keine neue Instanz starten |
 
-Dadurch wird insbesondere verhindert, dass mehrere Instanzen des Backup-Skripts gleichzeitig ausgeführt werden.
+Damit wird insbesondere verhindert, dass mehrere Instanzen des Backup-Skripts gleichzeitig durch die Aufgabenplanung gestartet werden.
 
 ## Proton Drive
 
-Der lokale Home-Assistant-Ordner befindet sich innerhalb der Ordnerstruktur `C:\PC Sicherungen`.
+Der lokale Sicherungsordner HomeAssistant befindet sich unterhalb des für die Synchronisierung mit Proton Drive ausgewählten Basisverzeichnisses.
 
 Dieser Ordner wird mit der offiziellen **Proton Drive Windows-App** über die Funktion **„Mein Computer“** synchronisiert.
 
-Damit wird ein bereits vorhandener lokaler Ordner synchronisiert. Die Home-Assistant-Backups müssen nicht direkt in den regulären Proton-Drive-Ordner geschrieben werden.
+Damit wird ein bereits vorhandener lokaler Ordner synchronisiert.
 
 Nach der erfolgreichen Übertragung auf den Windows-PC übernimmt die Proton-Drive-Anwendung die weitere Synchronisierung.
 
-Home Assistant und das PowerShell-Skript benötigen dafür keine Zugangsdaten zum Proton-Konto.
+Für diese Synchronisierung benötigt das PowerShell-Skript keine Zugangsdaten zum Proton-Konto.
 
 ## Getestetes Verhalten
 
@@ -300,7 +308,7 @@ Erfolgreich geprüft wurden:
 - Aktualisierung des Home-Assistant-Zeitstempels über den Webhook
 - automatische Ausführung über die Windows-Aufgabenplanung
 - Ausführung von PowerShell mit ausgeblendetem Fenster
-- Synchronisierung des lokalen Home-Assistant-Backup-Ordners mit Proton Drive über „Mein Computer“
+- Synchronisierung des lokalen Home-Assistant-Backup-Ordners mit Proton Drive über **„Mein Computer“**
 
 ## Nützliche Links & Quellen
 

@@ -1,14 +1,15 @@
+
 # Mosquitto broker
 
 Diese Dokumentation beschreibt die Einrichtung der Home-Assistant-App **Mosquitto broker**.
 
-Mosquitto stellt den MQTT-Broker für die Kommunikation zwischen MQTT-Komponenten bereit. In dieser Installation wird der Broker insbesondere für die Verbindung zwischen Zigbee2MQTT und Home Assistant verwendet.
+Die App stellt einen zentralen MQTT-Broker für die Kommunikation zwischen verschiedenen MQTT-basierten Geräten, Anwendungen und Home Assistant bereit.
 
 ## Installation
 
-Verwendet wird die Home-Assistant-App **Mosquitto broker**.
+Verwendet wird die offizielle Home-Assistant-App **Mosquitto broker**.
 
-Nach der Installation wurden folgende App-Einstellungen verwendet:
+Nach der Installation wurden folgende App-Einstellungen festgelegt:
 
 | Einstellung | Konfiguration |
 | --- | --- |
@@ -20,37 +21,39 @@ Automatische Updates sind deaktiviert, damit Aktualisierungen bewusst durchgefü
 
 ## Benutzer
 
-Für die Kommunikation zwischen Zigbee2MQTT und dem MQTT-Broker wird ein separater Home-Assistant-Benutzer ohne Administratorrechte verwendet.
+Für die MQTT-Kommunikation werden separate Home-Assistant-Benutzer ohne Administratorrechte verwendet.
 
-Der Benutzer wird unter **Home Assistant → Einstellungen → Personen → Benutzer** angelegt.
+Die Benutzer werden unter **Home Assistant → Einstellungen → Personen → Benutzer** angelegt.
 
-Für diesen Benutzer ist in Home Assistant die Option **„Nur lokaler Zugriff“** aktiviert.
+Für die verwendeten MQTT-Benutzer ist die Option **„Nur lokaler Zugriff“** aktiviert.
+
+Die Zuordnung der Benutzer zu den jeweiligen MQTT-Komponenten erfolgt in deren eigener Dokumentation.
 
 ## Konfiguration
 
-Für Mosquitto werden die vorgesehenen Standardeinstellungen verwendet.
+Für **Mosquitto broker** werden die vorgesehenen Standardeinstellungen verwendet.
 
 Die vorhandenen Netzwerk-Ports wurden nicht verändert.
 
-Für die Kommunikation mit Zigbee2MQTT wird der normale MQTT-Dienst über Port `1883` verwendet.
+Für die MQTT-Kommunikation wird Port `1883` verwendet.
 
 Eine eigene TLS-Konfiguration oder ein eigenes Client-Zertifikat wird für die interne Kommunikation dieser Installation nicht verwendet.
 
-## MQTT-Integration
+## Verbindung mit Home Assistant
 
-Nach dem Start von Mosquitto wurde der Broker von Home Assistant automatisch erkannt.
+Nach dem Start von **Mosquitto broker** wurde der Broker von Home Assistant automatisch erkannt.
 
-Die angebotene **MQTT**-Integration wurde anschließend über **Hinzufügen** eingerichtet. Eine manuelle Eingabe von Broker-Adresse, Port oder Zugangsdaten war dabei nicht erforderlich.
+Die angebotene **MQTT**-Integration wurde anschließend über **Hinzufügen** eingerichtet.
 
-## Funktionstest
+Eine manuelle Eingabe von Broker-Adresse, Port oder Zugangsdaten war dabei nicht erforderlich.
 
-Nach dem Start meldete Mosquitto einen erfolgreichen Betrieb des MQTT-Brokers auf Port `1883`.
+## Funktionsprüfung
 
-Anschließend wurde Zigbee2MQTT erfolgreich mit dem Broker verbunden.
+Nach dem Start meldete **Mosquitto broker** einen erfolgreichen Betrieb des MQTT-Brokers auf Port `1883`.
 
-Das Zigbee2MQTT-Protokoll bestätigte die Verbindung zum MQTT-Broker. In Home Assistant wurde danach die **Zigbee2MQTT Bridge** über die **MQTT**-Integration erkannt.
+Die Verbindung mit der **MQTT**-Integration wurde erfolgreich hergestellt.
 
-Damit wurde die Kommunikation zwischen Mosquitto, Zigbee2MQTT und Home Assistant erfolgreich geprüft.
+Zusätzlich wurde die Kommunikation mit MQTT-Clients erfolgreich geprüft.
 
 ## Nützliche Links & Quellen
 
@@ -60,7 +63,8 @@ Damit wurde die Kommunikation zwischen Mosquitto, Zigbee2MQTT und Home Assistant
 ## 🔗 Verwendung & Verknüpfungen
 
 - [MQTT](mqtt.md) – Home-Assistant-Integration für MQTT
-- [Zigbee2MQTT](zigbee2mqtt.md) – verwendet Mosquitto für die MQTT-Kommunikation
+- [Zendure](zendure.md) – verwendet den Broker für die MQTT-Kommunikation
+- [Zigbee2MQTT](zigbee2mqtt.md) – verwendet den Broker zur Einbindung von Zigbee-Geräten
 
 ---
 

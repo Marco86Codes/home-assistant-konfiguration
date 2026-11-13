@@ -1,9 +1,9 @@
 
 # Home Flow Card
 
-Diese Dokumentation beschreibt die Verwendung der **Home Flow Card** zur grafischen Darstellung der Energieflüsse im Home-Assistant-Dashboard.
+Diese Dokumentation beschreibt die Verwendung der **Home Flow Card** zur grafischen Darstellung von Energieflüssen im Home-Assistant-Dashboard.
 
-Die Erweiterung visualisiert die Verbindungen und Leistungsflüsse zwischen den Komponenten der Solaranlage.
+Die Erweiterung visualisiert Leistungswerte und Verbindungen zwischen verschiedenen Komponenten in einem gemeinsamen Energieflussdiagramm.
 
 ## Installation
 
@@ -14,7 +14,13 @@ Die **Home Flow Card** wurde über den Home Assistant Marketplace installiert.
 
 ## Verwendung
 
-Im Solar-Dashboard zeigt die Home Flow Card die Energieflüsse zwischen:
+Die Home Flow Card stellt Komponenten als Knoten dar, die über Verbindungen miteinander verknüpft werden.
+
+Dadurch lassen sich Leistungsflüsse und ihre Richtungen grafisch nachvollziehen.
+
+### Beispiel: Solaransicht
+
+In der Solaransicht zeigt die Home Flow Card die Energieflüsse zwischen:
 
 - Den jeweils zwei PV-Eingängen beider Zendure SolarFlow 800 Plus.
 - Den beiden Zendure-Geräten und ihren Batteriespeichern.
@@ -30,17 +36,15 @@ Die einzelnen Komponenten werden über Knoten und Verbindungen zu einem gemeinsa
 
 ## Konfiguration
 
-Die vollständige Konfiguration mit Knoten, Verbindungen, Positionen und Darstellungseinstellungen befindet sich in:
+Die Konfiguration der Home Flow Card ist Bestandteil der zentralen `dashboard.yaml`.
 
-[Home Assistant – dashboard.yaml](../skripte/home-assistant/dashboard.yaml)
-
-## Nützliche Links & Quellen
-
-- [Home Flow Card – GitHub](https://github.com/rosenrot00/home-flow-card)
+Dort werden die Knoten, Verbindungen, Positionen und Darstellungseinstellungen festgelegt.
 
 ## 🔗 Verwendung & Verknüpfungen
 
-- [Dashboard-Konfiguration](../skripte/home-assistant/dashboard.yaml) – Energieflussdiagramm mit allen Knoten und Verbindungen
+- [Dashboard](../grundlagen/dashboard.md) – allgemeiner Aufbau und verwendete Dashboard-Tools
+- [Home Assistant – dashboard.yaml](../skripte/home-assistant/dashboard.yaml) – vollständige Dashboard-Konfiguration
+- [Home Flow Card – GitHub](https://github.com/rosenrot00/home-flow-card) – Projektseite und Dokumentation
 
 ---
 

@@ -1,6 +1,7 @@
+
 # Studio Code Server
 
-## Beschreibung
+Diese Dokumentation beschreibt die Einrichtung der Home-Assistant-App **Studio Code Server**.
 
 Studio Code Server ermöglicht die Bearbeitung der Home-Assistant-Konfigurationsdateien direkt im Browser.
 
@@ -18,7 +19,7 @@ Die App wird insbesondere zur Verwaltung von YAML-Konfigurationen und Home-Assis
 Folgende Einstellungen wurden vorgenommen:
 
 | Einstellung | Wert |
-|---|---|
+| --- | --- |
 | Beim Systemstart starten | Aktiviert |
 | Watchdog | Aktiviert |
 | Automatische Updates | Deaktiviert |
@@ -80,58 +81,20 @@ Die Einstellung `editor.unicodeHighlight.nonBasicASCII` deaktiviert die Hervorhe
 
 **Hinweis:** Die Unicode-Einstellung betrifft sämtliche Nicht-ASCII-Zeichen, nicht ausschließlich deutsche Umlaute.
 
-## Home-Assistant-Packages
+## Home-Assistant-Konfiguration
 
-Zur strukturierten Verwaltung der YAML-Konfigurationen werden Home-Assistant-Packages verwendet.
+Studio Code Server wird zur Bearbeitung der zentralen `configuration.yaml` und der thematisch gegliederten Home-Assistant-Packages verwendet.
 
-Dadurch lassen sich zusammengehörige Sensoren, Helfer, Automationen und Skripte nach Themengebieten organisieren.
-
-### Package-Einbindung
-
-In der Datei `/config/configuration.yaml` wurde folgender Abschnitt ergänzt:
-
-```yaml
-homeassistant:
-  packages: !include_dir_named packages
-```
-
-Die vorhandenen Standard-Einbindungen bleiben bestehen.
-
-### Verzeichnisstruktur
-
-Im Home-Assistant-Konfigurationsverzeichnis wurde der Ordner `packages` angelegt.
-
-```text
-/config/
-├── configuration.yaml
-├── automations.yaml
-├── scripts.yaml
-├── scenes.yaml
-└── packages/
-    └── spezifische-konfiguration.yaml
-```
-
-Die Dateien im Ordner `packages` werden thematisch getrennt angelegt und enthalten die jeweils zusammengehörigen Home-Assistant-Konfigurationen.
-
-Neue YAML-Dateien werden automatisch über die Package-Einbindung berücksichtigt. Eine erneute Anpassung der `configuration.yaml` ist dafür nicht erforderlich.
-
-### Konfiguration prüfen
-
-Nach Änderungen an der YAML-Konfiguration:
-
-1. **Einstellungen → Werkzeuge → YAML** öffnen.
-2. Konfiguration prüfen.
-3. Bei gültiger Konfiguration Home Assistant neu starten, sofern die Änderung dies erfordert.
-
-Die Package-Einbindung wurde erfolgreich geprüft.
+Die Verzeichnisstruktur, die Package-Einbindung und die Prüfung der YAML-Konfiguration sind in der Grundlagen-Dokumentation beschrieben.
 
 ## Nützliche Links & Quellen
 
-- [Home Assistant Packages](https://www.home-assistant.io/docs/configuration/packages/)
 - [Studio Code Server](https://github.com/hassio-addons/addon-vscode)
-
----
 
 ## 🔗 Verwendung & Verknüpfungen
 
-- [⬅️ Zurück zur Übersicht](../README.md)
+- [Home-Assistant-Konfiguration](../grundlagen/konfiguration.md) – zentrale YAML-Konfiguration, Packages und Dateistruktur
+
+---
+
+[⬅️ Zurück zur Übersicht](../README.md)

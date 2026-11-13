@@ -14,7 +14,9 @@ Die Erweiterung ermöglicht die Anpassung der Darstellung über CSS und Home-Ass
 
 ## Verwendung
 
-Im Solar-Dashboard wird card-mod für folgende Anpassungen verwendet:
+card-mod wird verwendet, um das Erscheinungsbild von Dashboard-Karten individuell anzupassen.
+
+Dazu gehören unter anderem:
 
 - Transparente Kartenhintergründe und ausgeblendete Kartenrahmen.
 - Anpassung von Abständen und Schriftgrößen.
@@ -22,10 +24,14 @@ Im Solar-Dashboard wird card-mod für folgende Anpassungen verwendet:
 - Ausblendung nicht benötigter Kartensymbole.
 - Farbliche Hervorhebung bestimmter Betriebszustände.
 
-Die farblichen Hervorhebungen werden über Templates abhängig von aktuellen Sensorwerten gesteuert.
+Die Darstellung kann über Templates abhängig von aktuellen Sensorwerten verändert werden.
+
+### Beispiel: Solaransicht
+
+In der Solaransicht werden bestimmte Betriebszustände farblich hervorgehoben.
 
 | Farbe | Bedingung |
-|---|---|
+| --- | --- |
 | Blau | Berechnete AC-Soll-Leistung unterscheidet sich von der eingestellten AC-Ausgangsgrenze. |
 | Gelb | Dynamische PV-Begrenzung (0–100 %) aktiv oder Batterieheizung eingeschaltet. |
 | Rot | Wechselrichtertemperatur unter 0 °C oder über 60 °C beziehungsweise Batterietemperatur unter 0 °C oder über 40 °C. |
@@ -34,17 +40,15 @@ Die übrigen Karten werden überwiegend transparent dargestellt, um ein einheitl
 
 ## Konfiguration
 
-Die vollständigen CSS- und Template-Anpassungen befinden sich in:
+Die CSS- und Template-Anpassungen sind Bestandteil der zentralen `dashboard.yaml`.
 
-[Home Assistant – dashboard.yaml](../skripte/home-assistant/dashboard.yaml)
-
-## Nützliche Links & Quellen
-
-- [card-mod – GitHub](https://github.com/thomasloven/lovelace-card-mod)
+Dort werden die individuellen Darstellungsregeln und zustandsabhängigen Formatierungen festgelegt.
 
 ## 🔗 Verwendung & Verknüpfungen
 
-- [Dashboard-Konfiguration](../skripte/home-assistant/dashboard.yaml) – CSS-Anpassungen und Statusfarben
+- [Dashboard](../grundlagen/dashboard.md) – allgemeiner Aufbau und verwendete Dashboard-Tools
+- [Home Assistant – dashboard.yaml](../skripte/home-assistant/dashboard.yaml) – vollständige Dashboard-Konfiguration
+- [card-mod – GitHub](https://github.com/thomasloven/lovelace-card-mod) – Projektseite und Dokumentation
 
 ---
 

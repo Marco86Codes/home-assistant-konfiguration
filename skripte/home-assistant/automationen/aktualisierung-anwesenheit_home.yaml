@@ -1,46 +1,40 @@
-alias: Aktualisierung Anwesenheit Home
+alias: Aktualisierung OwnTracks Anwesenheit Home
 description: >-
-  Aktualisiert die Anwesenheits-Booleans aller Personen anhand ihrer
-  Handy-Tracker. Bei home wird die Person als anwesend, bei not_home als
-  abwesend markiert. Bei unknown oder unavailable bleibt der letzte
-  Anwesenheitsstatus erhalten.
+  Aktualisiert die Anwesenheits-Helfer anhand des OwnTracks-Attributs in_zones.
+  Bei unbekanntem oder nicht verfügbarem Tracker bleibt der letzte Status erhalten.
 triggers:
   - trigger: state
     entity_id:
-      - device_tracker.josiane_handy
-      - device_tracker.marco_handy
-      - device_tracker.rowan_handy
-      - device_tracker.tamara_handy
-      - device_tracker.victor_handy
+      - device_tracker.person1_smartphoneowntracks
+      - device_tracker.person2_smartphoneowntracks
   - trigger: homeassistant
     event: start
 conditions: []
 actions:
   - repeat:
       for_each:
-        - josiane
-        - marco
-        - rowan
-        - tamara
-        - victor
+        - tracker: device_tracker.person1_smartphoneowntracks
+          helfer: input_boolean.anwesend_person1
+        - tracker: device_tracker.person2_smartphoneowntracks
+          helfer: input_boolean.anwesend_person2
       sequence:
-        - choose:
-            - conditions:
-                - condition: template
-                  value_template: >-
-                    {{ is_state('device_tracker.' ~ repeat.item ~ '_handy',
-                    'home') }}
-              sequence:
-                - action: input_boolean.turn_on
-                  target:
-                    entity_id: input_boolean.anwesend_{{ repeat.item }}
-            - conditions:
-                - condition: template
-                  value_template: >-
-                    {{ is_state('device_tracker.' ~ repeat.item ~ '_handy',
-                    'not_home') }}
-              sequence:
+        - variables:
+            tracker: "{{ repeat.item.tracker }}"
+            helfer: "{{ repeat.item.helfer }}"
+        - if:
+            - condition: template
+              value_template: "{{ states(tracker) not in ['unknown', 'unavailable'] }}"
+          then:
+            - choose:
+                - conditions:
+                    - condition: template
+                      value_template: "{{ 'zone.home' in (state_attr(tracker, 'in_zones') or []) }}"
+                  sequence:
+                    - action: input_boolean.turn_on
+                      target:
+                        entity_id: "{{ helfer }}"
+              default:
                 - action: input_boolean.turn_off
                   target:
-                    entity_id: input_boolean.anwesend_{{ repeat.item }}
+                    entity_id: "{{ helfer }}"
 mode: restart

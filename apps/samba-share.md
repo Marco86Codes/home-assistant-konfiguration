@@ -1,22 +1,15 @@
+
 # Samba share
 
-Diese Dokumentation beschreibt die Konfiguration der offiziellen Home-Assistant-App **Samba share**.
+Diese Dokumentation beschreibt die Installation und Konfiguration der offiziellen Home-Assistant-App **Samba share**.
 
-Die App stellt ausschließlich das Backup-Verzeichnis von Home Assistant im lokalen Netzwerk bereit. Dadurch kann der Windows-PC die von Home Assistant erstellten Backups abrufen.
-
-## Verwendung
-
-Samba share wird in dieser Installation ausschließlich für die zusätzliche Sicherung der Home-Assistant-Backups verwendet.
-
-Freigegeben wird nur `backup`.
-
-Andere Home-Assistant-Verzeichnisse werden nicht über Samba bereitgestellt.
+Die App wird ausschließlich verwendet, um das Backup-Verzeichnis von Home Assistant im lokalen Netzwerk für die zusätzliche Sicherung auf einem Windows-PC bereitzustellen.
 
 ## Installation
 
 Verwendet wird die offizielle Home-Assistant-App **Samba share**.
 
-Nach der Installation wurden folgende App-Einstellungen aktiviert:
+Nach der Installation wurden folgende App-Einstellungen festgelegt:
 
 | Einstellung | Konfiguration |
 | --- | --- |
@@ -34,10 +27,10 @@ Verwendete Konfiguration:
 
 | Einstellung | Konfiguration |
 | --- | --- |
-| Benutzername | separat angelegter Benutzer für Samba share |
-| Passwort | separates zufällig erzeugtes Passwort |
+| Benutzername | Separat angelegter Benutzer für Samba share |
+| Passwort | Separates zufällig erzeugtes Passwort |
 | Workgroup | `WORKGROUP` |
-| Freigabe | ausschließlich `backup` |
+| Freigabe | Ausschließlich `backup` |
 | Compatibility mode | Deaktiviert |
 | Apple compatibility mode | Deaktiviert |
 | NetBIOS over IP | Deaktiviert |
@@ -46,12 +39,14 @@ Verwendete Konfiguration:
 | Server signing | Standardeinstellung |
 | Veto files | Standardeinstellung |
 
+Andere Home-Assistant-Verzeichnisse werden nicht über Samba bereitgestellt.
+
 > [!WICHTIG]
 > Änderungen im Reiter **Konfiguration** müssen über **Speichern** übernommen werden, bevor in einen anderen Reiter gewechselt oder die App gestartet wird. Ein einfacher Wechsel des Reiters übernimmt die vorgenommenen Änderungen nicht.
 
 ## Zugriff auf die Freigabe beschränken
 
-Der Netzwerkzugriff auf Samba share ist über **Allowed Hosts** eingeschränkt.
+Der Netzwerkzugriff auf **Samba share** ist über **Allowed Hosts** eingeschränkt.
 
 Zugelassen sind ausschließlich die lokalen IPv4-Adressen der Netzwerkverbindungen des Windows-PCs, der die Backups übernimmt.
 
