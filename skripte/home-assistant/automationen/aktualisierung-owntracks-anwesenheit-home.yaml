@@ -1,0 +1,129 @@
+alias: Aktualisierung OwnTracks Anwesenheit Home
+description: >-
+  Aktualisiert die Anwesenheits-Helfer anhand der Prüf-Sensoren.
+  Für Person5 wird bei verfügbarem Radar der verzögerte Radar-Helfer
+  verwendet; bei nicht verfügbarem Radar der Prüf-Sensor.
+  Bei ungültigen Prüfwerten bleibt der bisherige Status erhalten.
+triggers:
+  - trigger: state
+    entity_id:
+      - sensor.person2_anwesenheit_prufung
+      - sensor.person1_anwesenheit_prufung
+      - sensor.person3_anwesenheit_prufung
+      - sensor.person4_anwesenheit_prufung
+      - sensor.person5_anwesenheit_prufung
+      - input_boolean.anwesend_person5_radar
+      - binary_sensor.radar_person5_presence
+  - trigger: homeassistant
+    event: start
+conditions: []
+actions:
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: >-
+              {{ states('binary_sensor.radar_person5_presence') in ['on', 'off'] }}
+        sequence:
+          - if:
+              - condition: state
+                entity_id: input_boolean.anwesend_person5_radar
+                state: 'on'
+            then:
+              - action: input_boolean.turn_on
+                target:
+                  entity_id: input_boolean.anwesend_person5
+            else:
+              - action: input_boolean.turn_off
+                target:
+                  entity_id: input_boolean.anwesend_person5
+      - conditions:
+          - condition: template
+            value_template: >-
+              {{ states('binary_sensor.radar_person5_presence') in ['unknown', 'unavailable']
+                  and states('sensor.person5_anwesenheit_prufung') in ['home', 'not_home'] }}
+        sequence:
+          - if:
+              - condition: state
+                entity_id: sensor.person5_anwesenheit_prufung
+                state: home
+            then:
+              - action: input_boolean.turn_on
+                target:
+                  entity_id: input_boolean.anwesend_person5
+            else:
+              - action: input_boolean.turn_off
+                target:
+                  entity_id: input_boolean.anwesend_person5
+  - if:
+      - condition: template
+        value_template: >-
+          {{ states('sensor.person2_anwesenheit_prufung') in ['home', 'not_home'] }}
+    then:
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: sensor.person2_anwesenheit_prufung
+                state: home
+            sequence:
+              - action: input_boolean.turn_on
+                target:
+                  entity_id: input_boolean.anwesend_person2
+        default:
+          - action: input_boolean.turn_off
+            target:
+              entity_id: input_boolean.anwesend_person2
+  - if:
+      - condition: template
+        value_template: >-
+          {{ states('sensor.person1_anwesenheit_prufung') in ['home', 'not_home'] }}
+    then:
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: sensor.person1_anwesenheit_prufung
+                state: home
+            sequence:
+              - action: input_boolean.turn_on
+                target:
+                  entity_id: input_boolean.anwesend_person1
+        default:
+          - action: input_boolean.turn_off
+            target:
+              entity_id: input_boolean.anwesend_person1
+  - if:
+      - condition: template
+        value_template: >-
+          {{ states('sensor.person3_anwesenheit_prufung') in ['home', 'not_home'] }}
+    then:
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: sensor.person3_anwesenheit_prufung
+                state: home
+            sequence:
+              - action: input_boolean.turn_on
+                target:
+                  entity_id: input_boolean.anwesend_person3
+        default:
+          - action: input_boolean.turn_off
+            target:
+              entity_id: input_boolean.anwesend_person3
+  - if:
+      - condition: template
+        value_template: >-
+          {{ states('sensor.person4_anwesenheit_prufung') in ['home', 'not_home'] }}
+    then:
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: sensor.person4_anwesenheit_prufung
+                state: home
+            sequence:
+              - action: input_boolean.turn_on
+                target:
+                  entity_id: input_boolean.anwesend_person4
+        default:
+          - action: input_boolean.turn_off
+            target:
+              entity_id: input_boolean.anwesend_person4
+mode: restart

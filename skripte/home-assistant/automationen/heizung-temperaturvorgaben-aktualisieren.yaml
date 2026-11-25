@@ -1,0 +1,32 @@
+# Anonymisiertes Beispiel – Entitäten und Geräte-ID an die eigene Installation anpassen.
+# Raum2 setzt eine Kopie der Heizungsautomation für Raum1 voraus.
+alias: Heizung Temperaturvorgaben aktualisieren
+description: Aktualisiert alle Raumheizungen bei geänderten Temperaturvorgaben
+triggers:
+- trigger: state
+  entity_id:
+  - input_number.heizung_temperatur_minimum
+  - input_number.heizung_temperatur_abgesenkt
+  - input_number.heizung_temperatur_standard
+actions:
+- action: automation.trigger
+  target:
+    entity_id:
+    - automation.heizung_raum1
+    - automation.heizung_raum2
+  data:
+    skip_condition: true
+- if:
+  - condition: switch.is_off
+    target:
+      device_id: "<MIDEA-GERAETE-ID>"
+    options:
+      behavior: any
+      for: 00:00:00
+  then:
+  - action: climate.set_temperature
+    target:
+      device_id: "<MIDEA-GERAETE-ID>"
+    data:
+      temperature: '{{ states(''sensor.midea_portasplit_solltemperatur'') | float }}'
+mode: restart

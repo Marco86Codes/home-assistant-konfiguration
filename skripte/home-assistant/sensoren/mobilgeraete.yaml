@@ -1,0 +1,95 @@
+input_boolean:
+  anwesend_person2:
+    name: Anwesend Person 2
+    icon: mdi:account-check
+
+  anwesend_person1:
+    name: Anwesend Person 1
+    icon: mdi:account-check
+
+  anwesend_person3:
+    name: Anwesend Person 3
+    icon: mdi:account-check
+
+  anwesend_person4:
+    name: Anwesend Person 4
+    icon: mdi:account-check
+
+  anwesend_person5:
+    name: Anwesend Person 5
+    icon: mdi:account-check
+
+  anwesend_person5_radar:
+    name: Anwesend Person 5 Radar
+    icon: mdi:account-check
+
+  home_office_person1:
+    name: Home Office Person 1
+    icon: mdi:account-check
+
+template:
+  - sensor:
+      # PERSON 2 ANWESENHEIT - PRÜFUNG
+      - name: "Person 2 Anwesenheit Prüfung"
+        unique_id: person2_anwesenheit_prufung
+        icon: mdi:home-account
+        availability: >
+          {{ states('person.person2') not in ['unknown', 'unavailable'] }}
+        state: >
+          {% if is_state('person.person2', 'not_home') %}
+            not_home
+          {% else %}
+            home
+          {% endif %}
+
+      # PERSON 1 ANWESENHEIT - PRÜFUNG
+      - name: "Person 1 Anwesenheit Prüfung"
+        unique_id: person1_anwesenheit_prufung
+        icon: mdi:home-account
+        availability: >
+          {{ states('person.person1') not in ['unknown', 'unavailable'] }}
+        state: >
+          {% if is_state('person.person1', 'not_home') %}
+            not_home
+          {% else %}
+            home
+          {% endif %}
+
+      # PERSON 3 ANWESENHEIT - PRÜFUNG
+      - name: "Person 3 Anwesenheit Prüfung"
+        unique_id: person3_anwesenheit_prufung
+        icon: mdi:home-account
+        availability: >
+          {{ states('person.person3') not in ['unknown', 'unavailable'] }}
+        state: >
+          {% if is_state('person.person3', 'not_home') %}
+            not_home
+          {% else %}
+            home
+          {% endif %}
+
+      # PERSON 4 ANWESENHEIT - PRÜFUNG
+      - name: "Person 4 Anwesenheit Prüfung"
+        unique_id: person4_anwesenheit_prufung
+        icon: mdi:home-account
+        availability: >
+          {{ states('person.person4') not in ['unknown', 'unavailable'] }}
+        state: >
+          {% if is_state('person.person4', 'not_home') %}
+            not_home
+          {% else %}
+            home
+          {% endif %}
+
+      # PERSON 5 ANWESENHEIT - PRÜFUNG
+      - name: "Person 5 Anwesenheit Prüfung"
+        unique_id: person5_anwesenheit_prufung
+        icon: mdi:home-account
+        availability: >
+          {{ states('person.person5') not in ['unknown', 'unavailable'] }}
+        state: >
+          {% if is_state('person.person5', 'not_home') %}
+            not_home
+          {% else %}
+            home
+          {% endif %}

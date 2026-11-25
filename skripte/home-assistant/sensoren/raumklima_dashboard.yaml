@@ -1,0 +1,42 @@
+# Anonymisierte Beispielkonfiguration für die Dashboard-Anzeige.
+# Der Heizungs-Anzeigesensor kann für weitere Räume entsprechend ergänzt werden.
+template:
+  - binary_sensor:
+      # ------------------------------------------------------
+      # KONTAKT FENSTER RAUM 2 GROSS ANZEIGE
+      # ------------------------------------------------------
+    - name: "Kontakt Fenster Raum2 gross Anzeige"
+      unique_id: kontakt_fenster_raum2_gross_anzeige
+      device_class: window
+      state: >
+        {% set midea = states('input_select.option_midea_portasplit') %}
+        {% set fenster = states('binary_sensor.kontakt_fenster_raum2_gross_contact') %}
+
+        {% if midea != 'Demontiert' %}
+          false
+        {% else %}
+          {{ fenster == 'on' }}
+        {% endif %}
+
+  - sensor:
+      # ------------------------------------------------------
+      # HEIZUNG RAUM 1 – STEUERUNG ANZEIGE
+      # ------------------------------------------------------
+      - name: "Heizung Raum1 Steuerung Anzeige"
+        unique_id: heizung_raum1_steuerung_anzeige
+        icon: mdi:fire
+        state: >
+          {% set modus = states('climate.heizung_raum1') %}
+          {% set running = state_attr('climate.heizung_raum1', 'running_state') %}
+          {% set hvac = state_attr('climate.heizung_raum1', 'hvac_action') %}
+          {% if is_state('input_boolean.status_heizung', 'off') or modus == 'off' %}
+            off
+          {% elif modus in ['unknown', 'unavailable'] %}
+            unknown
+          {% elif running == 'heat' or (running is none and hvac == 'heating') %}
+            heat
+          {% elif running == 'idle' or (running is none and hvac == 'idle') %}
+            idle
+          {% else %}
+            unknown
+          {% endif %}

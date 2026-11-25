@@ -1,0 +1,25 @@
+# Anonymisiertes Beispiel – Entitäten und Geräte-ID an die eigene Installation anpassen.
+alias: Midea PortaSplit Heizbetrieb
+description: Dynamische Heiztemperatur
+triggers:
+- trigger: state
+  entity_id: sensor.midea_portasplit_solltemperatur
+- trigger: state
+  entity_id: input_boolean.status_midea_portasplit
+  to: 'on'
+conditions:
+- condition: state
+  entity_id: input_select.option_midea_portasplit
+  state: Heizen
+- condition: state
+  entity_id: input_boolean.status_midea_portasplit
+  state: 'on'
+- condition: template
+  value_template: '{{ is_number(states(''sensor.midea_portasplit_solltemperatur'')) }}'
+actions:
+- action: climate.set_temperature
+  target:
+    device_id: "<MIDEA-GERAETE-ID>"
+  data:
+    temperature: '{{ states(''sensor.midea_portasplit_solltemperatur'') | float }}'
+mode: restart

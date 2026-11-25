@@ -1,0 +1,31 @@
+template:
+  - sensor:
+      - name: "Letztes erfolgreiches automatisches Backup Anzeige"
+        unique_id: backup_last_successful_automatic_backup_anzeige
+        state: >
+          {% set wert = states('sensor.backup_last_successful_automatic_backup') %}
+          {% if wert not in ['unknown', 'unavailable', 'none'] %}
+            {{ as_timestamp(wert) | timestamp_custom('%d.%m.%Y %H:%M', true) }}
+          {% else %}
+            Unbekannt
+          {% endif %}
+
+      - name: "Letzte Windows-Sicherung Anzeige"
+        unique_id: letzte_windows_sicherung_anzeige
+        state: >
+          {% set wert = states('input_datetime.letzte_windows_sicherung') %}
+          {% if wert not in ['unknown', 'unavailable', 'none'] %}
+            {{ as_timestamp(wert) | timestamp_custom('%d.%m.%Y %H:%M', true) }}
+          {% else %}
+            Unbekannt
+          {% endif %}
+
+      - name: "Nächstes geplantes automatisches Backup Datum"
+        unique_id: backup_next_scheduled_automatic_backup_anzeige
+        state: >
+          {% set wert = states('sensor.backup_next_scheduled_automatic_backup') %}
+          {% if wert not in ['unknown', 'unavailable', 'none'] %}
+            {{ as_timestamp(wert) | timestamp_custom('%d.%m.%Y %H:%M', true) }}
+          {% else %}
+            Unbekannt
+          {% endif %}

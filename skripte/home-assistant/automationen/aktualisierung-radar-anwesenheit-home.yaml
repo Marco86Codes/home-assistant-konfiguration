@@ -1,0 +1,48 @@
+alias: Aktualisierung Radar Anwesenheit Home
+description: >-
+  Aktualisiert den Radar-Anwesenheitsstatus mit Zeitverzögerung.
+  Nach einem Home-Assistant-Neustart wird die Prüfung erneut gestartet.
+  Bei unknown oder unavailable bleibt der bisherige Status erhalten.
+triggers:
+  - trigger: state
+    entity_id: binary_sensor.radar_person5_presence
+    to: "on"
+  - trigger: state
+    entity_id: binary_sensor.radar_person5_presence
+    to: "off"
+  - trigger: state
+    entity_id: binary_sensor.radar_person5_presence
+    to: "unavailable"
+  - trigger: state
+    entity_id: binary_sensor.radar_person5_presence
+    to: "unknown"
+  - trigger: homeassistant
+    event: start
+conditions: []
+actions:
+  - choose:
+      - conditions:
+          - condition: state
+            entity_id: binary_sensor.radar_person5_presence
+            state: "off"
+        sequence:
+          - delay: "00:30:00"
+          - condition: state
+            entity_id: binary_sensor.radar_person5_presence
+            state: "off"
+          - action: input_boolean.turn_off
+            target:
+              entity_id: input_boolean.anwesend_person5_radar
+      - conditions:
+          - condition: state
+            entity_id: binary_sensor.radar_person5_presence
+            state: "on"
+        sequence:
+          - delay: "00:10:00"
+          - condition: state
+            entity_id: binary_sensor.radar_person5_presence
+            state: "on"
+          - action: input_boolean.turn_on
+            target:
+              entity_id: input_boolean.anwesend_person5_radar
+mode: restart

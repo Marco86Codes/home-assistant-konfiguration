@@ -1,0 +1,12 @@
+shell_command:
+  wakeup_zendure_1: >-
+    curl --max-time 15 -sS -X POST
+    http://<IP Zendure 1>/rpc
+    -H "Content-Type: application/json"
+    -d '{"sn":"<Seriennummer Zendure 1>","method":"HA.Mqtt.SetConfig","params":{"config":{"enable":true,"server":"<IP Home Assistant>","port":1883,"protocol":"mqtt","username":"<MQTT Username>","password":"<Passwort MQTT User>"}}}'
+
+  wakeup_zendure_2: >-
+    curl --max-time 15 -sS -X POST
+    http://<IP Zendure 2>/rpc
+    -H "Content-Type: application/json"
+    -d '{"sn":"<Seriennummer Zendure 2>","method":"HA.Mqtt.SetConfig","params":{"config":{"enable":true,"server":"<IP Home Assistant>","port":1883,"protocol":"mqtt","username":"<MQTT Username>","password":"<Passwort MQTT User>"}}}'

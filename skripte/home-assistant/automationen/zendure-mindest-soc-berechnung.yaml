@@ -1,0 +1,94 @@
+alias: Zendure Mindest-SoC Berechnung
+description: >-
+  Berechnet zu diversen Zeiten den neuen Mindest-SoC beider Zendure anhand der
+  durchschnittlichen Bewölkung zwischen 08:00 und 18:00 Uhr und aktualisiert den
+  Zeitpunkt der letzten erfolgreichen Berechnung.
+triggers:
+  - trigger: sun.sunrise
+    id: Sonnenaufgang
+    options:
+      offset:
+        days: 0
+        hours: 0
+        minutes: 0
+        seconds: 0
+  - trigger: time
+    at: '12:00:00'
+    id: Mittag
+  - trigger: sun.sunset
+    id: Sonnenuntergang-2h
+    options:
+      offset: '-02:00:00'
+conditions: []
+actions:
+  - action: weather.get_forecasts
+    target:
+      entity_id: weather.forecast_home
+    data:
+      type: hourly
+    response_variable: stuendlicher_forecast
+  - variables:
+      ziel_datum: |
+        {% if trigger.id == 'Sonnenuntergang-2h' %}
+          {{ (now() + timedelta(days=1)).strftime('%Y-%m-%d') }}
+        {% else %}
+          {{ now().strftime('%Y-%m-%d') }}
+        {% endif %}
+  - variables:
+      wolkenanteil: >
+        {% set info = stuendlicher_forecast['weather.forecast_home'].forecast %}
+        {% set ns = namespace(werte=[]) %}
+
+        {% for eintrag in info %}
+          {% set zeit = as_local(as_datetime(eintrag.datetime)) %}
+
+          {% if zeit.strftime('%Y-%m-%d') == ziel_datum
+                and 8 <= zeit.hour <= 18
+                and eintrag.cloud_coverage is defined
+                and is_number(eintrag.cloud_coverage) %}
+            {% set ns.werte = ns.werte + [eintrag.cloud_coverage | float] %}
+          {% endif %}
+        {% endfor %}
+
+        {{ ((ns.werte | sum) / (ns.werte | count)) | round(1)
+           if ns.werte | count > 0 else -1 }}
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: '{{ wolkenanteil | float(-1) < 0 }}'
+        sequence:
+          - stop: Keine gültige Bewölkungsprognose verfügbar
+      - conditions:
+          - condition: template
+            value_template: '{{ wolkenanteil | float(-1) > 75 }}'
+        sequence:
+          - action: input_number.set_value
+            target:
+              entity_id:
+                - input_number.zendure_1_neuer_min_soc
+                - input_number.zendure_2_neuer_min_soc
+            data:
+              value: 15
+          - action: input_datetime.set_datetime
+            target:
+              entity_id: input_datetime.zendure_letzte_min_soc_berechnung
+            data:
+              timestamp: '{{ now().timestamp() }}'
+    default:
+      - action: input_number.set_value
+        target:
+          entity_id:
+            - input_number.zendure_1_neuer_min_soc
+            - input_number.zendure_2_neuer_min_soc
+        data:
+          value: 10
+      - action: input_datetime.set_datetime
+        target:
+          entity_id: input_datetime.zendure_letzte_min_soc_berechnung
+        data:
+          timestamp: '{{ now().timestamp() }}'
+  - action: automation.turn_on
+    target:
+      entity_id: automation.zendure_ubernahme_neue_mindest_soc
+    data: {}
+mode: single

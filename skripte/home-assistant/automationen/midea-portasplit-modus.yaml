@@ -1,0 +1,92 @@
+# Anonymisiertes Beispiel – Entitäten und Geräte-ID an die eigene Installation anpassen.
+# Label midea_portasplit_kuhlung ist für die spätere Kühlungsregelung vorgesehen.
+alias: Midea Portasplit Modus
+description: Modussteuerung mit Batterie-Hysterese
+triggers:
+- trigger: state
+  entity_id: input_select.option_midea_portasplit
+  for: 00:00:10
+- trigger: state
+  entity_id: sensor.zendure_gesamt_soc_durchschnitt
+- trigger: homeassistant
+  event: start
+conditions: []
+actions:
+- variables:
+    modus: '{{ states(''input_select.option_midea_portasplit'') }}'
+    soc_gueltig: '{{ is_number(states(''sensor.zendure_gesamt_soc_durchschnitt'')) }}'
+    soc: '{{ states(''sensor.zendure_gesamt_soc_durchschnitt'') | float(-1) }}'
+    freigabe: '{{ is_state(''input_boolean.status_midea_portasplit'', ''on'') }}'
+- choose:
+  - conditions:
+    - condition: template
+      value_template: '{{ modus not in [''Heizen'', ''Kühlen''] or not soc_gueltig or soc < 40 or (soc <= 50 and not freigabe)
+        }}'
+    sequence:
+    - action: input_boolean.turn_off
+      target:
+        entity_id: input_boolean.status_midea_portasplit
+    - action: automation.turn_off
+      target:
+        label_id:
+        - midea_portasplit_heizung
+        - midea_portasplit_kuhlung
+      data:
+        stop_actions: true
+    - action: climate.set_hvac_mode
+      target:
+        device_id: "<MIDEA-GERAETE-ID>"
+      data:
+        hvac_mode: 'off'
+    - action: switch.turn_off
+      target:
+        device_id: "<MIDEA-GERAETE-ID>"
+  - conditions:
+    - condition: template
+      value_template: '{{ modus == ''Heizen'' }}'
+    sequence:
+    - action: automation.turn_off
+      target:
+        label_id: midea_portasplit_kuhlung
+      data:
+        stop_actions: true
+    - action: switch.turn_on
+      target:
+        device_id: "<MIDEA-GERAETE-ID>"
+    - action: climate.set_hvac_mode
+      target:
+        device_id: "<MIDEA-GERAETE-ID>"
+      data:
+        hvac_mode: heat
+    - action: automation.turn_on
+      target:
+        label_id: midea_portasplit_heizung
+    - action: input_boolean.turn_on
+      target:
+        entity_id: input_boolean.status_midea_portasplit
+    - action: automation.trigger
+      target:
+        label_id: midea_portasplit_heizung
+      data:
+        skip_condition: false
+  - conditions:
+    - condition: template
+      value_template: '{{ modus == ''Kühlen'' }}'
+    sequence:
+    - action: automation.turn_off
+      target:
+        label_id: midea_portasplit_heizung
+      data:
+        stop_actions: true
+    - action: switch.turn_on
+      target:
+        device_id: "<MIDEA-GERAETE-ID>"
+    - action: climate.set_hvac_mode
+      target:
+        device_id: "<MIDEA-GERAETE-ID>"
+      data:
+        hvac_mode: cool
+    - action: input_boolean.turn_on
+      target:
+        entity_id: input_boolean.status_midea_portasplit
+mode: restart

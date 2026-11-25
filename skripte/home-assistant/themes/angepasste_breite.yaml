@@ -1,0 +1,11 @@
+2_spalten_3_breit:
+  modes:
+    light: {}
+    dark: {}
+  ha-view-sections-column-max-width: "750px"
+
+1_spalte_3_breit:
+  modes:
+    light: {}
+    dark: {}
+  ha-view-sections-column-max-width: "1500px"

@@ -1,0 +1,2687 @@
+views:
+  - title: Solar
+    path: solar
+    icon: mdi:solar-power
+    type: sections
+    sections:
+      - type: grid
+        columns: 1
+        square: false
+        cards:
+          - type: markdown
+            content: |
+              ### Zendure 1
+            text_only: true
+            card_mod:
+              style:
+                .: |
+                  ha-card {
+                    background: transparent !important;
+                    box-shadow: none !important;
+                    border: none !important;
+                  }
+                ha-markdown$: |
+                  h3 {
+                    text-align: center !important;
+                    font-size: 24px !important;
+                  }
+          - type: custom:config-template-card
+            entities:
+              - input_number.zendure_1_neuer_min_soc
+              - number.solarflow_800_plus_1_min_soc
+            card:
+              type: gauge
+              entity: sensor.solarflow_800_plus_1_electric_level
+              name: ''
+              min: 0
+              max: 100
+              needle: true
+              tap_action:
+                action: none
+              segments:
+                - from: 0
+                  color: '#E74C3C'
+                - from: ${Number(states['number.solarflow_800_plus_1_min_soc'].state)}
+                  color: >-
+                    ${Number(states['input_number.zendure_1_neuer_min_soc'].state)
+                    >
+                      Number(states['number.solarflow_800_plus_1_min_soc'].state)
+                      ? '#3498DB' : '#E0E0E0'}
+                - from: |-
+                    ${Math.max(
+                      Number(states['number.solarflow_800_plus_1_min_soc'].state),
+                      Number(states['input_number.zendure_1_neuer_min_soc'].state)
+                    )}
+                  color: '#E0E0E0'
+              card_mod:
+                style: |
+                  ha-card {
+                    background: transparent !important;
+                    box-shadow: none !important;
+                    border: none !important;
+                    margin-top: -12px !important;
+                    margin-bottom: -16px !important;
+                  }
+                  ha-tile-icon {
+                    display: none !important;
+                  }
+                  .card-content {
+                    padding: 0px !important;
+                  }
+          - square: false
+            type: grid
+            columns: 3
+            cards:
+              - type: tile
+                entity: sensor.solarflow_800_plus_1_solar_power1
+                name: PV 1
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.solarflow_800_plus_1_solar_power2
+                name: PV 2
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.zendure_1_pv_leistung
+                name: Gesamt
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+          - square: false
+            type: grid
+            columns: 3
+            card_mod:
+              style: |
+                :host {
+                  border-top: 2px solid #E0E0E0 !important;
+                }
+            cards:
+              - type: tile
+                entity: sensor.solarflow_800_plus_1_output_home_power
+                name: Einspeisung
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.zendure_1_ac_soll_leistung
+                name: Einspeisung neu
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        {% set aktuell = states('number.solarflow_800_plus_1_output_limit') | float(none) %}
+                        {% set geplant = states('sensor.zendure_1_ac_soll_leistung') | float(none) %}
+                        {% if aktuell is not none and geplant is not none and aktuell != geplant %}
+                          background: #3498DB !important;
+                        {% else %}
+                          background: transparent !important;
+                        {% endif %}
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.zendure_1_leistungsanteil
+                name: Anteil
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+          - type: grid
+            square: false
+            columns: 3
+            cards:
+              - type: custom:button-card
+                entity: sensor.solarflow_800_plus_1_output_pack_power
+                triggers_update:
+                  - sensor.solarflow_800_plus_1_output_pack_power
+                  - sensor.solarflow_800_plus_1_pack_input_power
+                show_icon: false
+                show_name: true
+                show_state: true
+                name: |
+                  [[[
+                    const ladung = Number(
+                      states['sensor.solarflow_800_plus_1_output_pack_power']?.state
+                    );
+                    const entladung = Number(
+                      states['sensor.solarflow_800_plus_1_pack_input_power']?.state
+                    );
+
+                    if (ladung > 0) return "Ladung";
+                    if (entladung > 0) return "Entladung";
+                    return "Standby";
+                  ]]]
+                state_display: |
+                  [[[
+                    const ladung = Number(
+                      states['sensor.solarflow_800_plus_1_output_pack_power']?.state
+                    );
+                    const entladung = Number(
+                      states['sensor.solarflow_800_plus_1_pack_input_power']?.state
+                    );
+
+                    if (ladung > 0) return ladung + " W";
+                    if (entladung > 0) return (-entladung) + " W";
+                    return "0 W";
+                  ]]]
+                styles:
+                  card:
+                    - background: transparent
+                    - box-shadow: none
+                    - border: none
+                    - padding: 8px 2px
+                    - margin-bottom: -4px
+                  grid:
+                    - grid-template-areas: '"n" "s"'
+                    - grid-template-columns: 1fr
+                    - grid-template-rows: auto auto
+                    - row-gap: 4px
+                  name:
+                    - font-size: 14px
+                    - font-weight: normal
+                    - justify-self: center
+                  state:
+                    - font-size: 16px
+                    - font-weight: normal
+                    - justify-self: center
+                    - color: |
+                        [[[
+                          const ladung = Number(states['sensor.solarflow_800_plus_1_output_pack_power']?.state);
+                          const entladung = Number(states['sensor.solarflow_800_plus_1_pack_input_power']?.state);
+
+                          return ladung <= 0 && entladung > 0
+                            ? '#E74C3C'
+                            : 'var(--primary-text-color)';
+                        ]]]
+                tap_action:
+                  action: none
+              - type: tile
+                entity: sensor.zendure_1_pv_begrenzung_anzeige
+                name: PV Begrenzung
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        {% if not is_state('sensor.zendure_1_pv_begrenzung_anzeige', 'Inaktiv') %}
+                          background: #F4D03F !important;
+                        {% else %}
+                          background: transparent !important;
+                        {% endif %}
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                        {% if not is_state('sensor.zendure_1_pv_begrenzung_anzeige', 'Inaktiv') %}
+                          color: black !important;
+                        {% endif %}
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                        {% if not is_state('sensor.zendure_1_pv_begrenzung_anzeige', 'Inaktiv') %}
+                          color: black !important;
+                        {% endif %}
+                      }
+              - type: custom:button-card
+                entity: sensor.solarflow_800_plus_1_hyper_tmp
+                triggers_update:
+                  - sensor.solarflow_800_plus_1_hyper_tmp
+                  - sensor.ab2000_1_max_temp
+                show_icon: false
+                show_name: false
+                show_state: false
+                custom_fields:
+                  wr: |
+                    [[[
+                      const s = states['sensor.solarflow_800_plus_1_hyper_tmp']?.state;
+                      const t = Number(s);
+
+                      return s !== 'unknown' &&
+                             s !== 'unavailable' &&
+                             s !== undefined &&
+                             Number.isFinite(t)
+                        ? Math.trunc(t) + " °C"
+                        : "–";
+                    ]]]
+                  akku: |
+                    [[[
+                      const s = states['sensor.ab2000_1_max_temp']?.state;
+                      const t = Number(s);
+
+                      return s !== 'unknown' &&
+                             s !== 'unavailable' &&
+                             s !== undefined &&
+                             Number.isFinite(t)
+                        ? Math.trunc(t) + " °C"
+                        : "–";
+                    ]]]
+                styles:
+                  card:
+                    - padding: 8px 0px
+                    - background: transparent
+                    - border: none
+                    - box-shadow: none
+                    - margin-bottom: -4px
+                  grid:
+                    - grid-template-areas: '"wr akku"'
+                    - grid-template-columns: 1fr 1fr
+                    - grid-template-rows: 1fr
+                  custom_fields:
+                    wr:
+                      - padding: 4px 0px
+                      - border-right: 1px solid var(--divider-color)
+                      - font-size: 16px
+                      - background: |
+                          [[[
+                            const s = states['sensor.solarflow_800_plus_1_hyper_tmp']?.state;
+                            const t = Math.trunc(Number(s));
+
+                            return s !== 'unknown' &&
+                                   s !== 'unavailable' &&
+                                   s !== undefined &&
+                                   Number.isFinite(t) &&
+                                   (t < 0 || t > 60)
+                              ? '#E74C3C'
+                              : 'transparent';
+                          ]]]
+                    akku:
+                      - padding: 4px 0px
+                      - font-size: 16px
+                      - background: |
+                          [[[
+                            const s = states['sensor.ab2000_1_max_temp']?.state;
+                            const t = Math.trunc(Number(s));
+
+                            return s !== 'unknown' &&
+                                   s !== 'unavailable' &&
+                                   s !== undefined &&
+                                   Number.isFinite(t) &&
+                                   (t < 0 || t > 40)
+                              ? '#E74C3C'
+                              : 'transparent';
+                          ]]]
+                extra_styles: |
+                  #wr::before {
+                    content: "WR";
+                    display: block;
+                    font-size: 14px;
+                    margin-bottom: 4px;
+                  }
+
+                  #akku::before {
+                    content: "Akku";
+                    display: block;
+                    font-size: 14px;
+                    margin-bottom: 4px;
+                  }
+                tap_action:
+                  action: none
+        card_mod:
+          style: |
+            :host {
+              border-left: 2px solid #B0B0B0;
+              border-right: 2px solid #B0B0B0;
+              padding-left: 8px;
+              padding-right: 8px;
+              margin-right: -14px;
+              box-sizing: border-box;
+            }
+      - type: grid
+        columns: 1
+        square: false
+        cards:
+          - type: markdown
+            content: |
+              ### Zendure 2
+            text_only: true
+            card_mod:
+              style:
+                .: |
+                  ha-card {
+                    background: transparent !important;
+                    box-shadow: none !important;
+                    border: none !important;
+                  }
+                ha-markdown$: |
+                  h3 {
+                    text-align: center !important;
+                    font-size: 24px !important;
+                  }
+          - type: custom:config-template-card
+            entities:
+              - input_number.zendure_2_neuer_min_soc
+              - number.solarflow_800_plus_2_min_soc
+            card:
+              type: gauge
+              entity: sensor.solarflow_800_plus_2_electric_level
+              name: ''
+              min: 0
+              max: 100
+              needle: true
+              tap_action:
+                action: none
+              segments:
+                - from: 0
+                  color: '#E74C3C'
+                - from: ${Number(states['number.solarflow_800_plus_2_min_soc'].state)}
+                  color: >-
+                    ${Number(states['input_number.zendure_2_neuer_min_soc'].state)
+                    >
+                      Number(states['number.solarflow_800_plus_2_min_soc'].state)
+                      ? '#3498DB' : '#E0E0E0'}
+                - from: |-
+                    ${Math.max(
+                      Number(states['number.solarflow_800_plus_2_min_soc'].state),
+                      Number(states['input_number.zendure_2_neuer_min_soc'].state)
+                    )}
+                  color: '#E0E0E0'
+              card_mod:
+                style: |
+                  ha-card {
+                    background: transparent !important;
+                    box-shadow: none !important;
+                    border: none !important;
+                    margin-top: -12px !important;
+                    margin-bottom: -16px !important;
+                  }
+                  ha-tile-icon {
+                    display: none !important;
+                  }
+                  .card-content {
+                    padding: 0px !important;
+                  }
+          - square: false
+            type: grid
+            columns: 3
+            cards:
+              - type: tile
+                entity: sensor.solarflow_800_plus_2_solar_power1
+                name: PV 1
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.solarflow_800_plus_2_solar_power2
+                name: PV 2
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.zendure_2_pv_leistung
+                name: Gesamt
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+          - square: false
+            type: grid
+            columns: 3
+            card_mod:
+              style: |
+                :host {
+                  border-top: 2px solid #E0E0E0 !important;
+                }
+            cards:
+              - type: tile
+                entity: sensor.solarflow_800_plus_2_output_home_power
+                name: Einspeisung
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.zendure_2_ac_soll_leistung
+                name: Einspeisung neu
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        {% set aktuell = states('number.solarflow_800_plus_2_output_limit') | float(none) %}
+                        {% set geplant = states('sensor.zendure_2_ac_soll_leistung') | float(none) %}
+                        {% if aktuell is not none and geplant is not none and aktuell != geplant %}
+                          background: #3498DB !important;
+                        {% else %}
+                          background: transparent !important;
+                        {% endif %}
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.zendure_2_leistungsanteil
+                name: Anteil
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+          - type: grid
+            square: false
+            columns: 3
+            cards:
+              - type: custom:button-card
+                entity: sensor.solarflow_800_plus_2_output_pack_power
+                triggers_update:
+                  - sensor.solarflow_800_plus_2_output_pack_power
+                  - sensor.solarflow_800_plus_2_pack_input_power
+                show_icon: false
+                show_name: true
+                show_state: true
+                name: |
+                  [[[
+                    const ladung = Number(
+                      states['sensor.solarflow_800_plus_2_output_pack_power']?.state
+                    );
+                    const entladung = Number(
+                      states['sensor.solarflow_800_plus_2_pack_input_power']?.state
+                    );
+
+                    if (ladung > 0) return "Ladung";
+                    if (entladung > 0) return "Entladung";
+                    return "Standby";
+                  ]]]
+                state_display: |
+                  [[[
+                    const ladung = Number(
+                      states['sensor.solarflow_800_plus_2_output_pack_power']?.state
+                    );
+                    const entladung = Number(
+                      states['sensor.solarflow_800_plus_2_pack_input_power']?.state
+                    );
+
+                    if (ladung > 0) return ladung + " W";
+                    if (entladung > 0) return (-entladung) + " W";
+                    return "0 W";
+                  ]]]
+                styles:
+                  card:
+                    - background: transparent
+                    - box-shadow: none
+                    - border: none
+                    - padding: 8px 2px
+                    - margin-bottom: -4px
+                  grid:
+                    - grid-template-areas: '"n" "s"'
+                    - grid-template-columns: 1fr
+                    - grid-template-rows: auto auto
+                    - row-gap: 4px
+                  name:
+                    - font-size: 14px
+                    - font-weight: normal
+                    - justify-self: center
+                  state:
+                    - font-size: 16px
+                    - font-weight: normal
+                    - justify-self: center
+                    - color: |
+                        [[[
+                          const ladung = Number(states['sensor.solarflow_800_plus_2_output_pack_power']?.state);
+                          const entladung = Number(states['sensor.solarflow_800_plus_2_pack_input_power']?.state);
+
+                          return ladung <= 0 && entladung > 0
+                            ? '#E74C3C'
+                            : 'var(--primary-text-color)';
+                        ]]]
+                tap_action:
+                  action: none
+              - type: tile
+                entity: sensor.zendure_2_pv_begrenzung_anzeige
+                name: PV Begrenzung
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        {% if not is_state('sensor.zendure_2_pv_begrenzung_anzeige', 'Inaktiv') %}
+                          background: #F4D03F !important;
+                        {% else %}
+                          background: transparent !important;
+                        {% endif %}
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                        {% if not is_state('sensor.zendure_2_pv_begrenzung_anzeige', 'Inaktiv') %}
+                          color: black !important;
+                        {% endif %}
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                        {% if not is_state('sensor.zendure_2_pv_begrenzung_anzeige', 'Inaktiv') %}
+                          color: black !important;
+                        {% endif %}
+                      }
+              - type: custom:button-card
+                entity: sensor.solarflow_800_plus_2_hyper_tmp
+                triggers_update:
+                  - sensor.solarflow_800_plus_2_hyper_tmp
+                  - sensor.ab2000_2_max_temp
+                show_icon: false
+                show_name: false
+                show_state: false
+                custom_fields:
+                  wr: |
+                    [[[
+                      const s = states['sensor.solarflow_800_plus_2_hyper_tmp']?.state;
+                      const t = Number(s);
+
+                      return s !== 'unknown' &&
+                             s !== 'unavailable' &&
+                             s !== undefined &&
+                             Number.isFinite(t)
+                        ? Math.trunc(t) + " °C"
+                        : "–";
+                    ]]]
+                  akku: |
+                    [[[
+                      const s = states['sensor.ab2000_2_max_temp']?.state;
+                      const t = Number(s);
+
+                      return s !== 'unknown' &&
+                             s !== 'unavailable' &&
+                             s !== undefined &&
+                             Number.isFinite(t)
+                        ? Math.trunc(t) + " °C"
+                        : "–";
+                    ]]]
+                styles:
+                  card:
+                    - padding: 8px 0px
+                    - background: transparent
+                    - border: none
+                    - box-shadow: none
+                    - margin-bottom: -4px
+                  grid:
+                    - grid-template-areas: '"wr akku"'
+                    - grid-template-columns: 1fr 1fr
+                    - grid-template-rows: 1fr
+                  custom_fields:
+                    wr:
+                      - padding: 4px 0px
+                      - border-right: 1px solid var(--divider-color)
+                      - font-size: 16px
+                      - background: |
+                          [[[
+                            const s = states['sensor.solarflow_800_plus_2_hyper_tmp']?.state;
+                            const t = Math.trunc(Number(s));
+
+                            return s !== 'unknown' &&
+                                   s !== 'unavailable' &&
+                                   s !== undefined &&
+                                   Number.isFinite(t) &&
+                                   (t < 0 || t > 60)
+                              ? '#E74C3C'
+                              : 'transparent';
+                          ]]]
+                    akku:
+                      - padding: 4px 0px
+                      - font-size: 16px
+                      - background: |
+                          [[[
+                            const s = states['sensor.ab2000_2_max_temp']?.state;
+                            const t = Math.trunc(Number(s));
+
+                            return s !== 'unknown' &&
+                                   s !== 'unavailable' &&
+                                   s !== undefined &&
+                                   Number.isFinite(t) &&
+                                   (t < 0 || t > 40)
+                              ? '#E74C3C'
+                              : 'transparent';
+                          ]]]
+                extra_styles: |
+                  #wr::before {
+                    content: "WR";
+                    display: block;
+                    font-size: 14px;
+                    margin-bottom: 4px;
+                  }
+
+                  #akku::before {
+                    content: "Akku";
+                    display: block;
+                    font-size: 14px;
+                    margin-bottom: 4px;
+                  }
+                tap_action:
+                  action: none
+        card_mod:
+          style: |
+            :host {
+              padding-left: 8px;
+              padding-right: 8px;
+              box-sizing: border-box;
+              margin-left: -14px;
+              margin-right: -14px;
+            }
+      - type: grid
+        cards:
+          - show_current: true
+            show_forecast: true
+            type: weather-forecast
+            entity: weather.forecast_home
+            forecast_type: daily
+            forecast_slots: 5
+            tap_action:
+              action: none
+            secondary_info_attribute: cloud_coverage
+            card_mod:
+              style: |
+                ha-card {
+                  background: transparent !important;
+                  box-shadow: none !important;
+                  border: none !important;
+                }
+          - show_current: false
+            show_forecast: true
+            type: weather-forecast
+            entity: weather.forecast_home
+            forecast_type: hourly
+            tap_action:
+              action: none
+            name: ''
+            card_mod:
+              style: |
+                ha-card {
+                  background: transparent !important;
+                  box-shadow: none !important;
+                  border: none !important;
+                }
+        card_mod:
+          style: |
+            :host {
+              border-left: 2px solid #B0B0B0;
+              border-right: 2px solid #B0B0B0;
+              padding-left: 8px;
+              padding-right: 8px;
+              margin-left: -14px;
+              box-sizing: border-box;
+            }
+      - type: grid
+        column_span: 2
+        cards:
+          - type: custom:home-flow-card
+            nodes:
+              - id: z1-pv1
+                kind: leaf
+                label: PV 1
+                entity: sensor.solarflow_800_plus_1_solar_power1
+                invert: false
+                flowDirection: supply
+                allowed_flow: supply
+                radius: 55
+                icon: null
+                color: '#F4D03F'
+              - id: z1-pv2
+                kind: leaf
+                label: PV 2
+                entity: sensor.solarflow_800_plus_1_solar_power2
+                invert: false
+                flowDirection: supply
+                allowed_flow: supply
+                radius: 55
+                icon: null
+                color: '#F4D03F'
+              - id: zendure1
+                kind: junction
+                label: ''
+                invert: false
+                balance_role: junction
+                flowMinVisibleValue: 0
+                flowMaxValue: 5000
+                radius: 65
+                icon: null
+                color: '#28B8B0'
+              - id: batterie1
+                kind: leaf
+                label: Zendure1
+                flow_mode: bidirectional
+                incoming_entity: sensor.solarflow_800_plus_1_pack_input_power
+                outgoing_entity: sensor.solarflow_800_plus_1_output_pack_power
+                invert: false
+                allowed_flow: both
+                radius: 55
+                icon: null
+                color: '#488DE0'
+              - id: grid1
+                kind: junction
+                label: ''
+                entity: sensor.solarflow_800_plus_1_output_home_power
+                invert: false
+                flowDirection: supply
+                balance_role: junction
+                flowMinVisibleValue: 0
+                flowMaxValue: 5000
+                radius: 55
+                icon: null
+                color: '#A78BFA'
+              - id: z2-pv1
+                kind: leaf
+                label: PV 1
+                entity: sensor.solarflow_800_plus_2_solar_power1
+                invert: false
+                flowDirection: supply
+                allowed_flow: supply
+                radius: 55
+                icon: null
+                color: '#F4D03F'
+              - id: z2-pv2
+                kind: leaf
+                label: PV 2
+                entity: sensor.solarflow_800_plus_2_solar_power2
+                invert: false
+                flowDirection: supply
+                allowed_flow: supply
+                radius: 55
+                icon: null
+                color: '#F4D03F'
+              - id: zendure2
+                kind: junction
+                label: ''
+                invert: false
+                balance_role: junction
+                flowMinVisibleValue: 0
+                flowMaxValue: 5000
+                radius: 65
+                icon: null
+                color: '#28B8B0'
+              - id: batterie2
+                kind: leaf
+                label: Zendure2
+                flow_mode: bidirectional
+                incoming_entity: sensor.solarflow_800_plus_2_pack_input_power
+                outgoing_entity: sensor.solarflow_800_plus_2_output_pack_power
+                invert: false
+                allowed_flow: both
+                radius: 55
+                icon: null
+                color: '#488DE0'
+              - id: grid2
+                kind: junction
+                label: ''
+                entity: sensor.solarflow_800_plus_2_output_home_power
+                invert: false
+                flowDirection: supply
+                balance_role: junction
+                flowMinVisibleValue: 0
+                flowMaxValue: 5000
+                radius: 55
+                icon: null
+                color: '#A78BFA'
+              - id: haus
+                kind: junction
+                label: Haus
+                entity: sensor.hausverbrauch_gesamt
+                invert: false
+                flowDirection: consume
+                balance_role: junction
+                flowMinVisibleValue: 0
+                flowMaxValue: 5000
+                radius: 75
+                icon: null
+                color: '#E88970'
+              - id: netz
+                kind: leaf
+                label: Netz
+                entity: sensor.shelly_netzleistung_gesamt
+                invert: false
+                flowDirection: supply
+                allowed_flow: both
+                radius: 65
+                icon: null
+                color: '#FF0000'
+            links:
+              - id: z1-pv1-zendure1
+                from: z1-pv1
+                to: zendure1
+                invert: false
+              - id: z1-pv2-zendure1
+                from: z1-pv2
+                to: zendure1
+                invert: false
+              - id: batterie1-zendure1
+                from: batterie1
+                to: zendure1
+                invert: false
+              - id: zendure1-grid1
+                from: zendure1
+                to: grid1
+                invert: false
+              - id: z2-pv1-zendure2
+                from: z2-pv1
+                to: zendure2
+                invert: false
+              - id: z2-pv2-zendure2
+                from: z2-pv2
+                to: zendure2
+                invert: false
+              - id: batterie2-zendure2
+                from: batterie2
+                to: zendure2
+                invert: false
+              - id: zendure2-grid2
+                from: zendure2
+                to: grid2
+                invert: false
+              - id: grid1-haus
+                from: grid1
+                to: haus
+                invert: false
+              - id: grid2-haus
+                from: grid2
+                to: haus
+                invert: false
+              - id: netz-haus
+                from: netz
+                to: haus
+                invert: false
+            layout:
+              z1-pv1:
+                x: 70
+                'y': 95
+              z1-pv2:
+                x: 270
+                'y': 95
+              zendure1:
+                x: 170
+                'y': 230
+              batterie1:
+                x: 70
+                'y': 400
+              grid1:
+                x: 350
+                'y': 230
+              z2-pv1:
+                x: 670
+                'y': 95
+              z2-pv2:
+                x: 870
+                'y': 95
+              zendure2:
+                x: 770
+                'y': 230
+              batterie2:
+                x: 870
+                'y': 400
+              grid2:
+                x: 590
+                'y': 230
+              haus:
+                x: 470
+                'y': 380
+              netz:
+                x: 470
+                'y': 105
+            flow_min_visible_value: 1
+            flow_max_value: 3000
+            label_style: straight
+            leaf_routing: funnel
+            scaling_mode: fit-width
+            width: 750
+            height: 365
+            canvas_height: 450
+            canvas_min_height: 450
+            canvas_min_width: 750
+            grid_options:
+              columns: full
+              rows: auto
+        card_mod:
+          style: |
+            :host {
+              padding-left: 8px;
+              padding-right: 8px;
+              box-sizing: border-box;
+              margin-left: -14px;
+              margin-right: -14px;
+            }
+      - type: grid
+        cards:
+          - square: false
+            type: grid
+            columns: 4
+            cards:
+              - type: tile
+                entity: sensor.hausverbrauch_gesamt
+                name: Gesamt
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.zendure_gesamt_einspeisung
+                name: Zendure
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.shelly_netzleistung_gesamt_anzeige
+                name: Netz
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.netzbezug_soll
+                name: Netz Soll
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+    show_icon_and_title: true
+    cards: []
+    max_columns: 3
+  - type: sections
+    cards: []
+    sections:
+      - type: grid
+        cards:
+          - type: custom:easy-floorplan-card
+            width: 700
+            height: 700
+            grid: 10
+            overlayScale: plan
+            showViewControls: false
+            floors:
+              - id: floor_example
+                name: Beispielgrundriss
+                walls:
+                  - id: wall_1
+                    x1: 80
+                    y1: 100
+                    x2: 620
+                    y2: 100
+                  - id: wall_2
+                    x1: 620
+                    y1: 100
+                    x2: 620
+                    y2: 500
+                  - id: wall_3
+                    x1: 620
+                    y1: 500
+                    x2: 80
+                    y2: 500
+                  - id: wall_4
+                    x1: 80
+                    y1: 500
+                    x2: 80
+                    y2: 100
+                  - id: wall_5
+                    x1: 350
+                    y1: 100
+                    x2: 350
+                    y2: 500
+                openings:
+                  - id: window_1
+                    type: window
+                    x: 215
+                    y: 100
+                    length: 120
+                    angle: 0
+                    entity: binary_sensor.kontakt_fenster_raum1_contact
+                    tap_action:
+                      action: none
+                    flipH: true
+                    activeColor: '#E74C3C'
+                    sunlight: false
+                  - id: window_2
+                    type: window
+                    x: 485
+                    y: 100
+                    length: 140
+                    angle: 0
+                    entity: binary_sensor.kontakt_fenster_raum2_gross_anzeige
+                    tap_action:
+                      action: none
+                    flipH: true
+                    activeColor: '#E74C3C'
+                    sunlight: false
+                  - id: window_3
+                    type: window
+                    x: 485
+                    y: 500
+                    length: 80
+                    angle: 0
+                    entity: binary_sensor.kontakt_fenster_raum2_klein_contact
+                    tap_action:
+                      action: none
+                    flipH: true
+                    activeColor: '#E74C3C'
+                    sunlight: false
+                items:
+                  - id: item_1
+                    entity: sensor.heizung_raum1_local_temperature
+                    x: 215
+                    y: 240
+                    kind: sensor
+                    showState: false
+                    size: 16
+                    showName: false
+                    readings:
+                      - entity: sensor.heizung_raum1_local_temperature
+                    badgeContent: none
+                    display: badge
+                    iconAnimation: none
+                    tap_action:
+                      action: none
+                    icon: none
+                    labelSize: 30
+                  - id: item_2
+                    entity: sensor.heizung_raum1_steuerung_anzeige
+                    x: 215
+                    y: 310
+                    kind: sensor
+                    showState: false
+                    showName: false
+                    readings:
+                      - attribute: temperature
+                        entity: climate.heizung_raum1
+                    badgeContent: icon
+                    display: badge
+                    iconAnimation: none
+                    tap_action:
+                      action: none
+                    labelSize: 24
+                    enableHideByEntity: true
+                    hideEntity: input_boolean.status_heizung
+                    hideState: 'off'
+                    hideInvert: false
+                    angle: 0
+                    stateColor:
+                      - color: '#A0A0A0'
+                        state: 'off'
+                      - color: '#3498DB'
+                        state: idle
+                      - color: '#ff0000'
+                        state: heat
+                      - color: '#FFFFFF'
+                        state: unknown
+                    disableLabelColor: true
+                    useCustomLabelColor: true
+                    labelCustomColor: '#FFFF00'
+                    labelPosition: right
+                  - id: item_3
+                    entity: sensor.thermostat_raum2_temperature
+                    x: 485
+                    y: 240
+                    kind: sensor
+                    showState: false
+                    size: 16
+                    showName: false
+                    readings:
+                      - entity: sensor.thermostat_raum2_temperature
+                    badgeContent: none
+                    display: badge
+                    iconAnimation: none
+                    tap_action:
+                      action: none
+                    icon: none
+                    labelSize: 30
+                  - id: item_4
+                    entity: input_boolean.status_midea_portasplit
+                    x: 485
+                    y: 310
+                    kind: generic
+                    showState: false
+                    showName: false
+                    readings:
+                      - entity: sensor.midea_portasplit_solltemperatur
+                    badgeContent: icon
+                    display: badge
+                    iconAnimation: none
+                    tap_action:
+                      action: none
+                    labelSize: 24
+                    enableHideByEntity: true
+                    hideEntity: input_boolean.status_heizung
+                    hideState: 'off'
+                    hideInvert: false
+                    angle: 0
+                    stateColor:
+                      - color: '#A0A0A0'
+                        state: 'off'
+                      - color: '#ff0000'
+                        state: 'on'
+                    disableLabelColor: true
+                    useCustomLabelColor: true
+                    labelCustomColor: '#FFFF00'
+                    labelPosition: right
+                    icon: mdi:air-conditioner
+                    enableHideStateByEntity: true
+                    hideStateEntity: input_boolean.status_midea_portasplit
+                    hideStateMatch: 'off'
+                texts: []
+                furniture: []
+                trackers: []
+                areas: []
+                roofs: []
+            view: 2d
+            appearance: normal
+            wallHeight: 100
+            wallOpacity: 1
+          - square: false
+            type: grid
+            columns: 3
+            cards:
+              - type: tile
+                entity: input_boolean.status_heizung
+                name: Heizung
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: toggle
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        {% if states('input_boolean.status_heizung') == 'on' %}
+                          background: #F4D03F !important;
+                        {% else %}
+                          background: transparent !important;
+                        {% endif %}
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                        {% if states('input_boolean.status_heizung') == 'on' %}
+                          color: black !important;
+                        {% endif %}
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                        {% if states('input_boolean.status_heizung') == 'on' %}
+                          color: black !important;
+                        {% endif %}
+                      }
+              - type: tile
+                entity: input_number.heizung_temperatur_standard
+                name: Standard
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: input_number.heizung_temperatur_abgesenkt
+                name: Abgesenkt
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+          - square: false
+            type: grid
+            columns: 1
+            cards:
+              - type: tile
+                entity: input_select.option_midea_portasplit
+                name: Midea Portasplit
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: perform-action
+                  perform_action: input_select.select_next
+                  target:
+                    entity_id: input_select.option_midea_portasplit
+                  data:
+                    cycle: true
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        {% if states('input_select.option_midea_portasplit') == 'Demontiert' %}
+                          background: #9E9E9E !important;
+                        {% elif states('input_boolean.status_midea_portasplit') == 'on' %}
+                          background: #F4D03F !important;
+                        {% else %}
+                          background: transparent !important;
+                        {% endif %}
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                        {% if states('input_boolean.status_midea_portasplit') == 'on' %}
+                          color: black !important;
+                        {% endif %}
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                        {% if states('input_boolean.status_midea_portasplit') == 'on' %}
+                          color: black !important;
+                        {% endif %}
+                      }
+            grid_options:
+              columns: 4
+          - square: false
+            type: grid
+            columns: 2
+            cards:
+              - type: tile
+                entity: sensor.klimaanlage_portasplit_innentemperatur
+                name: Ist-Temperatur
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.midea_portasplit_solltemperatur
+                name: Soll-Temperatur
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+            grid_options:
+              columns: 8
+            visibility:
+              - condition: state
+                entity_id: input_boolean.status_midea_portasplit
+                state:
+                  - 'on'
+      - type: grid
+        cards:
+          - square: false
+            type: grid
+            columns: 4
+            cards:
+              - type: markdown
+                content: '**Raum**'
+                card_mod:
+                  style: |
+                    ha-card {
+                      background: transparent !important;
+                      box-shadow: none !important;
+                      border: none !important;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                    }
+              - type: markdown
+                content: '**Ventil**'
+                card_mod:
+                  style: |
+                    ha-card {
+                      background: transparent !important;
+                      box-shadow: none !important;
+                      border: none !important;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                    }
+              - type: markdown
+                content: '**Sensor**'
+                card_mod:
+                  style: |
+                    ha-card {
+                      background: transparent !important;
+                      box-shadow: none !important;
+                      border: none !important;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                    }
+              - type: markdown
+                content: '**Update**'
+                card_mod:
+                  style: |
+                    ha-card {
+                      background: transparent !important;
+                      box-shadow: none !important;
+                      border: none !important;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                    }
+            card_mod:
+              style: |
+                :host {
+                  --grid-card-gap: 4px;
+                  margin-top: -8px !important;
+                  margin-bottom: -8px !important;
+                }
+                ha-tile-info$: |
+                  .primary {
+                    font-size: 14px !important;
+                  }
+          - square: false
+            type: grid
+            columns: 4
+            cards:
+              - type: markdown
+                content: Raum 2
+                text_only: true
+                card_mod:
+                  style: |
+                    ha-card {
+                      background: transparent !important;
+                      box-shadow: none !important;
+                      border: none !important;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                    }
+              - type: tile
+                entity: number.heizung_raum2_external_temperature_input
+                name: ''
+                icon: none
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style: |
+                    ha-card {
+                      background: transparent !important;
+                      box-shadow: none !important;
+                      border: none !important;
+                    }
+                    ha-tile-icon { display: none !important; }
+              - type: tile
+                entity: sensor.thermostat_raum2_temperature
+                name: ''
+                icon: none
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style: |
+                    ha-card {
+                      {% set a = states('number.heizung_raum2_external_temperature_input') | float(none) %}
+                      {% set b = states('sensor.thermostat_raum2_temperature') | float(none) %}
+                      background: {{ '#3498DB' if a is not none and b is not none and a | round(1) != b | round(1) else 'transparent' }} !important;
+                      box-shadow: none !important;
+                      border: none !important;
+                    }
+                    ha-tile-icon { display: none !important; }
+              - type: tile
+                entity: number.heizung_raum2_external_temperature_input
+                name: ''
+                icon: none
+                state_content: last_updated
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style: |
+                    ha-card {
+                      background: transparent !important;
+                      box-shadow: none !important;
+                      border: none !important;
+                    }
+                    ha-tile-icon { display: none !important; }
+            card_mod:
+              style: |
+                :host {
+                  --grid-card-gap: 4px;
+                  margin-top: -8px !important;
+                  margin-bottom: -8px !important;
+                }
+          - square: false
+            type: grid
+            columns: 5
+            cards:
+              - type: tile
+                entity: input_boolean.anwesend_person1
+                name: Person 1
+                icon: mdi:home
+                show_entity_picture: false
+                hide_state: true
+                vertical: true
+                tap_action:
+                  action: none
+                icon_tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style: |
+                    ha-card {
+                      background: transparent !important;
+                      box-shadow: none !important;
+                      border: none !important;
+                    }
+                    ha-tile-icon {
+                      --tile-icon-color: {{
+                        '#3498DB' if is_state('input_boolean.home_office_person1', 'on')
+                        else '#4CAF50' if is_state('input_boolean.anwesend_person1', 'on')
+                        else '#9E9E9E'
+                      }} !important;
+                      --mdc-icon-size: 40px;
+                    }
+              - type: tile
+                entity: input_boolean.anwesend_person2
+                name: Person 2
+                icon: mdi:home
+                show_entity_picture: false
+                hide_state: true
+                vertical: true
+                tap_action:
+                  action: none
+                icon_tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style: |
+                    ha-card {
+                      background: transparent !important;
+                      box-shadow: none !important;
+                      border: none !important;
+                    }
+                    ha-tile-icon {
+                      --tile-icon-color: {{
+                        '#4CAF50' if is_state(config.entity, 'on')
+                        else '#9E9E9E'
+                      }} !important;
+                      --mdc-icon-size: 40px;
+                    }
+              - type: tile
+                entity: input_boolean.anwesend_person3
+                name: Person 3
+                icon: mdi:home
+                show_entity_picture: false
+                hide_state: true
+                vertical: true
+                tap_action:
+                  action: none
+                icon_tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style: |
+                    ha-card {
+                      background: transparent !important;
+                      box-shadow: none !important;
+                      border: none !important;
+                    }
+                    ha-tile-icon {
+                      --tile-icon-color: {{
+                        '#4CAF50' if is_state(config.entity, 'on')
+                        else '#9E9E9E'
+                      }} !important;
+                      --mdc-icon-size: 40px;
+                    }
+              - type: tile
+                entity: input_boolean.anwesend_person4
+                name: Person 4
+                icon: mdi:home
+                show_entity_picture: false
+                hide_state: true
+                vertical: true
+                tap_action:
+                  action: none
+                icon_tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style: |
+                    ha-card {
+                      background: transparent !important;
+                      box-shadow: none !important;
+                      border: none !important;
+                    }
+                    ha-tile-icon {
+                      --tile-icon-color: {{
+                        '#4CAF50' if is_state(config.entity, 'on')
+                        else '#9E9E9E'
+                      }} !important;
+                      --mdc-icon-size: 40px;
+                    }
+              - type: tile
+                entity: input_boolean.anwesend_person5
+                name: Person 5
+                icon: mdi:home
+                show_entity_picture: false
+                hide_state: true
+                vertical: true
+                tap_action:
+                  action: none
+                icon_tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style: |
+                    ha-card {
+                      background: transparent !important;
+                      box-shadow: none !important;
+                      border: none !important;
+                    }
+                    ha-tile-icon {
+                      --tile-icon-color: {{
+                        '#4CAF50' if is_state(config.entity, 'on')
+                        else '#9E9E9E'
+                      }} !important;
+                      --mdc-icon-size: 40px;
+                    }
+    title: Klima
+    icon: mdi:home-thermometer
+    show_icon_and_title: true
+    max_columns: 3
+    path: klima
+  - title: Netzwerk
+    path: netzwerk
+    icon: mdi:lan
+    type: sections
+    sections:
+      - type: grid
+        cards:
+          - type: markdown
+            content: |
+              ### Kontaktsensoren
+            text_only: true
+            card_mod:
+              style:
+                .: |
+                  ha-card {
+                    background: transparent !important;
+                    box-shadow: none !important;
+                    border: none !important;
+                  }
+                ha-markdown$: |
+                  h3 {
+                    text-align: center !important;
+                    font-size: 24px !important;
+                  }
+          - type: custom:flex-table-card
+            title: ''
+            card_mod:
+              style: |
+                ha-card {
+                  background: transparent !important;
+                  box-shadow: none !important;
+                  border: none !important;
+                  margin-top: 0px !important;
+                  margin-bottom: -4px !important;
+                }
+
+                table tr,
+                table tr:nth-child(even),
+                table tr:nth-child(odd),
+                table td {
+                  background: transparent !important;
+                }
+                {% set batterien = states.sensor
+                  | selectattr('entity_id', 'match', 'sensor\\.(kontakt.*|radar.*)_battery$')
+                  | sort(attribute='name') | list %}
+
+                {% for batterie in batterien %}
+                  {% set wert = batterie.state | float(100) %}
+
+                  {% if wert < 25 %}
+                    table tbody tr:nth-child({{ loop.index }}) td {
+                      color: #E74C3C !important;
+                    }
+                  {% elif wert < 50 %}
+                    table tbody tr:nth-child({{ loop.index }}) td:nth-child(2) {
+                      color: #3498DB !important;
+                    }
+                  {% endif %}
+                {% endfor %}
+            entities:
+              include:
+                - sensor.kontakt*_battery
+                - sensor.radar*_battery
+            css:
+              table+: 'width: 100%; table-layout: fixed;'
+              thead tr th:nth-child(1)+: 'width: 5%;'
+              thead tr th:nth-child(2)+: 'width: 65%;'
+              thead tr th:nth-child(3)+: 'width: 25%;'
+            columns:
+              - name: ''
+                data: friendly_name
+                modify: ''''''
+              - name: Gerätename
+                data: friendly_name
+                modify: |-
+                  x.replace(/Kontakt/g,'')
+                   .replace(/_/g, ' ')
+                   .replace(/ Batterie$/i, '')
+                   .replace(/ Battery$/i, '')
+              - name: Batterie
+                data: state
+                modify: x + ' %'
+            sort_by: Gerätename
+      - type: grid
+        cards:
+          - type: markdown
+            content: |
+              ### externe Thermostate
+            text_only: true
+            card_mod:
+              style:
+                .: |
+                  ha-card {
+                    background: transparent !important;
+                    box-shadow: none !important;
+                    border: none !important;
+                  }
+                ha-markdown$: |
+                  h3 {
+                    text-align: center !important;
+                    font-size: 24px !important;
+                  }
+          - type: custom:flex-table-card
+            title: ''
+            card_mod:
+              style: |
+                ha-card {
+                  background: transparent !important;
+                  box-shadow: none !important;
+                  border: none !important;
+                  margin-top: 0px !important;
+                  margin-bottom: -4px !important;
+                }
+
+                table tr,
+                table tr:nth-child(even),
+                table tr:nth-child(odd),
+                table td {
+                  background: transparent !important;
+                }
+
+                {% set batterien = states.sensor
+                  | selectattr('entity_id', 'match', 'sensor\\.thermostat.*_battery$')
+                  | sort(attribute='name') | list %}
+
+                {% for batterie in batterien %}
+                  {% set wert = batterie.state | float(100) %}
+
+                  {% if wert < 25 %}
+                    table tbody tr:nth-child({{ loop.index }}) td {
+                      color: #E74C3C !important;
+                    }
+                  {% elif wert < 50 %}
+                    table tbody tr:nth-child({{ loop.index }}) td:nth-child(2) {
+                      color: #3498DB !important;
+                    }
+                  {% endif %}
+                {% endfor %}
+            entities:
+              include:
+                - sensor.thermostat*_battery
+            css:
+              table+: 'width: 100%; table-layout: fixed;'
+              thead tr th:nth-child(1)+: 'width: 5%;'
+              thead tr th:nth-child(2)+: 'width: 65%;'
+              thead tr th:nth-child(3)+: 'width: 25%;'
+            columns:
+              - name: ''
+                data: friendly_name
+                modify: ''''''
+              - name: Gerätename
+                data: friendly_name
+                modify: |-
+                  x.replace(/Thermostat/g,'')
+                   .replace(/_/g, ' ')
+                   .replace(/ Batterie$/i, '')
+                   .replace(/ Battery$/i, '')
+              - name: Batterie
+                data: state
+                modify: x + ' %'
+            sort_by: Gerätename
+          - type: heading
+            icon: ''
+            heading_style: subtitle
+          - type: markdown
+            content: |
+              ### Heizkörperventile
+            text_only: true
+            card_mod:
+              style:
+                .: |
+                  ha-card {
+                    background: transparent !important;
+                    box-shadow: none !important;
+                    border: none !important;
+                  }
+                ha-markdown$: |
+                  h3 {
+                    text-align: center !important;
+                    font-size: 24px !important;
+                  }
+          - type: custom:flex-table-card
+            title: ''
+            card_mod:
+              style: |
+                ha-card {
+                  background: transparent !important;
+                  box-shadow: none !important;
+                  border: none !important;
+                  margin-top: 0px !important;
+                  margin-bottom: -4px !important;
+                }
+
+                table tr,
+                table tr:nth-child(even),
+                table tr:nth-child(odd),
+                table td {
+                  background: transparent !important;
+                }
+
+                {% set batterien = states.sensor
+                  | selectattr('entity_id', 'match', 'sensor\\.heizung.*_battery$')
+                  | sort(attribute='name') | list %}
+
+                {% for batterie in batterien %}
+                  {% set wert = batterie.state | float(100) %}
+
+                  {% if wert < 25 %}
+                    table tbody tr:nth-child({{ loop.index }}) td {
+                      color: #E74C3C !important;
+                    }
+                  {% elif wert < 50 %}
+                    table tbody tr:nth-child({{ loop.index }}) td:nth-child(2) {
+                      color: #3498DB !important;
+                    }
+                  {% endif %}
+                {% endfor %}
+            entities:
+              include:
+                - sensor.heizung*_battery
+            css:
+              table+: 'width: 100%; table-layout: fixed;'
+              thead tr th:nth-child(1)+: 'width: 5%;'
+              thead tr th:nth-child(2)+: 'width: 65%;'
+              thead tr th:nth-child(3)+: 'width: 25%;'
+            columns:
+              - name: ''
+                data: friendly_name
+                modify: ''''''
+              - name: Gerätename
+                data: friendly_name
+                modify: |-
+                  x.replace(/Heizung/g,'')
+                   .replace(/_/g, ' ')
+                   .replace(/ Batterie$/i, '')
+                   .replace(/ Battery$/i, '')
+              - name: Batterie
+                data: state
+                modify: x + ' %'
+            sort_by: Gerätename
+      - type: grid
+        cards:
+          - type: markdown
+            content: |
+              ### WLAN
+            text_only: true
+            card_mod:
+              style:
+                .: |
+                  ha-card {
+                    background: transparent !important;
+                    box-shadow: none !important;
+                    border: none !important;
+                  }
+                ha-markdown$: |
+                  h3 {
+                    text-align: center !important;
+                    font-size: 24px !important;
+                  }
+          - type: custom:flex-table-card
+            title: ''
+            card_mod:
+              style: |
+                ha-card {
+                  background: transparent !important;
+                  box-shadow: none !important;
+                  border: none !important;
+                  margin-top: 0px !important;
+                  margin-bottom: -4px !important;
+                }
+                table tr,
+                table tr:nth-child(even),
+                table tr:nth-child(odd),
+                table td {
+                  background: transparent !important;
+                }
+            entities:
+              include:
+                - device_tracker.*
+              exclude:
+                - device_tracker.person2_person2owntracks
+                - device_tracker.laptop_person1_wlan
+                - device_tracker.person1_handy
+                - device_tracker.person1_person1owntracks
+                - device_tracker.person3_person3owntracks
+                - device_tracker.person4_person4owntracks
+                - device_tracker.person5_person5owntracks
+            css:
+              table+: 'width: 100%; table-layout: fixed;'
+              thead tr th:nth-child(1)+: 'width: 5%;'
+              thead tr th:nth-child(2)+: 'width: 65%;'
+              thead tr th:nth-child(3)+: 'width: 25%;'
+            columns:
+              - name: ''
+                data: friendly_name
+                modify: ''''''
+              - name: Gerätename
+                data: friendly_name, state
+                modify: |-
+                  x.trim().endsWith(' home')
+                    ? x.replace(/home$/, '').trim()
+                    : '<span style="color:#E74C3C">' +
+                      x.replace(/(not_home|unavailable|unknown)$/, '').trim() +
+                      '</span>'
+              - name: Status
+                data: state
+                modify: |-
+                  x === 'home'
+                    ? 'Online'
+                    : '<span style="color:#E74C3C">Offline</span>'
+            sort_by: Gerätename
+          - type: heading
+            icon: ''
+            heading_style: subtitle
+          - square: false
+            type: grid
+            columns: 3
+            cards:
+              - type: tile
+                entity: switch.freebox_v8_r1_wlan
+                name: WLAN
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        {% if not is_state('switch.freebox_v8_r1_wlan', 'on') %}
+                          background: #E74C3C !important;
+                        {% elif is_state('switch.freebox_v8_r1_wlan', 'on') %}
+                          background: #F4D03F !important;
+                        {% else %}
+                          background: transparent !important;
+                        {% endif %}
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                        {% if is_state('switch.freebox_v8_r1_wlan', 'on') %}
+                          color: black !important;
+                        {% endif %}
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                        {% if is_state('switch.freebox_v8_r1_wlan', 'on') %}
+                          color: black !important;
+                        {% endif %}
+                      }
+              - type: tile
+                entity: sensor.freebox_v8_r1_download_geschwindigkeit
+                name: Download
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.freebox_v8_r1_upload_geschwindigkeit
+                name: Upload
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+          - square: false
+            type: grid
+            columns: 3
+            cards:
+              - type: tile
+                entity: sensor.freebox_v8_r1_temperature_1
+                name: Temperatur 1
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.freebox_v8_r1_temperature_2
+                name: Temperatur 2
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.freebox_v8_r1_ventilateur_1
+                name: interner Ventilator
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+          - type: heading
+            icon: ''
+            heading_style: subtitle
+          - square: false
+            type: grid
+            columns: 3
+            cards:
+              - type: tile
+                entity: sensor.letztes_erfolgreiches_automatisches_backup_anzeige
+                name: letztes Backup
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: >
+                      {% set zeit =
+                      as_timestamp(states('input_datetime.letzte_windows_sicherung'),
+                      default=none) %}
+
+                      {% set alter = (as_timestamp(now()) - zeit) / 3600 if zeit
+                      is not none else 0 %}
+
+
+                      .primary {
+                        font-size: 14px !important;
+                      }
+
+                      .secondary {
+                        font-size: 16px !important;
+                        {% if alter > 48 %}
+                          color: #E74C3C !important;
+                        {% elif alter > 24 %}
+                          color: #3498DB !important;
+                        {% endif %}
+                      }
+              - type: tile
+                entity: sensor.nachstes_geplantes_automatisches_backup_datum
+                name: nächstes Backup
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: |
+                      .primary {
+                        font-size: 14px !important;
+                      }
+                      .secondary {
+                        font-size: 16px !important;
+                      }
+              - type: tile
+                entity: sensor.letzte_windows_sicherung_anzeige
+                name: letzte Sicherung
+                icon: none
+                show_entity_picture: false
+                vertical: true
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    .: |
+                      ha-card {
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                        margin-top: 0px !important;
+                        margin-bottom: -4px !important;
+                      }
+                      ha-tile-icon {
+                        display: none !important;
+                      }
+                    ha-tile-info$: >
+                      {% set zeit =
+                      as_timestamp(states('input_datetime.letzte_windows_sicherung'),
+                      default=none) %}
+
+                      {% set alter = (as_timestamp(now()) - zeit) / 3600 if zeit
+                      is not none else 0 %}
+
+
+                      .primary {
+                        font-size: 14px !important;
+                      }
+
+                      .secondary {
+                        font-size: 16px !important;
+                        {% if alter > 48 %}
+                          color: #E74C3C !important;
+                        {% elif alter > 24 %}
+                          color: #3498DB !important;
+                        {% endif %}
+                      }
+    show_icon_and_title: true
+    max_columns: 3
+  - title: neu
+    path: neu
+    icon: mdi:set-none
+    type: sections
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Neuer Abschnitt
+    show_icon_and_title: true
+    max_columns: 3
+background:
+  opacity: 33
+  alignment: center
+  size: cover
+  repeat: repeat
+  attachment: fixed

@@ -1,0 +1,251 @@
+# Anonymisierte Beispielkonfiguration – zwei Raumvarianten.
+# Raumbezogene Entitäten und Zeitfenster an die eigene Installation anpassen.
+input_boolean:
+  # ------------------------------------------------------
+  # STATUS HEIZUNG - EIN ODER AUS
+  # ------------------------------------------------------
+  status_heizung:
+    name: Status Heizung
+    icon: mdi:account-check
+
+  # ------------------------------------------------------
+  # STATUS MIDEA PORTASPLIT - EIN ODER AUS
+  # ------------------------------------------------------
+  status_midea_portasplit:
+    name: Status Midea Portasplit
+    icon: mdi:account-check
+
+input_number:
+  # ------------------------------------------------------
+  # HEIZUNG - TEMPERATUR ABGESENKT
+  # ------------------------------------------------------
+  heizung_temperatur_abgesenkt:
+    name: Heizung Temperatur abgesenkt
+    min: 0
+    max: 30
+    step: 1
+    unit_of_measurement: "°C"
+    icon: mdi:temperature-celsius
+
+  # ------------------------------------------------------
+  # HEIZUNG - TEMPERATUR MINIMUM
+  # ------------------------------------------------------
+  heizung_temperatur_minimum:
+    name: Heizung Temperatur Minimum
+    min: 0
+    max: 15
+    step: 1
+    unit_of_measurement: "°C"
+    icon: mdi:temperature-celsius
+
+  # ------------------------------------------------------
+  # HEIZUNG - TEMPERATUR STANDARD
+  # ------------------------------------------------------
+  heizung_temperatur_standard:
+    name: Heizung Temperatur Standard
+    min: 0
+    max: 30
+    step: 1
+    unit_of_measurement: "°C"
+    icon: mdi:temperature-celsius
+
+input_select:
+  # ------------------------------------------------------
+  # OPTION MIDEA PORTASPLIT - KÜHLEN, HEIZEN ODER AUS
+  # ------------------------------------------------------
+  option_midea_portasplit:
+    name: Option Midea Portasplit
+    options:
+      - Kühlen
+      - Heizen
+      - Aus
+      - Demontiert
+    icon: mdi:air-conditioner
+
+template:
+  - sensor:
+      # ------------------------------------------------------
+      # HEIZUNG RAUM 1 – STEUERUNG (OHNE MIDEA PORTASPLIT)
+      # ------------------------------------------------------
+      - name: "Heizung Raum1 Steuerung"
+        unique_id: heizung_raum1_steuerung
+        state: >
+          {# ----------------------------------------------- #}
+          {# RAUMSPEZIFISCHE EINSTELLUNGEN                   #}
+          {# ----------------------------------------------- #}
+          {% set arbeitstage = [0, 1, 3, 4] %}
+          {% set absenkung_start = 7 %}
+          {% set absenkung_ende = 15 %}
+          {% set morgenabsenkung = false %}
+          {% set nacht_start = 22 %}
+          {% set nacht_ende = 5 %}
+          {% set nacht_ende_wochenende = 8 %}
+          {% set wochenendtage = [5, 6] %}
+
+          {% set anwesend =
+            is_state('input_boolean.anwesend_person2', 'on')
+            or (
+              is_state('input_boolean.anwesend_person1', 'on')
+              and is_state('input_boolean.home_office_person1', 'off')
+            )
+            or is_state('input_boolean.anwesend_person3','on')
+            or is_state('input_boolean.anwesend_person4','on')
+            or is_state('input_boolean.anwesend_person5','on')
+          %}
+
+          {% set deaktiviert =
+            is_state('input_boolean.status_heizung', 'off')
+          %}
+
+          {% set fenster_offen =
+            is_state('binary_sensor.kontakt_fenster_raum1_contact', 'on')
+          %}
+
+          {% set midea_heizt = false %}
+
+          {% set nacht_ende_aktiv =
+            nacht_ende_wochenende
+            if now().weekday() in wochenendtage
+            else nacht_ende
+          %}         
+
+          {% if deaktiviert %}
+            0
+          {% elif fenster_offen %}
+            1
+          {% elif midea_heizt %}
+            5
+          {% elif now().hour >= nacht_start
+                  or now().hour < nacht_ende_aktiv %}
+            2
+          {% elif now().weekday() in arbeitstage
+                  and (
+                    (morgenabsenkung and now().hour < absenkung_start)
+                    or (
+                      absenkung_start <= now().hour < absenkung_ende
+                      and not anwesend
+                    )
+                  ) %}
+            3
+          {% else %}
+            4
+          {% endif %}
+
+      # ------------------------------------------------------
+      # HEIZUNG RAUM 2 – STEUERUNG (INKL. MIDEA PORTASPLIT)
+      # ------------------------------------------------------
+      - name: "Heizung Raum2 Steuerung"
+        unique_id: heizung_raum2_steuerung
+        state: >
+          {# ----------------------------------------------- #}
+          {# RAUMSPEZIFISCHE EINSTELLUNGEN                   #}
+          {# ----------------------------------------------- #}
+          {% set arbeitstage = [0, 1, 3, 4] %}
+          {% set absenkung_start = 8 %}
+          {% set absenkung_ende = 15 %}
+          {% set morgenabsenkung = true %}
+          {% set nacht_start = 22 %}
+          {% set nacht_ende = 5 %}
+          {% set nacht_ende_wochenende = 8 %}
+          {% set wochenendtage = [5, 6] %}
+
+          {% set anwesend =
+            is_state('input_boolean.anwesend_person2', 'on')
+            or (
+              is_state('input_boolean.anwesend_person1', 'on')
+              and is_state('input_boolean.home_office_person1', 'off')
+            )
+          %}
+
+          {% set deaktiviert =
+            is_state('input_boolean.status_heizung', 'off')
+          %}
+
+          {% set fenster_offen =
+            (
+              is_state('binary_sensor.kontakt_fenster_raum2_gross_contact', 'on')
+              and is_state('input_select.option_midea_portasplit', 'Demontiert')
+            )
+            or is_state('binary_sensor.kontakt_fenster_raum2_klein_contact','on')
+            or is_state('binary_sensor.kontakt_fenster_nachbarraum_gross_contact', 'on')
+            or is_state('binary_sensor.kontakt_fenster_nachbarraum_klein_contact', 'on')
+          %}
+
+          {% set midea_heizt =
+            is_state('input_boolean.status_midea_portasplit', 'on')
+          %}
+
+          {% set nacht_ende_aktiv =
+            nacht_ende_wochenende
+            if now().weekday() in wochenendtage
+            else nacht_ende
+          %}         
+
+          {% if deaktiviert %}
+            0
+          {% elif fenster_offen %}
+            1
+          {% elif midea_heizt %}
+            5
+          {% elif now().hour >= nacht_start
+                  or now().hour < nacht_ende_aktiv %}
+            2
+          {% elif now().weekday() in arbeitstage
+                  and (
+                    (morgenabsenkung and now().hour < absenkung_start)
+                    or (
+                      absenkung_start <= now().hour < absenkung_ende
+                      and not anwesend
+                    )
+                  ) %}
+            3
+          {% else %}
+            4
+          {% endif %}
+
+      # ------------------------------------------------------
+      # HEIZUNG MIDEA PORTASPLIT - SOLLTEMPERATUR
+      # ------------------------------------------------------
+      - name: "Midea PortaSplit Solltemperatur"
+        unique_id: midea_portasplit_solltemperatur
+        unit_of_measurement: "°C"
+        device_class: temperature
+        state: >
+          {% set soc = states('sensor.zendure_gesamt_soc_durchschnitt') | float(0) %}
+
+          {% set standard = states('input_number.heizung_temperatur_standard') | float(21) %}
+          {% set abgesenkt = states('input_number.heizung_temperatur_abgesenkt') | float(19) %}
+
+          {% set nacht_start = 22 %}
+          {% set nacht_ende = 5 %}
+          {% set nacht_ende_wochenende = 8 %}
+          {% set wochenendtage = [5, 6] %}
+
+          {% set nacht_ende_aktiv =
+            nacht_ende_wochenende
+            if now().weekday() in wochenendtage
+            else nacht_ende
+          %}
+
+          {% if now().hour >= nacht_start
+                or now().hour < nacht_ende_aktiv %}
+
+            {{ [abgesenkt, 25] | min }}
+
+          {% else %}
+
+            {% if soc > 90 %}
+              {% set bonus = 4 %}
+            {% elif soc > 80 %}
+              {% set bonus = 3 %}
+            {% elif soc > 70 %}
+              {% set bonus = 2 %}
+            {% elif soc > 60 %}
+              {% set bonus = 1 %}
+            {% else %}
+              {% set bonus = 0 %}
+            {% endif %}
+
+            {{ [standard + bonus, 25] | min }}
+
+          {% endif %}

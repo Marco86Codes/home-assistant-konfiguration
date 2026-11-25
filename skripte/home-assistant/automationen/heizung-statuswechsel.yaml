@@ -1,0 +1,33 @@
+# Anonymisiertes Beispiel – Entitäten und Geräte-ID an die eigene Installation anpassen.
+alias: Heizung Statuswechsel
+description: ''
+triggers:
+- trigger: state
+  entity_id: input_boolean.status_heizung
+  to:
+  - 'on'
+  - 'off'
+conditions: []
+actions:
+- if:
+  - condition: state
+    entity_id: input_boolean.status_heizung
+    state: 'on'
+  then:
+  - action: automation.turn_on
+    target:
+      label_id: heizung
+  - delay: 00:01:00
+  - action: automation.trigger
+    target:
+      label_id: heizung
+    data:
+      skip_condition: true
+  else:
+  - delay: 00:01:00
+  - action: automation.turn_off
+    target:
+      label_id: heizung
+    data:
+      stop_actions: true
+mode: restart

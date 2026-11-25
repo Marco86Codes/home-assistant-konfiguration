@@ -1,0 +1,25 @@
+alias: Zendure 1 MQTT Reconnect nach HA Neustart
+description: Prüft SolarFlow 1 nach HA-Neustart minütlich
+triggers:
+  - trigger: homeassistant
+    event: start
+actions:
+  - delay: '00:01:00'
+  - repeat:
+      while:
+        - condition: template
+          value_template: |-
+            {{ states('sensor.solarflow_800_plus_1_electric_level')
+               in ['unknown', 'unavailable', 'none', '']
+               or
+               states('number.solarflow_800_plus_1_min_soc')
+               in ['unknown', 'unavailable', 'none', ''] }}
+      sequence:
+        - action: shell_command.wakeup_zendure_1
+          continue_on_error: true
+        - delay:
+            hours: 0
+            minutes: 1
+            seconds: 0
+            milliseconds: 0
+mode: single

@@ -1,0 +1,93 @@
+# Anonymisiertes Beispiel – Entitäten und Geräte-ID an die eigene Installation anpassen.
+# Kalibrierung und Ventilschließgrad sind Beispielwerte und gerätespezifisch anzupassen.
+alias: Heizung Raum2 - Geräteeinstellungen & externe Temperatur
+description: 'Überwacht und korrigiert die SONOFF TRVZB-Einstellungen (Temperaturkalibrierung, Temperature Accuracy, Valve
+  Closing Degree, Child Lock und PID) und überträgt die Temperatur des externen Sensors.
+
+  '
+triggers:
+- trigger: state
+  entity_id:
+  - number.heizung_raum2_local_temperature_calibration
+  - number.heizung_raum2_temperature_accuracy
+  - number.heizung_raum2_valve_closing_degree
+  - select.heizung_raum2_temperature_sensor_select
+  - switch.heizung_raum2_child_lock
+  - switch.heizung_raum2_smart_temperature_control
+  - sensor.thermostat_raum2_temperature
+- trigger: homeassistant
+  event: start
+- trigger: time_pattern
+  minutes: /5
+conditions: []
+actions:
+- if:
+  - condition: state
+    entity_id: switch.heizung_raum2_child_lock
+    state: 'off'
+  then:
+  - action: switch.turn_on
+    target:
+      entity_id: switch.heizung_raum2_child_lock
+- if:
+  - condition: template
+    value_template: "{{ is_number(states('number.heizung_raum2_local_temperature_calibration'))\n   and (states('number.heizung_raum2_local_temperature_calibration')\n\
+      \   | float - (-1.6)) | abs > 0.01 }}\n"
+  then:
+  - action: number.set_value
+    target:
+      entity_id: number.heizung_raum2_local_temperature_calibration
+    data:
+      value: -1.6
+- if:
+  - condition: state
+    entity_id: switch.heizung_raum2_smart_temperature_control
+    state: 'on'
+  then:
+  - action: switch.turn_off
+    target:
+      entity_id: switch.heizung_raum2_smart_temperature_control
+- if:
+  - condition: template
+    value_template: "{{ is_number(states('number.heizung_raum2_temperature_accuracy'))\n   and (states('number.heizung_raum2_temperature_accuracy')\n\
+      \   | float - (-0.4)) | abs > 0.01 }}\n"
+  then:
+  - action: number.set_value
+    target:
+      entity_id: number.heizung_raum2_temperature_accuracy
+    data:
+      value: -0.4
+- if:
+  - condition: template
+    value_template: "{{ states('select.heizung_raum2_temperature_sensor_select')\n   not in ['remote_temperature', 'unknown',\
+      \ 'unavailable'] }}\n"
+  then:
+  - action: select.select_option
+    target:
+      entity_id: select.heizung_raum2_temperature_sensor_select
+    data:
+      option: remote_temperature
+- if:
+  - condition: template
+    value_template: "{{ is_number(states('number.heizung_raum2_valve_closing_degree'))\n   and states('number.heizung_raum2_valve_closing_degree')\n\
+      \   | float != 90 }}\n"
+  then:
+  - action: number.set_value
+    target:
+      entity_id: number.heizung_raum2_valve_closing_degree
+    data:
+      value: 90
+- if:
+  - condition: template
+    value_template: '{{ is_number(states(''sensor.thermostat_raum2_temperature'')) }}
+
+      '
+  then:
+  - action: number.set_value
+    target:
+      entity_id: number.heizung_raum2_external_temperature_input
+    data:
+      value: '{{ states(''sensor.thermostat_raum2_temperature'') | float }}
+
+        '
+mode: restart

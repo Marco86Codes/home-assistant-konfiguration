@@ -1,0 +1,79 @@
+# Anonymisiertes Beispiel – Entitäten und Geräte-ID an die eigene Installation anpassen.
+# Kalibrierung und Ventilschließgrad sind Beispielwerte und gerätespezifisch anzupassen.
+alias: Heizung Raum1 - Geräteeinstellungen
+description: 'Überwacht und korrigiert die SONOFF TRVZB-Einstellungen (Temperaturkalibrierung, Temperature Accuracy, Valve
+  Closing Degree, Child Lock und PID).
+
+  '
+triggers:
+- trigger: state
+  entity_id:
+  - number.heizung_raum1_local_temperature_calibration
+  - number.heizung_raum1_temperature_accuracy
+  - number.heizung_raum1_valve_closing_degree
+  - switch.heizung_raum1_child_lock
+  - switch.heizung_raum1_smart_temperature_control
+  - select.heizung_raum1_temperature_sensor_select
+- trigger: homeassistant
+  event: start
+- trigger: time_pattern
+  hours: /1
+conditions: []
+actions:
+- if:
+  - condition: state
+    entity_id: switch.heizung_raum1_child_lock
+    state: 'off'
+  then:
+  - action: switch.turn_on
+    target:
+      entity_id: switch.heizung_raum1_child_lock
+- if:
+  - condition: template
+    value_template: "{{ is_number(states('number.heizung_raum1_local_temperature_calibration'))\n   and (states('number.heizung_raum1_local_temperature_calibration')\n\
+      \   | float - (-1.4)) | abs > 0.01 }}\n"
+  then:
+  - action: number.set_value
+    target:
+      entity_id: number.heizung_raum1_local_temperature_calibration
+    data:
+      value: -1.4
+- if:
+  - condition: state
+    entity_id: switch.heizung_raum1_smart_temperature_control
+    state: 'on'
+  then:
+  - action: switch.turn_off
+    target:
+      entity_id: switch.heizung_raum1_smart_temperature_control
+- if:
+  - condition: template
+    value_template: "{{ is_number(states('number.heizung_raum1_temperature_accuracy'))\n   and (states('number.heizung_raum1_temperature_accuracy')\n\
+      \   | float - (-0.4)) | abs > 0.01 }}\n"
+  then:
+  - action: number.set_value
+    target:
+      entity_id: number.heizung_raum1_temperature_accuracy
+    data:
+      value: '-0.4'
+- if:
+  - condition: template
+    value_template: "{{ states('select.heizung_raum1_temperature_sensor_select')\n   not in ['local_temperature', 'unknown',\
+      \ 'unavailable'] }}\n"
+  then:
+  - action: select.select_option
+    target:
+      entity_id: select.heizung_raum1_temperature_sensor_select
+    data:
+      option: local_temperature
+- if:
+  - condition: template
+    value_template: "{{ is_number(states('number.heizung_raum1_valve_closing_degree'))\n   and states('number.heizung_raum1_valve_closing_degree')\n\
+      \   | float != 95 }}\n"
+  then:
+  - action: number.set_value
+    target:
+      entity_id: number.heizung_raum1_valve_closing_degree
+    data:
+      value: 95
+mode: restart

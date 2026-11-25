@@ -1,0 +1,32 @@
+
+alias: Aktualisierung Status Home Office
+description: >-
+  Aktualisiert den Home-Office-Status anhand des WLAN-Geräte-Trackers.
+  Bei home wird der Helfer eingeschaltet, bei not_home ausgeschaltet.
+  Bei unknown oder unavailable bleibt der letzte Status erhalten.
+triggers:
+  - trigger: state
+    entity_id:
+      - device_tracker.laptop_person1_wlan
+  - trigger: homeassistant
+    event: start
+conditions: []
+actions:
+  - choose:
+      - conditions:
+          - condition: state
+            entity_id: device_tracker.laptop_person1_wlan
+            state: "home"
+        sequence:
+          - action: input_boolean.turn_on
+            target:
+              entity_id: input_boolean.home_office_person1
+      - conditions:
+          - condition: state
+            entity_id: device_tracker.laptop_person1_wlan
+            state: "not_home"
+        sequence:
+          - action: input_boolean.turn_off
+            target:
+              entity_id: input_boolean.home_office_person1
+mode: restart

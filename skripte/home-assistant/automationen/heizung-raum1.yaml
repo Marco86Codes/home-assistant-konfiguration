@@ -1,0 +1,157 @@
+# Anonymisiertes Beispiel – Entitäten und Geräte-ID an die eigene Installation anpassen.
+# Für Raum2 duplizieren und Alias sowie Raum-Entitäten entsprechend ersetzen.
+alias: Heizung Raum1
+description: '0 = Heizung global ausgeschaltet
+
+  1 = Fenster oder Tür geöffnet
+
+  2 = Nachtabsenkung
+
+  3 = Morgenabsenkung oder Abwesenheitsabsenkung
+
+  4 = Standardbetrieb
+
+  5 = Midea übernimmt den Heizbetrieb'
+triggers:
+- trigger: state
+  entity_id: sensor.heizung_raum1_steuerung
+- trigger: homeassistant
+  event: start
+conditions: []
+actions:
+- variables:
+    status: '{{ states(''sensor.heizung_raum1_steuerung'') | int(-1) }}'
+- choose:
+  - conditions:
+    - condition: state
+      entity_id: sensor.heizung_raum1_steuerung
+      state:
+      - '0'
+    sequence:
+    - action: climate.set_hvac_mode
+      target:
+        entity_id: climate.heizung_raum1
+      data:
+        hvac_mode: 'off'
+  - conditions:
+    - condition: state
+      entity_id: sensor.heizung_raum1_steuerung
+      state:
+      - '1'
+    sequence:
+    - delay: 00:02:00
+    - condition: state
+      entity_id: sensor.heizung_raum1_steuerung
+      state: '1'
+    - action: climate.set_hvac_mode
+      target:
+        entity_id: climate.heizung_raum1
+      data:
+        hvac_mode: heat
+    - action: climate.set_temperature
+      target:
+        entity_id: climate.heizung_raum1
+      data:
+        temperature: '{{ states(''input_number.heizung_temperatur_minimum'') | float(5) }}
+
+          '
+  - conditions:
+    - condition: state
+      entity_id: sensor.heizung_raum1_steuerung
+      state:
+      - '2'
+    sequence:
+    - action: climate.set_hvac_mode
+      target:
+        entity_id: climate.heizung_raum1
+      data:
+        hvac_mode: heat
+    - action: climate.set_temperature
+      target:
+        entity_id: climate.heizung_raum1
+      data:
+        temperature: '{{ states(''input_number.heizung_temperatur_abgesenkt'') | float(20) }}
+
+          '
+  - conditions:
+    - condition: state
+      entity_id: sensor.heizung_raum1_steuerung
+      state:
+      - '3'
+    sequence:
+    - delay:
+        hours: 0
+        minutes: 10
+        seconds: 0
+        milliseconds: 0
+    - condition: state
+      entity_id: sensor.heizung_raum1_steuerung
+      state:
+      - '3'
+    - action: climate.set_hvac_mode
+      target:
+        entity_id: climate.heizung_raum1
+      data:
+        hvac_mode: heat
+    - action: climate.set_temperature
+      target:
+        entity_id: climate.heizung_raum1
+      data:
+        temperature: '{{ states(''input_number.heizung_temperatur_abgesenkt'') | float(20) }}
+
+          '
+  - conditions:
+    - condition: state
+      entity_id: sensor.heizung_raum1_steuerung
+      state:
+      - '4'
+    sequence:
+    - delay:
+        hours: 0
+        minutes: 2
+        seconds: 0
+        milliseconds: 0
+    - condition: state
+      entity_id: sensor.heizung_raum1_steuerung
+      state:
+      - '4'
+    - action: climate.set_hvac_mode
+      target:
+        entity_id: climate.heizung_raum1
+      data:
+        hvac_mode: heat
+    - action: climate.set_temperature
+      target:
+        entity_id: climate.heizung_raum1
+      data:
+        temperature: '{{ states(''input_number.heizung_temperatur_standard'') | float(22) }}
+
+          '
+  - conditions:
+    - condition: state
+      entity_id: sensor.heizung_raum1_steuerung
+      state:
+      - '5'
+    sequence:
+    - delay:
+        hours: 0
+        minutes: 2
+        seconds: 0
+        milliseconds: 0
+    - condition: state
+      entity_id: sensor.heizung_raum1_steuerung
+      state:
+      - '5'
+    - action: climate.set_hvac_mode
+      target:
+        entity_id: climate.heizung_raum1
+      data:
+        hvac_mode: heat
+    - action: climate.set_temperature
+      target:
+        entity_id: climate.heizung_raum1
+      data:
+        temperature: '{{ states(''input_number.heizung_temperatur_minimum'') | float(5) }}
+
+          '
+mode: restart
